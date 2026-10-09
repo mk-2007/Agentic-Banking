@@ -15,8 +15,8 @@ gateway can replace the simulator later.
 | Phase | What | State |
 |---|---|---|
 | 0 | Scaffold, tooling, CI, architecture tests, context graph | done |
-| 1 | Domain contracts (case, evidence, decision, tool, audit schemas) | next |
-| 2 | Simulated bank, synthetic data, policy document | planned |
+| 1 | Domain contracts (case, evidence, decision, approval, tool, audit) with safety invariants | done |
+| 2 | Simulated bank, synthetic data, policy document | next |
 | 3 | Security, audit and tool layer (before any LLM) | planned |
 | 4 | RAG over knowledge base and policies | planned |
 | 5 | Specialist agents with small evals | planned |
@@ -74,10 +74,17 @@ a test (`backend/tests/architecture/test_layer_rules.py`), so CI fails if it is 
 `docs/context/graph.json` records modules, phases, decisions and how they relate; `AGENTS.md`
 explains how to use and update it. A test fails if the graph drifts from the code.
 
+## Domain contracts
+
+Phase 1 defines the data models and safety rules every layer shares: a closed set of actions, a case
+state machine, a decision object that cannot be built unsafely, approval evaluation, and a
+tamper-evident audit chain. See [docs/domain-contracts.md](docs/domain-contracts.md).
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
 - [ADR 0002](docs/adr/0002-swappable-decision-provider.md): the decision layer is a swappable provider; no JEV dependency (we have no access).
+- [ADR 0003](docs/adr/0003-safety-invariants-live-in-the-contracts.md): safety invariants are enforced by the domain contracts themselves.
 
 ## Scope and limits
 
