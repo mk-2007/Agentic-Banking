@@ -1,0 +1,658 @@
+{
+  "version": 1,
+  "description": "Machine-readable project memory. Read AGENTS.md first. Validated by backend/tests/architecture/test_context_graph.py.",
+  "nodes": [
+    {
+      "id": "module:domain",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/domain",
+      "summary": "Pure models/enums (Case, Decision, Action, Evidence); no I/O"
+    },
+    {
+      "id": "module:config",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/config",
+      "summary": "Settings, thresholds, approval matrix"
+    },
+    {
+      "id": "module:security",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/security",
+      "summary": "Roles, permissions, deterministic policy engine"
+    },
+    {
+      "id": "module:audit",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/audit",
+      "summary": "Append-only audit log"
+    },
+    {
+      "id": "module:bank_sim",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/bank_sim",
+      "summary": "Simulated bank APIs + seed data (swappable for a real gateway)"
+    },
+    {
+      "id": "module:llm",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/llm",
+      "summary": "Provider-agnostic model gateway"
+    },
+    {
+      "id": "module:rag",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/rag",
+      "summary": "Ingestion, chunking, metadata-filtered retrieval over bank policy"
+    },
+    {
+      "id": "module:tools",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/tools",
+      "summary": "Only door from agents to the bank; enforces schema, permissions, audit"
+    },
+    {
+      "id": "module:decision",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/decision",
+      "summary": "DecisionProvider interface; rule scorer + LLM provider; optional JEV adapter later"
+    },
+    {
+      "id": "module:approvals",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/approvals",
+      "summary": "Human-in-the-loop approve/reject/modify/escalate"
+    },
+    {
+      "id": "module:agents",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/agents",
+      "summary": "Specialist agents, one job each"
+    },
+    {
+      "id": "module:orchestration",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/orchestration",
+      "summary": "LangGraph graph + case state machine"
+    },
+    {
+      "id": "module:api",
+      "type": "module",
+      "status": "planned",
+      "path": "backend/src/nexa/api",
+      "summary": "Thin FastAPI layer"
+    },
+    {
+      "id": "doc:prd",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/source/PRD_technical_architecture.docx",
+      "summary": "Product/technical spec: principles, agents, tools, risk levels, scenarios A-E"
+    },
+    {
+      "id": "doc:kb",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/source/NexaBank_RAG_Knowledge_Base.docx",
+      "summary": "Synthetic NexaBank knowledge base for the customer chatbot channel"
+    },
+    {
+      "id": "doc:architecture",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/architecture.md",
+      "summary": "Layers, dependency rule, request flow"
+    },
+    {
+      "id": "doc:readme",
+      "type": "doc",
+      "status": "done",
+      "path": "README.md",
+      "summary": "Human entry point and live status"
+    },
+    {
+      "id": "doc:agents-guide",
+      "type": "doc",
+      "status": "done",
+      "path": "AGENTS.md",
+      "summary": "Operating manual for AI agents working on this repo"
+    },
+    {
+      "id": "doc:log",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/PROJECT_LOG.md",
+      "summary": "Chronological record of what was done and decided"
+    },
+    {
+      "id": "adr:0001",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md",
+      "summary": "Strict layer rule; agents reach the bank only via tools; auth is code"
+    },
+    {
+      "id": "adr:0002",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0002-swappable-decision-provider.md",
+      "summary": "Decision layer behind an interface; no JEV dependency"
+    },
+    {
+      "id": "concept:controlled-autonomy",
+      "type": "concept",
+      "status": "done",
+      "summary": "Agents recommend; deterministic code + humans authorize consequential actions"
+    },
+    {
+      "id": "concept:risk-levels",
+      "type": "concept",
+      "status": "done",
+      "summary": "Actions are Level 1-4; Level 4 needs two humans"
+    },
+    {
+      "id": "concept:decision-provider",
+      "type": "concept",
+      "status": "done",
+      "summary": "Swappable ranking of a closed set of candidate actions"
+    },
+    {
+      "id": "concept:jev-optional",
+      "type": "concept",
+      "status": "done",
+      "summary": "TypeSafe JEV is a possible future provider; no access now"
+    },
+    {
+      "id": "phase:0",
+      "type": "phase",
+      "status": "done",
+      "summary": "Scaffold, tooling, CI, architecture tests, context graph"
+    },
+    {
+      "id": "phase:1",
+      "type": "phase",
+      "status": "planned",
+      "summary": "Domain contracts: schemas for case, evidence, decision, tool, audit"
+    },
+    {
+      "id": "phase:2",
+      "type": "phase",
+      "status": "planned",
+      "summary": "bank_sim + synthetic data + policy document for scenarios A-E and injection case"
+    },
+    {
+      "id": "phase:3",
+      "type": "phase",
+      "status": "planned",
+      "summary": "security + audit + tools layer with tests (before any LLM)"
+    },
+    {
+      "id": "phase:4",
+      "type": "phase",
+      "status": "planned",
+      "summary": "RAG over KB and policy docs"
+    },
+    {
+      "id": "phase:5",
+      "type": "phase",
+      "status": "planned",
+      "summary": "Individual agents with small evals"
+    },
+    {
+      "id": "phase:6",
+      "type": "phase",
+      "status": "planned",
+      "summary": "LangGraph orchestration, approval interrupt, loop limits"
+    },
+    {
+      "id": "phase:7",
+      "type": "phase",
+      "status": "planned",
+      "summary": "Decision providers wired in; baseline vs LLM evaluation"
+    },
+    {
+      "id": "phase:8",
+      "type": "phase",
+      "status": "planned",
+      "summary": "API, frontend, evaluation report, demo script"
+    }
+  ],
+  "edges": [
+    {
+      "from": "module:config",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:security",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:security",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:audit",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:audit",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:bank_sim",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:bank_sim",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:llm",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:llm",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:rag",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:rag",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:rag",
+      "to": "module:llm",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:audit",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:bank_sim",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:rag",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:tools",
+      "to": "module:security",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:decision",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:decision",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:decision",
+      "to": "module:llm",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:approvals",
+      "to": "module:audit",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:approvals",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:approvals",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:approvals",
+      "to": "module:security",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:approvals",
+      "to": "module:tools",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:decision",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:llm",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:rag",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:agents",
+      "to": "module:tools",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:agents",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:approvals",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:audit",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:decision",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:security",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:orchestration",
+      "to": "module:tools",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:agents",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:approvals",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:audit",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:bank_sim",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:decision",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:llm",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:orchestration",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:rag",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:security",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:tools",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:0",
+      "to": "doc:readme",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:0",
+      "to": "doc:architecture",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:1",
+      "to": "module:domain",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:2",
+      "to": "module:bank_sim",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:2",
+      "to": "module:config",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:3",
+      "to": "module:security",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:3",
+      "to": "module:audit",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:3",
+      "to": "module:tools",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:4",
+      "to": "module:rag",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:4",
+      "to": "module:llm",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:5",
+      "to": "module:agents",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:6",
+      "to": "module:orchestration",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:6",
+      "to": "module:approvals",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:7",
+      "to": "module:decision",
+      "relation": "implements"
+    },
+    {
+      "from": "phase:8",
+      "to": "module:api",
+      "relation": "implements"
+    },
+    {
+      "from": "adr:0001",
+      "to": "concept:controlled-autonomy",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0002",
+      "to": "concept:decision-provider",
+      "relation": "decides"
+    },
+    {
+      "from": "concept:controlled-autonomy",
+      "to": "module:tools",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:controlled-autonomy",
+      "to": "module:approvals",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:risk-levels",
+      "to": "module:security",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:decision-provider",
+      "to": "module:decision",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:jev-optional",
+      "to": "module:decision",
+      "relation": "constrains"
+    },
+    {
+      "from": "doc:prd",
+      "to": "concept:controlled-autonomy",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:prd",
+      "to": "concept:risk-levels",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:kb",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:architecture",
+      "to": "module:domain",
+      "relation": "documents"
+    },
+    {
+      "from": "phase:2",
+      "to": "phase:1",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:3",
+      "to": "phase:2",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:4",
+      "to": "phase:3",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:5",
+      "to": "phase:4",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:6",
+      "to": "phase:5",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:7",
+      "to": "phase:6",
+      "relation": "depends_on"
+    },
+    {
+      "from": "phase:8",
+      "to": "phase:7",
+      "relation": "depends_on"
+    }
+  ]
+}
