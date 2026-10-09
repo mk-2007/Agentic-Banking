@@ -5,7 +5,7 @@
     {
       "id": "module:domain",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/domain",
       "summary": "Pure models/enums (Case, Decision, Action, Evidence); no I/O"
     },
@@ -182,7 +182,7 @@
     {
       "id": "phase:1",
       "type": "phase",
-      "status": "planned",
+      "status": "done",
       "summary": "Domain contracts: schemas for case, evidence, decision, tool, audit"
     },
     {
@@ -226,6 +226,20 @@
       "type": "phase",
       "status": "planned",
       "summary": "API, frontend, evaluation report, demo script"
+    },
+    {
+      "id": "doc:domain-contracts",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/domain-contracts.md",
+      "summary": "Table of every contract and the rules each enforces; decision invariants; case lifecycle"
+    },
+    {
+      "id": "adr:0003",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0003-safety-invariants-live-in-the-contracts.md",
+      "summary": "Safety invariants are validators on domain models so any provider is checked identically"
     }
   ],
   "edges": [
@@ -653,6 +667,21 @@
       "from": "phase:8",
       "to": "phase:7",
       "relation": "depends_on"
+    },
+    {
+      "from": "doc:domain-contracts",
+      "to": "module:domain",
+      "relation": "documents"
+    },
+    {
+      "from": "adr:0003",
+      "to": "concept:controlled-autonomy",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0003",
+      "to": "module:domain",
+      "relation": "constrains"
     }
   ]
 }
