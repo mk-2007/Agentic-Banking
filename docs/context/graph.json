@@ -12,7 +12,7 @@
     {
       "id": "module:config",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/config",
       "summary": "Settings, thresholds, approval matrix"
     },
@@ -33,7 +33,7 @@
     {
       "id": "module:bank_sim",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/bank_sim",
       "summary": "Simulated bank APIs + seed data (swappable for a real gateway)"
     },
@@ -188,7 +188,7 @@
     {
       "id": "phase:2",
       "type": "phase",
-      "status": "planned",
+      "status": "done",
       "summary": "bank_sim + synthetic data + policy document for scenarios A-E and injection case"
     },
     {
@@ -240,6 +240,47 @@
       "status": "done",
       "path": "docs/adr/0003-safety-invariants-live-in-the-contracts.md",
       "summary": "Safety invariants are validators on domain models so any provider is checked identically"
+    },
+    {
+      "id": "doc:synthetic-data",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/synthetic-data.md",
+      "summary": "Dataset contents, scenarios A-E plus F and X with expected handling, thresholds in force"
+    },
+    {
+      "id": "doc:policy-fraud",
+      "type": "doc",
+      "status": "done",
+      "path": "data/policies/NB-POL-FRAUD-001_fraud_detection_and_response.md",
+      "summary": "Synthetic fraud policy: indicators, thresholds, allowed responses"
+    },
+    {
+      "id": "doc:policy-aml",
+      "type": "doc",
+      "status": "done",
+      "path": "data/policies/NB-POL-AML-001_kyc_and_aml_escalation.md",
+      "summary": "Synthetic KYC/AML policy: missing items, mismatches, escalation"
+    },
+    {
+      "id": "doc:policy-auth",
+      "type": "doc",
+      "status": "done",
+      "path": "data/policies/NB-POL-AUTH-001_action_authorization_matrix.md",
+      "summary": "Synthetic approval matrix: who approves what, expiry, rules"
+    },
+    {
+      "id": "adr:0004",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0004-bank-access-through-gateway-protocols.md",
+      "summary": "Bank access via Protocols; deterministic committed synthetic data"
+    },
+    {
+      "id": "concept:evaluation-scenarios",
+      "type": "concept",
+      "status": "done",
+      "summary": "Seven scenarios as data in data/synthetic/scenarios.json; the Phase 7 evaluation set"
     }
   ],
   "edges": [
@@ -682,6 +723,61 @@
       "from": "adr:0003",
       "to": "module:domain",
       "relation": "constrains"
+    },
+    {
+      "from": "doc:synthetic-data",
+      "to": "module:bank_sim",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:synthetic-data",
+      "to": "concept:evaluation-scenarios",
+      "relation": "documents"
+    },
+    {
+      "from": "concept:evaluation-scenarios",
+      "to": "module:bank_sim",
+      "relation": "constrains"
+    },
+    {
+      "from": "doc:policy-fraud",
+      "to": "module:config",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:policy-aml",
+      "to": "module:config",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:policy-auth",
+      "to": "module:config",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:policy-fraud",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:policy-aml",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:policy-auth",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "adr:0004",
+      "to": "module:bank_sim",
+      "relation": "constrains"
+    },
+    {
+      "from": "adr:0004",
+      "to": "concept:controlled-autonomy",
+      "relation": "decides"
     }
   ]
 }
