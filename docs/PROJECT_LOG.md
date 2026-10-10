@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-10 - Phase 2: simulated bank, data and policies
+- Added `bank_sim`: record models, `BankGateway` Protocols (customer, account, transaction, KYC, actions) and a deterministic in-memory bank (ADR 0004).
+- Added `config`: fraud thresholds and the approval matrix (Level 4 = fraud analyst + risk officer; expiries 60/120/240 minutes).
+- Added a deterministic data generator and committed dataset (23 customers, 865 transactions); a test regenerates it to prove it matches.
+- Defined 7 scenarios as data: PRD A-E plus F (account takeover, Level 4 approval) and X (prompt injection).
+- Wrote 3 synthetic policy documents with KB section 19.2 metadata; a test keeps their numbers identical to config.
+- 107 tests pass. Next: Phase 3, security + audit + tool layer (before any LLM).
+
 ## 2026-10-09 - Phase 1: domain contracts
 - Added immutable, strict contracts: actions/risk, actors, evidence, case state machine, decision, approval, tool, audit.
 - Safety rules are validators (ADR 0003): unsafe decisions cannot be constructed; Level 4 needs two approver roles; audit events form a hash chain.

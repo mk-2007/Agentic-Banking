@@ -16,8 +16,8 @@ gateway can replace the simulator later.
 |---|---|---|
 | 0 | Scaffold, tooling, CI, architecture tests, context graph | done |
 | 1 | Domain contracts (case, evidence, decision, approval, tool, audit) with safety invariants | done |
-| 2 | Simulated bank, synthetic data, policy document | next |
-| 3 | Security, audit and tool layer (before any LLM) | planned |
+| 2 | Simulated bank, synthetic data, policy documents, approval matrix | done |
+| 3 | Security, audit and tool layer (before any LLM) | next |
 | 4 | RAG over knowledge base and policies | planned |
 | 5 | Specialist agents with small evals | planned |
 | 6 | LangGraph orchestration with human approval | planned |
@@ -52,7 +52,8 @@ directly: every access passes through a tool layer that enforces permissions and
 | `docs/adr/` | Architecture decision records: why things are the way they are |
 | `docs/context/graph.json` | Machine-readable project memory for AI agents |
 | `AGENTS.md` | Operating manual for AI agents working here |
-| `data/` | Synthetic customers/transactions and policy documents |
+| `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents |
+| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh` |
 
 ## Quickstart
 
@@ -80,11 +81,19 @@ Phase 1 defines the data models and safety rules every layer shares: a closed se
 state machine, a decision object that cannot be built unsafely, approval evaluation, and a
 tamper-evident audit chain. See [docs/domain-contracts.md](docs/domain-contracts.md).
 
+## Simulated bank and data
+
+Phase 2 adds a deterministic simulated bank behind gateway interfaces, 865 synthetic transactions,
+three synthetic policy documents, the fraud thresholds and approval matrix as configuration, and seven
+evaluation scenarios (PRD A-E plus an account-takeover and a prompt-injection case). See
+[docs/synthetic-data.md](docs/synthetic-data.md).
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
 - [ADR 0002](docs/adr/0002-swappable-decision-provider.md): the decision layer is a swappable provider; no JEV dependency (we have no access).
 - [ADR 0003](docs/adr/0003-safety-invariants-live-in-the-contracts.md): safety invariants are enforced by the domain contracts themselves.
+- [ADR 0004](docs/adr/0004-bank-access-through-gateway-protocols.md): bank access goes through gateway Protocols; synthetic data is deterministic.
 
 ## Scope and limits
 
