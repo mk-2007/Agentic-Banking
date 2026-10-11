@@ -11,6 +11,7 @@ from nexa.domain.actions import ActionType
 from nexa.domain.actors import Actor, ActorKind, Role
 from nexa.domain.approval import ApprovalRequest, ApprovalVote, Verdict
 from nexa.domain.tooling import ToolCall
+from nexa.rag import load_knowledge_base
 from nexa.security import CaseScope
 from nexa.tools import ToolContext, ToolRegistry, build_default_registry
 
@@ -71,6 +72,7 @@ class Env:
             bank=self.bank,
             scopes=self.scopes,
             approvals=self.approvals,
+            knowledge=load_knowledge_base(),
             audit=AuditRecorder(self.log, clock=lambda: self.now),
             clock=lambda: self.now,
         )

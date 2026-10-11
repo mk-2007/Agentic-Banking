@@ -13,7 +13,9 @@ from nexa.audit import AuditRecorder
 from nexa.bank_sim.gateway import BankGateway
 from nexa.domain.base import JsonDict
 from nexa.domain.clock import Clock
+from nexa.domain.evidence import PolicyRef
 from nexa.domain.tooling import ToolCall, ToolSpec
+from nexa.rag import KnowledgeSearch
 from nexa.security import ApprovalSource, CaseScopeProvider, check_scope
 
 
@@ -24,6 +26,7 @@ class ToolContext:
     bank: BankGateway
     scopes: CaseScopeProvider
     approvals: ApprovalSource
+    knowledge: KnowledgeSearch
     audit: AuditRecorder
     clock: Clock
 
@@ -54,3 +57,7 @@ class Tool(ABC):
         for anything not allowed. They never write audit events about the call itself; the
         registry does.
         """
+
+    def policy_refs(self, output: JsonDict) -> tuple[PolicyRef, ...]:
+        """Return the policy documents ``output`` was drawn from, for the audit record."""
+        return ()

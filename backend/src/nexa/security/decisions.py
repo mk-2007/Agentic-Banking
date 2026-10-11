@@ -23,6 +23,7 @@ class DenialReason(StrEnum):
     APPROVAL_NOT_APPROVED = "approval_not_approved"
     APPROVAL_ALREADY_USED = "approval_already_used"
     UNSUPPORTED_ACTION = "unsupported_action"
+    NO_CLEARANCE = "no_clearance"
 
 
 class AuthorizationDecision(Contract):
