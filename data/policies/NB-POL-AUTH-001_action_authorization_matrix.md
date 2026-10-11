@@ -9,6 +9,7 @@ status: Active
 access_level: Internal Prototype
 product: Agentic Operations
 jurisdiction: Pakistan Prototype
+sensitivity: internal
 ---
 
 # Action Authorization Matrix (synthetic prototype policy)

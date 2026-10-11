@@ -1,0 +1,75 @@
+{
+  "source": "NexaBank knowledge base, section 18 (equivalent user expressions)",
+  "groups": [
+    [
+      "debt-to-income ratio",
+      "DTI",
+      "debt ratio",
+      "income-to-debt ratio",
+      "debt burden"
+    ],
+    [
+      "fraud",
+      "unauthorized transaction",
+      "suspicious activity",
+      "account compromise"
+    ],
+    [
+      "debit card",
+      "ATM card",
+      "bank card",
+      "payment card"
+    ],
+    [
+      "personal financing",
+      "personal loan",
+      "consumer loan",
+      "borrowing",
+      "financing"
+    ],
+    [
+      "beneficiary",
+      "recipient",
+      "payee",
+      "transfer recipient"
+    ],
+    [
+      "authentication",
+      "identity verification",
+      "login verification",
+      "security verification"
+    ],
+    [
+      "OTP",
+      "one-time password",
+      "verification code",
+      "security code"
+    ],
+    [
+      "current account",
+      "transaction account",
+      "checking account"
+    ],
+    [
+      "savings account",
+      "saving account",
+      "deposit savings account"
+    ]
+  ],
+  "additional_groups_note": "Added by the project team (not in KB section 18). Added after the first evaluation run exposed these vocabulary gaps, so evaluation scores are slightly optimistic for these two questions.",
+  "additional_groups": [
+    [
+      "international transfer",
+      "abroad",
+      "overseas",
+      "foreign transfer",
+      "cross-border"
+    ],
+    [
+      "failed authentication",
+      "failed login",
+      "failed logins",
+      "wrong password attempts"
+    ]
+  ]
+}

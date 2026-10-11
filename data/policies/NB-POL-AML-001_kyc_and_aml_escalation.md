@@ -9,6 +9,7 @@ status: Active
 access_level: Internal Prototype
 product: Customer Onboarding
 jurisdiction: Pakistan Prototype
+sensitivity: restricted
 ---
 
 # KYC Completeness and AML Escalation (synthetic prototype policy)
