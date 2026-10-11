@@ -41,6 +41,9 @@ class ApprovalRequest(Contract):
     id: str = Field(min_length=1)
     case_id: str = Field(min_length=1)
     decision_id: str = Field(min_length=1)
+    target_account_id: str = Field(
+        min_length=1, description="The one account this approval authorizes action on."
+    )
     action: ActionType
     risk_level: RiskLevel
     required_roles: tuple[Role, ...] = Field(min_length=1)

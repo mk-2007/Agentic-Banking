@@ -81,6 +81,7 @@ def make_request(
         id="apr_1",
         case_id="case_1",
         decision_id="dec_1",
+        target_account_id="acc_1",
         action=action,
         risk_level=risk_level_for(action),
         required_roles=roles,

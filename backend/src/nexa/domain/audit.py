@@ -26,6 +26,7 @@ class AuditEventType(StrEnum):
     CASE_CREATED = "case_created"
     STATE_CHANGED = "state_changed"
     TOOL_CALLED = "tool_called"
+    TOOL_COMPLETED = "tool_completed"
     TOOL_DENIED = "tool_denied"
     EVIDENCE_RECORDED = "evidence_recorded"
     POLICY_RETRIEVED = "policy_retrieved"
