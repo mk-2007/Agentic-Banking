@@ -1,0 +1,390 @@
+{
+ "description": "Retrieval evaluation set. A hit counts if its 'document_id:section' equals one of 'expected'.",
+ "items": [
+  {
+   "id": "ATM daily limit",
+   "query": "What is the daily ATM withdrawal limit?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:4.1",
+    "NB-KB-001:9",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "current account fee",
+   "query": "How much is the monthly fee on a current account?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.1",
+    "NB-KB-001:9",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "savings fee waiver",
+   "query": "How can I avoid the savings account monthly fee?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.2",
+    "NB-KB-001:9",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "student eligibility",
+   "query": "Who can open a student account?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.3",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "lost card",
+   "query": "I lost my debit card, what should I do?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:4.2"
+   ]
+  },
+  {
+   "id": "fraud hotline",
+   "query": "What is the fraud hotline number?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:10.1"
+   ]
+  },
+  {
+   "id": "max loan",
+   "query": "What is the maximum personal loan amount?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.1",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "DTI meaning",
+   "query": "What does DTI mean?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.3",
+    "NB-KB-001:15"
+   ]
+  },
+  {
+   "id": "debt ratio synonym",
+   "query": "My debt ratio is 52 percent, is that a problem?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.3"
+   ]
+  },
+  {
+   "id": "loan tenure",
+   "query": "How many months can I take a personal loan for?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.1",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "loan documents",
+   "query": "What documents do I need for personal financing?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.4"
+   ]
+  },
+  {
+   "id": "online transfer limit",
+   "query": "How much money can I transfer online per day?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:6.1",
+    "NB-KB-001:9",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "international transfer",
+   "query": "What do I need to send money abroad?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:6.2"
+   ]
+  },
+  {
+   "id": "share OTP",
+   "query": "Can I tell the bank staff my one-time password?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:5.2"
+   ]
+  },
+  {
+   "id": "savings opening deposit",
+   "query": "What is the minimum opening deposit for a savings account?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.2",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "KYC pending",
+   "query": "What does pending KYC status mean?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:2.4"
+   ]
+  },
+  {
+   "id": "account opening documents",
+   "query": "What identification do I need to open an account?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:2.2",
+    "NB-KB-001:3.4",
+    "NB-KB-001:2.1"
+   ]
+  },
+  {
+   "id": "savings rate",
+   "query": "Is the savings account interest rate guaranteed?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.2"
+   ]
+  },
+  {
+   "id": "bill payment",
+   "query": "How do I pay my electricity bill?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:6.3",
+    "NB-KB-001:5.1"
+   ]
+  },
+  {
+   "id": "suspicious signs",
+   "query": "What are signs of suspicious activity on my account?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:10.2",
+    "NB-KB-001:10.3"
+   ]
+  },
+  {
+   "id": "other bank ATM fee",
+   "query": "What is the fee at another bank's ATM?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:4.1",
+    "NB-KB-001:9",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "complaint",
+   "query": "How do I file a complaint?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:12.1",
+    "NB-KB-001:12.2"
+   ]
+  },
+  {
+   "id": "beneficiary meaning",
+   "query": "What is a beneficiary?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:15",
+    "NB-KB-001:6.1"
+   ]
+  },
+  {
+   "id": "home financing",
+   "query": "What are the home financing requirements?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:8.1"
+   ]
+  },
+  {
+   "id": "credit card minimum",
+   "query": "What happens if I only pay the minimum on my credit card?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:4.3"
+   ]
+  },
+  {
+   "id": "budgeting",
+   "query": "How should I budget my monthly income?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:14.2"
+   ]
+  },
+  {
+   "id": "student minimum balance",
+   "query": "Does the student account need a minimum balance?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:3.3",
+    "NB-KB-001:16"
+   ]
+  },
+  {
+   "id": "DTI formula",
+   "query": "How is debt-to-income ratio calculated?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:7.3",
+    "NB-KB-001:15"
+   ]
+  },
+  {
+   "id": "restricted KYC",
+   "query": "What happens if my KYC status is restricted?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:2.4"
+   ]
+  },
+  {
+   "id": "contactless",
+   "query": "Can I make contactless payments with my debit card?",
+   "channel": "customer",
+   "role": "customer_service_agent",
+   "expected": [
+    "NB-KB-001:4.1"
+   ]
+  },
+  {
+   "id": "unusual amount rule",
+   "query": "When is a payment flagged as an unusual amount?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-FRAUD-001:2"
+   ]
+  },
+  {
+   "id": "freeze approvers",
+   "query": "Who has to approve freezing an account?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-AUTH-001:2",
+    "NB-POL-FRAUD-001:5"
+   ]
+  },
+  {
+   "id": "missing proof of address",
+   "query": "Large deposit but proof of address is missing, what next?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-AML-001:3"
+   ]
+  },
+  {
+   "id": "explain thresholds",
+   "query": "May the assistant explain detection thresholds to a customer?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-KB-001:17.6"
+   ]
+  },
+  {
+   "id": "failed logins",
+   "query": "How many failed logins count as suspicious?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-FRAUD-001:2"
+   ]
+  },
+  {
+   "id": "thin history",
+   "query": "What if the customer has too little transaction history?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-FRAUD-001:3"
+   ]
+  },
+  {
+   "id": "address mismatch",
+   "query": "Address on KYC document differs from the customer record",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-AML-001:4"
+   ]
+  },
+  {
+   "id": "approval validity",
+   "query": "How long does a card block approval stay valid?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-POL-AUTH-001:2"
+   ]
+  },
+  {
+   "id": "balance unauthenticated",
+   "query": "Customer asks for their balance without logging in",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-KB-001:17.1"
+   ]
+  },
+  {
+   "id": "DTI 52 employee",
+   "query": "What do we do when a customer has DTI of 52 percent?",
+   "channel": "employee",
+   "role": "policy_agent",
+   "expected": [
+    "NB-KB-001:17.2",
+    "NB-KB-001:7.3"
+   ]
+  }
+ ]
+}

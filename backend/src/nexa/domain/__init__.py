@@ -14,11 +14,12 @@ Modules:
     approval  approval requests, votes and the evaluation rule
     tooling   tool declarations, calls and results
     clock     injectable time source
+    knowledge documents, chunks, sensitivity and retrieval hits
     audit     tamper-evident hash-chained audit events
 """
 
 from .actions import ACTION_RISK_LEVEL, ActionType, RiskLevel
-from .actors import Actor, ActorKind, Role
+from .actors import Actor, ActorKind, Role, SessionChannel
 from .approval import ApprovalRequest, ApprovalStatus, ApprovalVote, Verdict, evaluate_approval
 from .audit import AuditDraft, AuditEvent, AuditEventType, first_broken_link, seal
 from .case import Alert, Case, CaseStatus
@@ -26,6 +27,7 @@ from .clock import Clock, utc_now
 from .decision import CandidateScore, Decision, UncertaintyFlag
 from .errors import DomainError, InvalidTransitionError
 from .evidence import Evidence, EvidenceKind, PolicyRef, SourceRef
+from .knowledge import Chunk, DocumentMeta, DocumentStatus, RetrievalHit, Sensitivity
 from .tooling import ToolCall, ToolResult, ToolSpec
 
 __all__ = [
@@ -41,17 +43,23 @@ __all__ = [
     "AuditEvent",
     "AuditEventType",
     "CandidateScore",
+    "Chunk",
     "Clock",
     "Case",
     "CaseStatus",
     "Decision",
+    "DocumentMeta",
+    "DocumentStatus",
     "DomainError",
     "Evidence",
     "EvidenceKind",
     "InvalidTransitionError",
     "PolicyRef",
+    "RetrievalHit",
     "RiskLevel",
     "Role",
+    "Sensitivity",
+    "SessionChannel",
     "SourceRef",
     "ToolCall",
     "ToolResult",

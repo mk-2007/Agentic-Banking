@@ -10,7 +10,7 @@ from nexa.domain.actions import ActionType
 POLICY_DIR = Path(__file__).resolve().parents[4] / "data" / "policies"
 REQUIRED_METADATA = {
     "document_id", "title", "department", "document_type", "version",
-    "effective_date", "status", "access_level", "product", "jurisdiction",
+    "effective_date", "status", "access_level", "product", "jurisdiction", "sensitivity",
 }  # fmt: skip
 
 
@@ -77,3 +77,11 @@ def test_authorization_policy_matches_the_approval_matrix() -> None:
         assert f"{rule.expiry_minutes} minutes" in row
         for role in rule.required_roles:
             assert role.value.replace("_", " ") in row
+
+
+def test_policies_declare_how_widely_they_may_be_shared() -> None:
+    levels = {parse(p)[0]["document_id"]: parse(p)[0]["sensitivity"] for p in POLICIES}
+    assert levels["NB-POL-FRAUD-001"] == "restricted"  # contains detection thresholds
+    assert levels["NB-POL-AML-001"] == "restricted"
+    assert levels["NB-POL-AUTH-001"] == "internal"
+    assert set(levels.values()) <= {"public", "internal", "restricted"}

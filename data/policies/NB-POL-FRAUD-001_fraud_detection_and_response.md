@@ -9,6 +9,7 @@ status: Active
 access_level: Internal Prototype
 product: Cards and Digital Banking
 jurisdiction: Pakistan Prototype
+sensitivity: restricted
 ---
 
 # Fraud Detection and Response (synthetic prototype policy)

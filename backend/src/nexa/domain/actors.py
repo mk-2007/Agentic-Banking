@@ -25,6 +25,7 @@ class Role(StrEnum):
     DECISION_AGENT = "decision_agent"
     RISK_AGENT = "risk_agent"
     REPORTING_AGENT = "reporting_agent"
+    CUSTOMER_SERVICE_AGENT = "customer_service_agent"
     # Services (non-agent, non-human components)
     EXECUTION_SERVICE = "execution_service"
 
@@ -43,6 +44,13 @@ HUMAN_ROLES: Final[frozenset[Role]] = frozenset(
 APPROVER_ROLES: Final[frozenset[Role]] = frozenset(
     {Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_OFFICER}
 )
+
+
+class SessionChannel(StrEnum):
+    """Who the current session is serving. Set by trusted code, never by an agent or a model."""
+
+    CUSTOMER = "customer"
+    EMPLOYEE = "employee"
 
 
 class ActorKind(StrEnum):

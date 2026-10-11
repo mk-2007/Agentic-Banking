@@ -9,7 +9,7 @@ from typing import Self
 from pydantic import AwareDatetime, Field, model_validator
 
 from .actions import RiskLevel
-from .actors import Actor, Role
+from .actors import Actor, Role, SessionChannel
 from .base import Contract, FlatDict, JsonDict
 
 _TOOL_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
@@ -44,6 +44,10 @@ class ToolCall(Contract):
     arguments: FlatDict = Field(default_factory=dict)
     approval_id: str | None = Field(
         default=None, description="Required by tools that execute approved actions."
+    )
+    channel: SessionChannel = Field(
+        default=SessionChannel.CUSTOMER,
+        description="Session channel set by trusted code. Defaults to the most restrictive.",
     )
     requested_at: AwareDatetime
 
