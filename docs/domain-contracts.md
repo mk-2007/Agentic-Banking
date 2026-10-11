@@ -6,12 +6,13 @@ unknown fields, and every safety rule below is enforced by a validator, so an in
 | Module | What it defines | Key rules enforced |
 |---|---|---|
 | `actions` | `ActionType` (closed set of 7), `RiskLevel` 1-4 | Every action has a risk level; only `freeze_account` is Level 4 |
-| `actors` | `Role`, `Actor` | Users hold human roles, agents hold agent roles, the system has none |
+| `actors` | `Role`, `Actor` | Users hold human roles, agents hold agent roles, the system holds only a service role (execution) or none |
 | `evidence` | `Evidence`, `SourceRef`, `PolicyRef` | Every fact names a tool record or a versioned policy clause |
 | `case` | `Case`, `CaseStatus`, transitions | Only listed transitions are legal; terminal states are final |
 | `decision` | `Decision`, `CandidateScore` | See below |
-| `approval` | `ApprovalRequest`, `ApprovalVote`, `evaluate_approval` | Level 4 needs two different approver roles; expired or late votes never approve |
-| `tooling` | `ToolSpec`, `ToolCall`, `ToolResult` | Snake-case names; state-changing tools are at least Level 2 |
+| `approval` | `ApprovalRequest`, `ApprovalVote`, `evaluate_approval` | Level 4 needs two different approver roles; each request names the one account it covers; expired or late votes never approve |
+| `tooling` | `ToolSpec`, `ToolCall`, `ToolResult` | Snake-case names; state-changing tools are at least Level 2; results carry output or an error, never both |
+| `clock` | `Clock`, `utc_now` | Time is injected, so expiry logic is testable |
 | `audit` | `AuditEvent`, `seal`, `first_broken_link` | SHA-256 hash chain; editing, removing or reordering events is detected |
 
 ## Decision invariants
