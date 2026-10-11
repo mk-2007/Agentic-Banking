@@ -24,6 +24,14 @@ TOOL_ROLES: Final[Mapping[str, frozenset[Role]]] = MappingProxyType(
             {Role.DATA_AGENT, Role.ANALYSIS_AGENT, *_HUMAN_INVESTIGATORS}
         ),
         "get_kyc_status": frozenset({Role.DATA_AGENT, *_HUMAN_INVESTIGATORS}),
+        "search_knowledge_base": frozenset(
+            {
+                Role.CUSTOMER_SERVICE_AGENT,
+                Role.POLICY_AGENT,
+                Role.VERIFICATION_AGENT,
+                *_HUMAN_INVESTIGATORS,
+            }
+        ),
         # Only the execution service may change bank state, and only with an approval.
         "execute_authorized_action": frozenset({Role.EXECUTION_SERVICE}),
     }

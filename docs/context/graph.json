@@ -47,7 +47,7 @@
     {
       "id": "module:rag",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/rag",
       "summary": "Ingestion, chunking, metadata-filtered retrieval over bank policy"
     },
@@ -200,14 +200,14 @@
     {
       "id": "phase:4",
       "type": "phase",
-      "status": "planned",
-      "summary": "RAG over KB and policy docs"
+      "status": "done",
+      "summary": "RAG: ingestion, chunking, per-clearance BM25 retrieval, knowledge search tool"
     },
     {
       "id": "phase:5",
       "type": "phase",
       "status": "planned",
-      "summary": "Individual agents with small evals"
+      "summary": "Individual agents with small evals; includes the model gateway (llm)"
     },
     {
       "id": "phase:6",
@@ -295,6 +295,33 @@
       "status": "done",
       "path": "docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md",
       "summary": "Deny by default; single-use approvals bound to one action/account/case; audit before and after"
+    },
+    {
+      "id": "doc:rag",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/rag.md",
+      "summary": "Corpus, chunking rules, access control before ranking, evaluation results and limits"
+    },
+    {
+      "id": "doc:kb-corpus",
+      "type": "doc",
+      "status": "done",
+      "path": "data/knowledge_base/nexabank_knowledge_base.md",
+      "summary": "Knowledge base as Markdown with front matter and per-section sensitivity"
+    },
+    {
+      "id": "adr:0006",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md",
+      "summary": "Per-clearance indexes; channel is trusted input defaulting to customer; BM25 first"
+    },
+    {
+      "id": "concept:retrieval-access-control",
+      "type": "concept",
+      "status": "done",
+      "summary": "Clearance = stricter of role and session channel; filtering before ranking"
     }
   ],
   "edges": [
@@ -604,11 +631,6 @@
       "relation": "implements"
     },
     {
-      "from": "phase:4",
-      "to": "module:llm",
-      "relation": "implements"
-    },
-    {
       "from": "phase:5",
       "to": "module:agents",
       "relation": "implements"
@@ -821,6 +843,41 @@
     {
       "from": "adr:0005",
       "to": "module:security",
+      "relation": "constrains"
+    },
+    {
+      "from": "phase:5",
+      "to": "module:llm",
+      "relation": "implements"
+    },
+    {
+      "from": "doc:rag",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:kb-corpus",
+      "to": "module:rag",
+      "relation": "documents"
+    },
+    {
+      "from": "adr:0006",
+      "to": "concept:retrieval-access-control",
+      "relation": "decides"
+    },
+    {
+      "from": "concept:retrieval-access-control",
+      "to": "module:rag",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:retrieval-access-control",
+      "to": "module:tools",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:retrieval-access-control",
+      "to": "module:config",
       "relation": "constrains"
     }
   ]

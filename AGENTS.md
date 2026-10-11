@@ -14,6 +14,7 @@ Read this first. It tells you how to get oriented and how to work without breaki
 - **Agents never import `bank_sim`.** They reach the bank only through `tools`. Layer rules are tested.
 - **Recommend vs authorize.** Decision output is a recommendation; execution needs an approved ID.
 - **Synthetic data only.** Never add real personal or financial data, secrets, or keys. Use `.env` (git-ignored).
+- **Session channel is trusted input.** It is set by orchestration on the `ToolCall`, never by a model, and defaults to the most restrictive (customer). Knowledge is filtered before ranking.
 - **Closed action set.** The decision layer chooses from a fixed enum, never free text.
 - Do not claim a model output is a calibrated probability unless it has been calibrated on our scenarios.
 

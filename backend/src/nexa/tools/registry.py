@@ -20,6 +20,7 @@ from nexa.domain.actors import ActorKind
 from nexa.domain.audit import AuditEventType
 from nexa.domain.base import JsonDict
 from nexa.domain.errors import DomainError
+from nexa.domain.evidence import PolicyRef
 from nexa.domain.hashing import sha256_hex
 from nexa.domain.tooling import ToolCall, ToolResult
 from nexa.security import AuthorizationDecision, AuthorizationDenied, DenialReason, authorize_role
@@ -89,7 +90,7 @@ class ToolRegistry:
             return self._fail(call, "domain_error", str(error), input_hash)
         except Exception as error:  # noqa: BLE001 - a tool bug must never crash the platform
             return self._fail(call, "internal_error", type(error).__name__, input_hash)
-        return self._succeed(call, output, input_hash)
+        return self._succeed(call, output, input_hash, tool.policy_refs(output))
 
     # --- outcomes -----------------------------------------------------
     def _deny(
@@ -115,12 +116,19 @@ class ToolRegistry:
         )
         return ToolResult(call_id=call.id, ok=False, error_code=code, error_message=message)
 
-    def _succeed(self, call: ToolCall, output: JsonDict, input_hash: str) -> ToolResult:
+    def _succeed(
+        self,
+        call: ToolCall,
+        output: JsonDict,
+        input_hash: str,
+        policy_refs: tuple[PolicyRef, ...] = (),
+    ) -> ToolResult:
         self._record(
             AuditEventType.TOOL_COMPLETED,
             call,
             input_hash=input_hash,
             output_ref=f"sha256:{sha256_hex(output)}",
+            policy_refs=policy_refs,
             detail="ok",
         )
         return ToolResult(call_id=call.id, ok=True, output=output)
@@ -132,6 +140,7 @@ class ToolRegistry:
         *,
         input_hash: str | None = None,
         output_ref: str | None = None,
+        policy_refs: tuple[PolicyRef, ...] = (),
         detail: str = "",
     ) -> None:
         self._ctx.audit.record(
@@ -141,5 +150,6 @@ class ToolRegistry:
             tool_name=call.tool_name,
             input_hash=input_hash,
             output_ref=output_ref,
+            policy_refs=policy_refs,
             detail=detail,
         )

@@ -18,8 +18,8 @@ gateway can replace the simulator later.
 | 1 | Domain contracts (case, evidence, decision, approval, tool, audit) with safety invariants | done |
 | 2 | Simulated bank, synthetic data, policy documents, approval matrix | done |
 | 3 | Security, audit and tool layer (before any LLM) | done |
-| 4 | RAG over knowledge base and policies | next |
-| 5 | Specialist agents with small evals | planned |
+| 4 | RAG over knowledge base and policies | done |
+| 5 | Model gateway and specialist agents with small evals | next |
 | 6 | LangGraph orchestration with human approval | planned |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
@@ -52,7 +52,7 @@ directly: every access passes through a tool layer that enforces permissions and
 | `docs/adr/` | Architecture decision records: why things are the way they are |
 | `docs/context/graph.json` | Machine-readable project memory for AI agents |
 | `AGENTS.md` | Operating manual for AI agents working here |
-| `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents |
+| `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents, `knowledge_base/` corpus, synonyms and retrieval evaluation set |
 | `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh` |
 
 ## Quickstart
@@ -95,6 +95,14 @@ matrix, per-case data scoping, data minimisation, a hash-chained append-only aud
 guarded execution tool that needs a valid, single-use approval. Scenario E is now a passing test. See
 [docs/security-model.md](docs/security-model.md), including its list of honest limits.
 
+## Knowledge retrieval
+
+Phase 4 ingests the knowledge base and policy documents into 98 cited chunks and searches them with BM25.
+Access is decided **before ranking**: one index per clearance level, and the clearance is the stricter of the
+caller's role and the session channel, so a customer chat can never reach internal or restricted material.
+On 40 labelled questions the right section is in the top 3 for 92.5%, with the caveats in
+[docs/rag.md](docs/rag.md).
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
@@ -102,6 +110,7 @@ guarded execution tool that needs a valid, single-use approval. Scenario E is no
 - [ADR 0003](docs/adr/0003-safety-invariants-live-in-the-contracts.md): safety invariants are enforced by the domain contracts themselves.
 - [ADR 0004](docs/adr/0004-bank-access-through-gateway-protocols.md): bank access goes through gateway Protocols; synthetic data is deterministic.
 - [ADR 0005](docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md): deny by default; approvals are single-use and bound to one target.
+- [ADR 0006](docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md): knowledge is filtered before ranking; the session channel is trusted input that fails closed.
 
 ## Scope and limits
 

@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-12 - Phase 4: RAG
+- Converted the knowledge base to Markdown with front matter; labelled sections 13/17/18/19 internal and the fraud and AML policies restricted.
+- `rag`: parsing, chunking (FAQ pairs, split tables, packed lists), version resolution, dependency-free BM25, synonym expansion; 98 chunks.
+- Access control before ranking: one index per clearance level; clearance = stricter of role and session channel (ADR 0006). Channel is set by trusted code on `ToolCall` and defaults to customer.
+- New `search_knowledge_base` tool: cited passages, historical documents for employee sessions only, audit records which policy versions were consulted.
+- New domain pieces: `Sensitivity`, `Chunk`, `SessionChannel`, `Role.CUSTOMER_SERVICE_AGENT`.
+- Evaluation: 40 labelled questions, recall@3 0.925, MRR 0.90 (caveats in docs/rag.md). Two synonym groups were added after the first run exposed vocabulary gaps.
+- A test caught chunk ids colliding across document versions; ids now include the version.
+- 381 tests pass. Next: Phase 5, model gateway and specialist agents.
+
 ## 2026-10-11 - Phase 3: security, audit and tool layer
 - `security`: role check (deny by default), per-case scope for agents, approval gate (one action, one account, one case, once, unexpired).
 - `config`: tool permission matrix is the single source of truth; tools that differ cannot register.

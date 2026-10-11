@@ -37,6 +37,9 @@ agent / human / service
 | Every call and denial leaves audit events; the log stores hashes, not raw data | `ToolRegistry`, `audit` | audit tests |
 | Editing, deleting or reordering history is detected, including between runs | hash chain, `JsonlAuditLog` | tamper tests |
 | Tool bugs return `internal_error` without leaking details | registry | crashing-tool test |
+| A customer session can never read internal or restricted knowledge, whichever agent serves it | per-clearance indexes, clearance = stricter of role and channel | exhaustive leak test over every protected chunk, 15 adversarial queries, role x channel table |
+| Forgetting to set the session channel fails closed | `ToolCall.channel` defaults to customer | default-channel test |
+| The audit trail shows which policy versions were consulted | `Tool.policy_refs` on completion events | policy-reference audit test |
 
 ## Roles that matter
 
