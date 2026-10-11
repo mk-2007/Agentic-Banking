@@ -25,12 +25,16 @@ class Role(StrEnum):
     DECISION_AGENT = "decision_agent"
     RISK_AGENT = "risk_agent"
     REPORTING_AGENT = "reporting_agent"
+    # Services (non-agent, non-human components)
+    EXECUTION_SERVICE = "execution_service"
 
     @property
     def is_human(self) -> bool:
         """True for roles held by people."""
         return self in HUMAN_ROLES
 
+
+SERVICE_ROLES: Final[frozenset[Role]] = frozenset({Role.EXECUTION_SERVICE})
 
 HUMAN_ROLES: Final[frozenset[Role]] = frozenset(
     {Role.CUSTOMER, Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_OFFICER}
@@ -58,12 +62,12 @@ class Actor(Contract):
 
     @model_validator(mode="after")
     def check_role_matches_kind(self) -> Self:
-        """Users hold human roles, agents hold agent roles, the system has no role."""
+        """Match roles to kinds: humans to users, agent roles to agents, services to the system."""
         if self.kind is ActorKind.SYSTEM:
-            if self.role is not None:
-                raise ValueError("system actors must not have a role")
+            if self.role is not None and self.role not in SERVICE_ROLES:
+                raise ValueError("system actors may only hold a service role")
         elif self.role is None:
             raise ValueError(f"{self.kind.value} actors need a role")
-        elif (self.kind is ActorKind.USER) != self.role.is_human:
+        elif self.role in SERVICE_ROLES or (self.kind is ActorKind.USER) != self.role.is_human:
             raise ValueError(f"role {self.role.value} does not fit actor kind {self.kind.value}")
         return self

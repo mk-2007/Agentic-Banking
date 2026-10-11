@@ -7,7 +7,7 @@
       "type": "module",
       "status": "done",
       "path": "backend/src/nexa/domain",
-      "summary": "Pure models/enums (Case, Decision, Action, Evidence); no I/O"
+      "summary": "Pure models/enums (Case, Decision, Action, Evidence); no I/O; execution-service role, approval target account, injectable clock (Phase 3)"
     },
     {
       "id": "module:config",
@@ -19,14 +19,14 @@
     {
       "id": "module:security",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/security",
       "summary": "Roles, permissions, deterministic policy engine"
     },
     {
       "id": "module:audit",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/audit",
       "summary": "Append-only audit log"
     },
@@ -54,7 +54,7 @@
     {
       "id": "module:tools",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/tools",
       "summary": "Only door from agents to the bank; enforces schema, permissions, audit"
     },
@@ -194,7 +194,7 @@
     {
       "id": "phase:3",
       "type": "phase",
-      "status": "planned",
+      "status": "done",
       "summary": "security + audit + tools layer with tests (before any LLM)"
     },
     {
@@ -281,6 +281,20 @@
       "type": "concept",
       "status": "done",
       "summary": "Seven scenarios as data in data/synthetic/scenarios.json; the Phase 7 evaluation set"
+    },
+    {
+      "id": "doc:security-model",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/security-model.md",
+      "summary": "Path of a tool call, guarantees and their tests, honest limits"
+    },
+    {
+      "id": "adr:0005",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md",
+      "summary": "Deny by default; single-use approvals bound to one action/account/case; audit before and after"
     }
   ],
   "edges": [
@@ -778,6 +792,36 @@
       "from": "adr:0004",
       "to": "concept:controlled-autonomy",
       "relation": "decides"
+    },
+    {
+      "from": "doc:security-model",
+      "to": "module:tools",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:security-model",
+      "to": "module:security",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:security-model",
+      "to": "module:audit",
+      "relation": "documents"
+    },
+    {
+      "from": "adr:0005",
+      "to": "concept:controlled-autonomy",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0005",
+      "to": "module:tools",
+      "relation": "constrains"
+    },
+    {
+      "from": "adr:0005",
+      "to": "module:security",
+      "relation": "constrains"
     }
   ]
 }

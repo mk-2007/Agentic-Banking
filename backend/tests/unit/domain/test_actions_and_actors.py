@@ -39,3 +39,11 @@ def test_actor_role_must_fit_kind() -> None:
         Actor(kind=ActorKind.SYSTEM, id="sys", role=Role.DATA_AGENT)
     with pytest.raises(ValidationError):
         Actor(kind=ActorKind.USER, id="u")
+
+
+def test_system_actors_may_hold_only_service_roles() -> None:
+    Actor(kind=ActorKind.SYSTEM, id="exec", role=Role.EXECUTION_SERVICE)
+    with pytest.raises(ValidationError):
+        Actor(kind=ActorKind.AGENT, id="a", role=Role.EXECUTION_SERVICE)
+    with pytest.raises(ValidationError):
+        Actor(kind=ActorKind.USER, id="u", role=Role.EXECUTION_SERVICE)

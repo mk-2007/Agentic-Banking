@@ -10,7 +10,7 @@ from pydantic import AwareDatetime, Field, model_validator
 
 from .actions import RiskLevel
 from .actors import Actor, Role
-from .base import Contract, FlatDict
+from .base import Contract, FlatDict, JsonDict
 
 _TOOL_NAME = re.compile(r"^[a-z][a-z0-9_]*$")
 
@@ -53,7 +53,7 @@ class ToolResult(Contract):
 
     call_id: str = Field(min_length=1)
     ok: bool
-    output: FlatDict = Field(default_factory=dict)
+    output: JsonDict = Field(default_factory=dict)
     error_code: str | None = None
     error_message: str | None = None
 

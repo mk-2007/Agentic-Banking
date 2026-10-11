@@ -1,11 +1,13 @@
 """Shared building blocks for every contract in the domain layer."""
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, JsonValue
 
 # Values allowed inside free-form `data` / `arguments` / `output` dictionaries.
 # Keeping them flat makes payloads easy to hash, log and validate.
 FlatValue = str | int | float | bool | None
 FlatDict = dict[str, FlatValue]
+# Structured, JSON-safe payloads (tool outputs); may nest lists and objects.
+JsonDict = dict[str, JsonValue]
 
 
 class Contract(BaseModel):

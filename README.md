@@ -17,8 +17,8 @@ gateway can replace the simulator later.
 | 0 | Scaffold, tooling, CI, architecture tests, context graph | done |
 | 1 | Domain contracts (case, evidence, decision, approval, tool, audit) with safety invariants | done |
 | 2 | Simulated bank, synthetic data, policy documents, approval matrix | done |
-| 3 | Security, audit and tool layer (before any LLM) | next |
-| 4 | RAG over knowledge base and policies | planned |
+| 3 | Security, audit and tool layer (before any LLM) | done |
+| 4 | RAG over knowledge base and policies | next |
 | 5 | Specialist agents with small evals | planned |
 | 6 | LangGraph orchestration with human approval | planned |
 | 7 | Decision providers and evaluation | planned |
@@ -88,12 +88,20 @@ three synthetic policy documents, the fraud thresholds and approval matrix as co
 evaluation scenarios (PRD A-E plus an account-takeover and a prompt-injection case). See
 [docs/synthetic-data.md](docs/synthetic-data.md).
 
+## Security model
+
+Phase 3 makes the guarantees real, with no LLM involved: deny-by-default tool permissions from a config
+matrix, per-case data scoping, data minimisation, a hash-chained append-only audit log, and a single
+guarded execution tool that needs a valid, single-use approval. Scenario E is now a passing test. See
+[docs/security-model.md](docs/security-model.md), including its list of honest limits.
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
 - [ADR 0002](docs/adr/0002-swappable-decision-provider.md): the decision layer is a swappable provider; no JEV dependency (we have no access).
 - [ADR 0003](docs/adr/0003-safety-invariants-live-in-the-contracts.md): safety invariants are enforced by the domain contracts themselves.
 - [ADR 0004](docs/adr/0004-bank-access-through-gateway-protocols.md): bank access goes through gateway Protocols; synthetic data is deterministic.
+- [ADR 0005](docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md): deny by default; approvals are single-use and bound to one target.
 
 ## Scope and limits
 
