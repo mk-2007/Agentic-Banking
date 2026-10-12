@@ -19,7 +19,7 @@ gateway can replace the simulator later.
 | 2 | Simulated bank, synthetic data, policy documents, approval matrix | done |
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
-| 5 | Model gateway and specialist agents with small evals | next |
+| 5 | Model gateway (5a, done) and specialist agents with small evals (5b) | in progress |
 | 6 | LangGraph orchestration with human approval | planned |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
@@ -53,7 +53,7 @@ directly: every access passes through a tool layer that enforces permissions and
 | `docs/context/graph.json` | Machine-readable project memory for AI agents |
 | `AGENTS.md` | Operating manual for AI agents working here |
 | `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents, `knowledge_base/` corpus, synonyms and retrieval evaluation set |
-| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh` |
+| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh`, `llm_smoke_test.py` |
 
 ## Quickstart
 
@@ -103,6 +103,13 @@ caller's role and the session channel, so a customer chat can never reach intern
 On 40 labelled questions the right section is in the top 3 for 92.5%, with the caveats in
 [docs/rag.md](docs/rag.md).
 
+## Model gateway
+
+Phase 5a adds one adapter for any OpenAI-compatible provider (Groq and Gemini presets), with retries, automatic
+failover between providers, a per-case token budget, and structured output that is validated against a schema
+before anyone uses it. Setup and limits: [docs/llm-gateway.md](docs/llm-gateway.md). To try your own keys:
+copy `.env.example` to `.env`, then `python scripts/llm_smoke_test.py`.
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
@@ -111,6 +118,7 @@ On 40 labelled questions the right section is in the top 3 for 92.5%, with the c
 - [ADR 0004](docs/adr/0004-bank-access-through-gateway-protocols.md): bank access goes through gateway Protocols; synthetic data is deterministic.
 - [ADR 0005](docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md): deny by default; approvals are single-use and bound to one target.
 - [ADR 0006](docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md): knowledge is filtered before ranking; the session channel is trusted input that fails closed.
+- [ADR 0007](docs/adr/0007-one-compatible-adapter-and-never-trust-model-output.md): one OpenAI-compatible adapter; the gateway owns reliability; model output is never trusted.
 
 ## Scope and limits
 
