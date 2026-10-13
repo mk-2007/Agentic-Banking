@@ -111,8 +111,9 @@ class OpenAiCompatibleProvider:
                 f"{self._name}: HTTP {status} {detail}", retry_after=self._retry_after(response)
             )
         if status == 404:
+            why = f" The provider said: {detail}." if detail else ""
             raise LlmRequestError(
-                f"{self._name}: model or endpoint not found ({self._model}). "
+                f"{self._name}: model or endpoint not found (model: {self._model}).{why} "
                 "Run scripts/llm_smoke_test.py --list-models, then set the model variable.",
                 status,
             )

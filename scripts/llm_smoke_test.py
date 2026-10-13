@@ -3,6 +3,7 @@
 
     python scripts/llm_smoke_test.py --list-models   # which models can my keys use today?
     python scripts/llm_smoke_test.py                 # one validated structured call per provider
+    python scripts/llm_smoke_test.py --model gemini=gemini-flash-latest   # try another model
 
 Keys come from the environment or from a `.env` file in the repository root (never committed).
 Nothing here prints or logs a key.
@@ -56,7 +57,9 @@ def list_models(env: dict[str, str]) -> int:
         try:
             response = httpx.get(url, headers={"Authorization": f"Bearer {key}"}, timeout=30)
             response.raise_for_status()
-            ids = sorted(m.get("id", "?") for m in response.json().get("data", []))
+            ids = sorted(
+                str(m.get("id", "?")).removeprefix("models/") for m in response.json().get("data", [])
+            )
         except (httpx.HTTPError, ValueError) as error:
             print(f"{name}: could not list models ({type(error).__name__})")
             continue
@@ -105,8 +108,20 @@ def smoke(env: dict[str, str]) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Smoke-test the model gateway with real keys.")
     parser.add_argument("--list-models", action="store_true", help="list models each key can use")
+    parser.add_argument(
+        "--model",
+        action="append",
+        default=[],
+        metavar="PROVIDER=MODEL",
+        help="use MODEL for PROVIDER in this run only (repeatable), e.g. gemini=gemini-flash-latest",
+    )
     args = parser.parse_args()
     env = environment()
+    for override in args.model:
+        provider, _, model = override.partition("=")
+        if provider not in PRESETS or not model:
+            parser.error(f"--model expects PROVIDER=MODEL with PROVIDER in {sorted(PRESETS)}")
+        env[PRESETS[provider].model_env] = model
     return list_models(env) if args.list_models else smoke(env)
 
 

@@ -186,3 +186,10 @@ def test_missing_usage_is_estimated() -> None:
 def test_a_provider_without_a_key_cannot_be_built() -> None:
     with pytest.raises(ValueError, match="no API key"):
         OpenAiCompatibleProvider(name="x", base_url="https://a", api_key="", model="m")
+
+
+def test_not_found_includes_the_providers_own_explanation() -> None:
+    handler = lambda r: httpx.Response(404, json={"error": {"message": "model is retired"}})  # noqa: E731
+    with pytest.raises(LlmRequestError) as caught:
+        provider(handler).complete(ask())
+    assert "model is retired" in str(caught.value) and "m-1" in str(caught.value)

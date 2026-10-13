@@ -39,6 +39,11 @@ def load_dotenv_file(path: Path) -> dict[str, str]:
     return values
 
 
+def _model_id(raw: str) -> str:
+    """Drop the ``models/`` prefix some model listings use; chat endpoints expect the bare id."""
+    return raw.removeprefix("models/")
+
+
 def build_providers(
     env: Mapping[str, str],
     *,
@@ -60,7 +65,7 @@ def build_providers(
                 name=preset.name,
                 base_url=preset.base_url,
                 api_key=key,
-                model=env.get(preset.model_env, "").strip() or preset.default_model,
+                model=_model_id(env.get(preset.model_env, "").strip() or preset.default_model),
                 json_mode=preset.json_mode,
                 timeout_seconds=limits.request_timeout_seconds,
                 client=client_factory() if client_factory else None,

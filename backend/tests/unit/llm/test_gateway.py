@@ -122,3 +122,12 @@ def test_a_gateway_needs_providers() -> None:
 def test_provider_names_are_listed_primary_first() -> None:
     gw = gateway(ScriptedProvider(["x"], name="groq"), ScriptedProvider(["y"], name="gemini"))
     assert gw.provider_names == ("groq", "gemini")
+
+
+def test_failover_summaries_do_not_repeat_the_provider_name() -> None:
+    a = ScriptedProvider([LlmRequestError("groq: model gone", 404)], name="groq")
+    b = ScriptedProvider([LlmAuthError("gemini: key rejected")], name="gemini")
+    with pytest.raises(AllProvidersFailedError) as caught:
+        gateway(a, b).complete(req())
+    assert "groq: groq:" not in str(caught.value) and "gemini: gemini:" not in str(caught.value)
+    assert "groq: model gone" in str(caught.value) and "gemini: key rejected" in str(caught.value)
