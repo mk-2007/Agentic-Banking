@@ -99,3 +99,10 @@ def test_cost_uses_the_price_table_and_defaults_to_free(monkeypatch: pytest.Monk
     monkeypatch.setattr("nexa.llm.usage.MODEL_PRICES_USD_PER_MILLION", {"paid": (1.0, 3.0)})
     assert cost_usd("paid", 1_000_000, 1_000_000) == pytest.approx(4.0)
     assert cost_usd("free-tier-model", 5_000_000, 5_000_000) == 0.0
+
+
+def test_model_ids_copied_from_a_listing_work() -> None:
+    (provider,) = build_providers(
+        {"GEMINI_API_KEY": "k", "NEXA_GEMINI_MODEL": "models/gemini-flash-latest"}
+    )
+    assert provider.model == "gemini-flash-latest"

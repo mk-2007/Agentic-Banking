@@ -97,11 +97,11 @@ class LlmGateway:
             try:
                 return provider.complete(request)
             except TransientLlmError as error:
-                failures.append(f"{provider.name} attempt {attempt}: {error}")
+                failures.append(f"{provider.name} attempt {attempt}: {_plain(provider, error)}")
                 if attempt < self._limits.max_attempts_per_provider:
                     self._sleep(self._delay(attempt, error.retry_after))
             except (LlmAuthError, LlmRequestError) as error:
-                failures.append(f"{provider.name}: {error}")
+                failures.append(f"{provider.name}: {_plain(provider, error)}")
                 break  # retrying the same provider cannot help; try the next one
         log.warning("provider %s failed; trying the next one", provider.name)
         return None
@@ -162,6 +162,11 @@ class LlmGateway:
         raise StructuredOutputError(
             f"no valid {schema.__name__} after {attempts} attempts: {last_error}"
         )
+
+
+def _plain(provider: LlmProvider, error: Exception) -> str:
+    """Return the error text without a leading ``<provider>: `` (the caller adds its own)."""
+    return str(error).removeprefix(f"{provider.name}: ")
 
 
 def _extract_json(text: str) -> object:
