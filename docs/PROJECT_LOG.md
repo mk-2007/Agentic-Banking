@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-13 - Phase 5a: model gateway
+- `llm`: provider-neutral types, one OpenAI-compatible adapter (Groq and Gemini presets), retries with backoff, failover, per-case token budget, validated structured output with bounded repair, untrusted-text fencing, environment factory, scripted fake provider (ADR 0007).
+- Errors are redacted so API keys can never appear in messages; a model that rejects `response_format` is retried without it.
+- `scripts/llm_smoke_test.py` lists the models a key can use and makes one validated call per provider. Not yet run against live APIs.
+- Renamed a module that shadowed the standard library (`types` -> `messages`) before it spread.
+- 443 tests pass. Next: Phase 5b, specialist agents with small evals.
+
 ## 2026-10-12 - Phase 4: RAG
 - Converted the knowledge base to Markdown with front matter; labelled sections 13/17/18/19 internal and the fraud and AML policies restricted.
 - `rag`: parsing, chunking (FAQ pairs, split tables, packed lists), version resolution, dependency-free BM25, synonym expansion; 98 chunks.

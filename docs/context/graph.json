@@ -40,7 +40,7 @@
     {
       "id": "module:llm",
       "type": "module",
-      "status": "planned",
+      "status": "done",
       "path": "backend/src/nexa/llm",
       "summary": "Provider-agnostic model gateway"
     },
@@ -206,8 +206,8 @@
     {
       "id": "phase:5",
       "type": "phase",
-      "status": "planned",
-      "summary": "Individual agents with small evals; includes the model gateway (llm)"
+      "status": "in_progress",
+      "summary": "5a model gateway done; 5b specialist agents with small evals next"
     },
     {
       "id": "phase:6",
@@ -322,6 +322,26 @@
       "type": "concept",
       "status": "done",
       "summary": "Clearance = stricter of role and session channel; filtering before ranking"
+    },
+    {
+      "id": "doc:llm-gateway",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/llm-gateway.md",
+      "summary": "Gateway features, Groq/Gemini setup on Windows, security notes, honest limits"
+    },
+    {
+      "id": "adr:0007",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0007-one-compatible-adapter-and-never-trust-model-output.md",
+      "summary": "One OpenAI-compatible adapter; gateway owns retries, failover, budget and output validation"
+    },
+    {
+      "id": "concept:model-output-untrusted",
+      "type": "concept",
+      "status": "done",
+      "summary": "Model replies are validated against schemas before use; untrusted text is fenced in prompts"
     }
   ],
   "edges": [
@@ -878,6 +898,26 @@
     {
       "from": "concept:retrieval-access-control",
       "to": "module:config",
+      "relation": "constrains"
+    },
+    {
+      "from": "doc:llm-gateway",
+      "to": "module:llm",
+      "relation": "documents"
+    },
+    {
+      "from": "adr:0007",
+      "to": "concept:model-output-untrusted",
+      "relation": "decides"
+    },
+    {
+      "from": "concept:model-output-untrusted",
+      "to": "module:llm",
+      "relation": "constrains"
+    },
+    {
+      "from": "concept:model-output-untrusted",
+      "to": "module:agents",
       "relation": "constrains"
     }
   ]
