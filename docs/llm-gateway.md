@@ -44,6 +44,18 @@ extra fields and wrong types are all handled.
 Provider order comes from `NEXA_LLM_PROVIDERS` (default `groq,gemini`, first is primary). A provider
 with no key is skipped, so one key is enough.
 
+## Troubleshooting
+
+| Message | Meaning and fix |
+|---|---|
+| `API key rejected (HTTP 401/403)` | Mistyped or revoked key. Re-copy it into `.env`. |
+| `model or endpoint not found ... The provider said: ...` | The model name is retired or not available to your key. Run `--list-models`, then try `--model PROVIDER=NAME`, and once it works put it in `.env` as `NEXA_GROQ_MODEL` or `NEXA_GEMINI_MODEL`. |
+| `empty answer (token limit reached...)` | A reasoning model spent its token limit thinking. Raise `default_max_tokens` in `config/llm.py`. |
+| `HTTP 429` | Free-tier rate limit. The gateway retries and then fails over; wait a minute and retry. |
+| `no provider is configured` | Neither key is set in `.env` or the environment. |
+
+Model ids copied from `--list-models` work with or without a leading `models/`.
+
 ## Security notes
 
 - Keys are read from the environment only. They are never logged, never put in error messages (errors
@@ -53,8 +65,9 @@ with no key is skipped, so one key is enough.
 
 ## Honest limits
 
-- **Not yet verified against the live APIs.** The adapter is tested against a simulated server, not Groq
-  or Gemini. Run the smoke test once; if it fails, paste me the message and I will adjust.
+- **Verified live: Groq** (`openai/gpt-oss-20b`, structured call succeeded with no repairs). **Gemini is not yet
+  verified**: the default `gemini-2.5-flash` was listed by the API but the chat endpoint answered "not found".
+  Try another model with `python scripts/llm_smoke_test.py --model gemini=gemini-flash-latest`.
 - **Default model names are my best guess** and model catalogues change often. That is why the model is a
   setting and the smoke script can list what your key allows.
 - **Gemini reasoning models spend output tokens thinking.** The default `max_tokens` is 2048 so answers are

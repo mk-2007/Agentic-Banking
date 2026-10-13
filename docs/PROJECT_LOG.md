@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-13 - Phase 5a-3: gateway diagnostics after the first live run
+- Live smoke test: Groq `openai/gpt-oss-20b` succeeded (655 ms, no repairs). Gemini `gemini-2.5-flash` was listed but the chat endpoint returned not found.
+- 404 errors now include the provider's own explanation; failover summaries no longer repeat the provider name; model ids with a `models/` prefix are accepted; smoke script gained `--model PROVIDER=MODEL` and prints clean ids.
+- 446 tests pass. Gemini default model to be settled once a working model is confirmed.
+
 ## 2026-10-13 - Phase 5a: model gateway
 - `llm`: provider-neutral types, one OpenAI-compatible adapter (Groq and Gemini presets), retries with backoff, failover, per-case token budget, validated structured output with bounded repair, untrusted-text fencing, environment factory, scripted fake provider (ADR 0007).
 - Errors are redacted so API keys can never appear in messages; a model that rejects `response_format` is retried without it.
