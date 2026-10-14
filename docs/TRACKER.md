@@ -62,4 +62,13 @@ Add one row per merged PR. This is also the proof of work for judges.
 
 | PR | Branch | Merged | What |
 |---|---|---|---|
-| | feat/phase-5b-specialist-agents | | Specialist agents with scenario evals |
+| #1 | chore/github-project-setup | 2026-10-09 | Chore/GitHub project setup |
+| #2 | feat/phase-1-domain-contracts | 2026-10-09 | Feat/phase 1 domain contracts |
+| #22 | feat/phase-2-simulated-bank | 2026-10-10 | Phase 2: simulated bank, synthetic data and policies |
+| #23 | feat/phase-3-security-audit-tools | 2026-10-11 | Feat/phase 3 security audit tools |
+| #24 | feat/phase-4a-rag-core | 2026-10-11 | Feat/phase 4a rag core |
+| #25 | feat/phase-4b-knowledge-tool | 2026-10-11 | Feat/phase 4b knowledge tool |
+| #26 | feat/phase-5a1-gateway-core | 2026-10-13 | hase 5a-1: model gateway core (Groq and Gemini adapter, retries, failover, budget, structured output) |
+| #27 | feat/phase-5a2-smoke-test-and-docs | 2026-10-13 | Phase 5a-2: live smoke test, .env template and gateway docs |
+| #28 | feat/phase-5a3-gateway-diagnostics | 2026-10-13 | Phase 5a-3: gateway diagnostics after the first live run |
+| #29 | feat/phase-5b-specialist-agents | 2026-10-14 | feat(agents): specialist agents with scenario evals (phase 5b) |
