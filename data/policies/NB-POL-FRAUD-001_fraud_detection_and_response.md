@@ -34,6 +34,10 @@ customer's own history over the previous 90 days.
 | New beneficiary | Funds sent to a beneficiary added recently, especially combined with other indicators |
 | Untrusted device | Activity from a device not registered to the customer |
 
+A rapid series that begins with 3 or more very small payments to one merchant (each at most 2% of
+the final payment) is treated as card testing, and is described as such rather than as a plain
+rapid series.
+
 ## 3. Insufficient history
 If the customer has fewer than 10 transactions in the lookback window, behaviour cannot be
 judged reliably. Record insufficient evidence and escalate to an analyst.

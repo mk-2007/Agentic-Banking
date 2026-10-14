@@ -16,6 +16,7 @@ Read this first. It tells you how to get oriented and how to work without breaki
 - **Synthetic data only.** Never add real personal or financial data, secrets, or keys. Use `.env` (git-ignored).
 - **Session channel is trusted input.** It is set by orchestration on the `ToolCall`, never by a model, and defaults to the most restrictive (customer). Knowledge is filtered before ranking.
 - **Models go through the gateway, and their output is never trusted.** Never call a provider directly; use `LlmGateway.structured` so replies are validated. Fence third-party text with `wrap_untrusted`. API keys live only in the environment or `.env`, never in code, logs or chats.
+- **Agents exchange typed findings, never prose.** A finding is `Evidence` with a code from `IndicatorCode`. Never put merchant names, memos or other third-party text in evidence or in a prompt. Agents never pick their own session channel.
 - **Closed action set.** The decision layer chooses from a fixed enum, never free text.
 - Do not claim a model output is a calibrated probability unless it has been calibrated on our scenarios.
 

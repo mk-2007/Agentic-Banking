@@ -31,6 +31,15 @@ class FraudThresholds(Contract):
         default=10, gt=0, description="Below this, the history is too thin to judge behaviour."
     )
     kyc_review_max_age_days: int = Field(default=365, gt=0)
+    card_testing_min_payments: int = Field(
+        default=3, gt=1, description="Very small payments to one merchant that make a test pattern."
+    )
+    card_testing_max_fraction_of_alert: float = Field(
+        default=0.02,
+        gt=0.0,
+        lt=1.0,
+        description="'Very small' means at most this share of the alert.",
+    )
 
 
 DEFAULT_THRESHOLDS = FraudThresholds()

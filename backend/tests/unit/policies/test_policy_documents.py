@@ -53,6 +53,9 @@ def test_fraud_policy_states_the_configured_thresholds() -> None:
     assert f"{t.failed_auth_attempts} or more failed" in body
     assert f"{t.history_lookback_days} days" in body
     assert f"{t.min_history_transactions} transactions" in body
+    testing = f"{t.card_testing_min_payments} or more very small payments"
+    assert testing in body
+    assert f"{t.card_testing_max_fraction_of_alert:.0%}" in body
 
 
 def test_aml_policy_states_the_configured_thresholds() -> None:

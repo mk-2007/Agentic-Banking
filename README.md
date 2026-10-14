@@ -19,7 +19,7 @@ gateway can replace the simulator later.
 | 2 | Simulated bank, synthetic data, policy documents, approval matrix | done |
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
-| 5 | Model gateway (5a, done) and specialist agents with small evals (5b) | in progress |
+| 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
 | 6 | LangGraph orchestration with human approval | planned |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
@@ -52,8 +52,8 @@ directly: every access passes through a tool layer that enforces permissions and
 | `docs/adr/` | Architecture decision records: why things are the way they are |
 | `docs/context/graph.json` | Machine-readable project memory for AI agents |
 | `AGENTS.md` | Operating manual for AI agents working here |
-| `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents, `knowledge_base/` corpus, synonyms and retrieval evaluation set |
-| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh`, `llm_smoke_test.py` |
+| `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents, `knowledge_base/` corpus, synonyms and retrieval evaluation set, `agent_eval/` expectations for the agent scenarios |
+| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh`, `llm_smoke_test.py`, `run_agent_eval.py` |
 
 ## Quickstart
 
@@ -110,6 +110,15 @@ failover between providers, a per-case token budget, and structured output that 
 before anyone uses it. Setup and limits: [docs/llm-gateway.md](docs/llm-gateway.md). To try your own keys:
 copy `.env.example` to `.env`, then `python scripts/llm_smoke_test.py`.
 
+## Specialist agents
+
+Phase 5b adds four agents that reach the bank only through tools: data, analysis, policy and verification.
+They exchange typed findings from a closed vocabulary, not prose. Analysis is plain code over the policy
+thresholds, and verification recomputes every finding before anyone decides on it. A model is used in one
+place (narrowing retrieved policy clauses) and can never widen anything. All seven scenarios pass offline:
+`PYTHONPATH=backend/src python scripts/run_agent_eval.py`. Design and honest limits:
+[docs/agents.md](docs/agents.md).
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
@@ -119,6 +128,7 @@ copy `.env.example` to `.env`, then `python scripts/llm_smoke_test.py`.
 - [ADR 0005](docs/adr/0005-tool-layer-enforces-deny-by-default-and-single-use-approvals.md): deny by default; approvals are single-use and bound to one target.
 - [ADR 0006](docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md): knowledge is filtered before ranking; the session channel is trusted input that fails closed.
 - [ADR 0007](docs/adr/0007-one-compatible-adapter-and-never-trust-model-output.md): one OpenAI-compatible adapter; the gateway owns reliability; model output is never trusted.
+- [ADR 0008](docs/adr/0008-typed-findings-deterministic-analysis-and-a-guarded-model-step.md): agents exchange typed findings; analysis is deterministic; the one model step is guarded.
 
 ## Scope and limits
 

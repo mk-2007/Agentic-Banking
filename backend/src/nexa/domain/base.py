@@ -17,4 +17,9 @@ class Contract(BaseModel):
     - ``extra="forbid"``: unknown fields are rejected, so typos and injected keys fail loudly.
     """
 
-    model_config = ConfigDict(frozen=True, extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(
+        frozen=True,
+        extra="forbid",
+        str_strip_whitespace=True,
+        protected_namespaces=(),  # fields such as `model_confidence` are ours, not pydantic's
+    )
