@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-14 - Phase 5b: specialist agents with scenario evals
+- `agents`: data, analysis, policy and verification agents, plus `ToolSession` (tool calls under the agent's own role, case and a channel set by trusted code). Findings are evidence with a closed code set (ADR 0008). Analysis is plain code against the policy thresholds, judged on history before the suspicious burst. Verification recomputes each finding and sets the insufficient / conflicting evidence flags. The policy agent may use a model only to narrow retrieved clauses; any failure keeps every clause.
+- Policy topics count as covered only when their governing policy was retrieved, so a customer-channel session reports gaps instead of using weaker material.
+- Config: two card-testing thresholds added to `FraudThresholds` and to NB-POL-FRAUD-001 (a test keeps them in sync). `Contract` no longer triggers pydantic's protected-namespace warning. Default Gemini model is now `gemini-flash-latest` (the 2.5 name returned not-found; four flash models answered 503 overloaded, so Gemini still has no successful call).
+- Evaluation: `data/agent_eval/expectations.json`, harness under `backend/tests/evals/`, `scripts/run_agent_eval.py`. 7 of 7 scenarios pass offline; the harness was mutation-tested. 487 tests pass; ruff and mypy clean.
+- Next: Phase 6, LangGraph orchestration with the human approval pause. Not yet run: the model step against a live provider.
+
+## 2026-10-14 - Process: tracker, resume-state and workflow
+- Added `docs/TRACKER.md` (phase dates, test counts, remaining work split into PR-sized steps, open items, PR log), `docs/context/STATE.md` (resume-here snapshot) and `docs/WORKFLOW.md` (small branches, small green commits, merge commits). The PR template now asks for the tracker and state updates.
+
 ## 2026-10-13 - Phase 5a-3: gateway diagnostics after the first live run
 - Live smoke test: Groq `openai/gpt-oss-20b` succeeded (655 ms, no repairs). Gemini `gemini-2.5-flash` was listed but the chat endpoint returned not found.
 - 404 errors now include the provider's own explanation; failover summaries no longer repeat the provider name; model ids with a `models/` prefix are accepted; smoke script gained `--model PROVIDER=MODEL` and prints clean ids.

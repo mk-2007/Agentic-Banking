@@ -1,0 +1,65 @@
+# Progress tracker
+
+The single place to see what is done, what is next and whether the schedule holds. Update it in the
+**same pull request** as the work (the PR template asks). Newest facts win; history lives in
+[PROJECT_LOG.md](PROJECT_LOG.md).
+
+**Hackathon deadline:** `____-__-__ __:__` (fill this in; every "days left" below depends on it)
+**Last updated:** 2026-10-14
+
+## Phases
+
+| Phase | Scope | Started | Done | Days taken | Tests | Status |
+|---|---|---|---|---|---|---|
+| 0 | Scaffold, tooling, CI, architecture tests, context graph | 2026-10-09 | 2026-10-09 | 1 | n/a | done |
+| 1 | Domain contracts with safety invariants | 2026-10-09 | 2026-10-09 | 1 | 68 | done |
+| 2 | Simulated bank, synthetic data, policies, approval matrix | 2026-10-10 | 2026-10-10 | 1 | 107 | done |
+| 3 | Security, audit and tool layer | 2026-10-11 | 2026-10-11 | 1 | 256 | done |
+| 4 | RAG over knowledge base and policies | 2026-10-12 | 2026-10-12 | 1 | 381 | done |
+| 5a | Model gateway (Groq, Gemini, failover, budgets) | 2026-10-13 | 2026-10-13 | 1 | 446 | done (Gemini never succeeded live) |
+| 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
+| 6 | LangGraph orchestration, approval pause, loop limits | | | est. 2-3 | | next |
+| 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | | | est. 2-3 | | planned |
+| 8 | API, frontend, demo | | | est. 3-4 | | planned |
+
+"Days taken" and "Tests" for finished phases come from the project log (calendar days, not hours; tests are the count when the phase closed).
+"est." figures are **my estimates** from the pace of phases 0-5, not measurements; correct them as
+real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the current pace. Keep at least
+2 days of buffer before the deadline for the demo and for things that break.
+
+## Proposed split of the remaining phases (each line = one pull request)
+
+**Phase 6**
+- [ ] 6a Case state machine as a LangGraph graph, wiring the four agents (no approvals yet)
+- [ ] 6b Approval interrupt and resume, using the existing approval contracts
+- [ ] 6c Loop limits, tool-failure states, audit events for every transition
+- [ ] 6d Orchestration tests for scenarios A-F, X (including the Level 4 two-approver path)
+
+**Phase 7**
+- [ ] 7a Rule-based decision provider (ranked candidate actions, policy refs, uncertainty respected)
+- [ ] 7b LLM decision provider behind the same interface, validated like every model output
+- [ ] 7c Evaluation harness: score both providers on the seven scenarios
+- [ ] 7d Baseline vs LLM comparison written up in docs
+
+**Phase 8**
+- [ ] 8a API (cases, evidence, approvals) with the employee/customer channel decided by trusted code
+- [ ] 8b Frontend: case view, evidence, approval screen
+- [ ] 8c Demo script, seeded run, screenshots or short video
+- [ ] 8d Final README, honest-limits pass, release tag
+
+## Open items
+
+| Item | Owner | Since | Note |
+|---|---|---|---|
+| Gemini has no successful live call | you | 2026-10-13 | 503 overloaded on 4 models; re-run `python scripts/llm_smoke_test.py` |
+| Model step in the policy agent never run live | you | 2026-10-14 | `python scripts/run_agent_eval.py --live` |
+| Repo public or private? | you | | Public is needed for GitHub badges; synthetic data only, no keys |
+| Deadline above | you | | Fill in at the top |
+
+## Pull request log
+
+Add one row per merged PR. This is also the proof of work for judges.
+
+| PR | Branch | Merged | What |
+|---|---|---|---|
+| | feat/phase-5b-specialist-agents | | Specialist agents with scenario evals |

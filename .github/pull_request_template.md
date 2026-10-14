@@ -7,5 +7,6 @@ Closes #
 - [ ] `pytest -q`, `ruff check .`, `ruff format --check .` and `mypy` pass (run from `backend/`)
 - [ ] Layer rules still hold (`tests/architecture/`)
 - [ ] README status, `docs/context/graph.json` and `docs/PROJECT_LOG.md` updated if this changes project state
+- [ ] `docs/TRACKER.md` (phase table, PR log) and `docs/context/STATE.md` updated
 - [ ] New architectural decision? Added an ADR in `docs/adr/`
 - [ ] No real personal/financial data, secrets or keys added (synthetic data only)
