@@ -65,9 +65,11 @@ Model ids copied from `--list-models` work with or without a leading `models/`.
 
 ## Honest limits
 
-- **Verified live: Groq** (`openai/gpt-oss-20b`, structured call succeeded with no repairs). **Gemini is not yet
-  verified**: the default `gemini-2.5-flash` was listed by the API but the chat endpoint answered "not found".
-  Try another model with `python scripts/llm_smoke_test.py --model gemini=gemini-flash-latest`.
+- **Verified live: Groq** (`openai/gpt-oss-20b`, structured call succeeded with no repairs). **Gemini has not
+  yet completed a successful call.** `gemini-2.5-flash` was listed by the API but the chat endpoint answered
+  "not found", so the default is now the alias `gemini-flash-latest`. On the day it was tried, that alias and
+  three other flash models answered HTTP 503 "high demand": the name and key were accepted, the model was
+  overloaded. Failover to Groq worked as designed. Re-run `python scripts/llm_smoke_test.py` when demand drops.
 - **Default model names are my best guess** and model catalogues change often. That is why the model is a
   setting and the smoke script can list what your key allows.
 - **Gemini reasoning models spend output tokens thinking.** The default `max_tokens` is 2048 so answers are
