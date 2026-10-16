@@ -15,6 +15,13 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 7a: rule-based decision provider
+- `decision`: `DecisionProvider` protocol, `DecisionRequest` and `RuleBasedDecisionProvider`. Seven rules map typed findings to one action each, ranked by fixed scores; two hard gates choose the recommendation: blocking uncertainty allows only cautious actions, and a Level 3+ action needs supporting findings plus a clause from the document that governs it. A skipped top candidate is named in `overridden_by`.
+- `IndicatorCode`, `Signal` and `SIGNAL_OF` moved to `domain/indicators.py` (agents re-export them) because the decision layer may not import agents.
+- `orchestration.provider_source` plugs a provider into the graph. All seven scenarios get an acceptable action; an account takeover runs from alert to a frozen account through two humans. 593 tests pass (39 new); disabling the uncertainty gate or lowering the takeover threshold fails tests.
+- Design choice: no recognisable findings at all means escalate, not "no action", because nothing was assessed.
+- Not built: LLM provider (7b), scoring harness (7c), comparison write-up (7d).
+
 ## 2026-10-16 - Phase 6d: execution of approved actions
 - `approvals.InMemoryApprovalStore` (requests, votes, atomic single-use consumption; implements `security.ApprovalSource`). New `execute` step after an approved `settle`: calls the guarded tool as the execution service, then `approved -> executed -> verified -> completed`; a refusal ends `failed_tool`, an effect that did not show ends `failed_validation`.
 - Tests: Level 4 with two approvers, Level 3 with one, one approver only, reject/escalate/modify, expiry, replay, approval consumed elsewhere, no store configured, and all seven scenarios end to end with no change to the bank without approval. 554 tests pass; routing around `execute` or ignoring a refusal each fail tests.
