@@ -37,3 +37,5 @@ class CaseGraphState(TypedDict, total=False):
     # Every vote received so far across resumes. Lists are appended to, not replaced.
     votes: Annotated[list[ApprovalVote], operator.add]
     approval: ApprovalStatus
+    # How many times the run has paused for votes; bounded by `RunLimits.max_vote_rounds`.
+    rounds: int

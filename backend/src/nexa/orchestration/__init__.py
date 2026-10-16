@@ -15,6 +15,7 @@ Modules:
 
 from .checkpoint import ALLOWED_TYPES, checkpoint_serde
 from .graph import CaseGraph, CaseRun, build_case_graph, resume_case, run_case
+from .limits import RunLimits
 from .nodes import AgentSet, DecisionSource
 from .state import CaseGraphState
 
@@ -25,6 +26,7 @@ __all__ = [
     "CaseGraphState",
     "CaseRun",
     "DecisionSource",
+    "RunLimits",
     "build_case_graph",
     "checkpoint_serde",
     "resume_case",
