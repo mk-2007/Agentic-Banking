@@ -184,3 +184,8 @@ def test_each_scenario_gets_an_acceptable_action_and_never_a_forbidden_one(
         or decision.recommended_action is A.ESCALATE_TO_ANALYST
         or bool(decision.uncertainty_flags)
     )
+
+
+def test_instruction_text_never_leads_to_a_restriction_even_with_policy_available() -> None:
+    decision = decide(C.INSTRUCTION_TEXT)
+    assert decision.recommended_action is A.MONITOR_ACCOUNT

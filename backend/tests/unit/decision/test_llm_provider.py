@@ -204,3 +204,52 @@ def test_a_model_that_agrees_with_the_rules_reproduces_their_action(
     assert got.case_id == case.id and set(inv.verification.uncertainty_flags) <= set(
         got.uncertainty_flags
     )
+
+
+# --- the pattern gate and the human floor --------------------------------------------------
+def test_a_freeze_needs_the_takeover_pattern_not_just_any_risk_finding() -> None:
+    cited = [evidence_id(C.KYC_NOT_VERIFIED)]
+    decision = decide([answer(["freeze_account", "monitor_account"], cited)], C.KYC_NOT_VERIFIED)
+    assert decision.recommended_action is not A.FREEZE_ACCOUNT
+    assert decision.overridden_by == "pattern_gate"
+
+
+def test_instruction_text_alone_never_justifies_a_restriction() -> None:
+    cited = [evidence_id(C.INSTRUCTION_TEXT)]
+    decision = decide([answer(["freeze_account", "block_card"], cited)], C.INSTRUCTION_TEXT)
+    assert decision.recommended_action in (A.ESCALATE_TO_ANALYST, A.MONITOR_ACCOUNT)
+    assert decision.overridden_by == "pattern_gate"
+
+
+def test_a_card_block_needs_card_testing_or_amount_with_geography() -> None:
+    cited = [evidence_id(C.HIGH_VALUE)]
+    refused = decide([answer(["block_card", "monitor_account"], cited)], C.HIGH_VALUE)
+    assert refused.recommended_action is not A.BLOCK_CARD
+    both = (C.AMOUNT_ABOVE_AVERAGE, C.UNUSUAL_GEOGRAPHY)
+    allowed = decide([answer(["block_card"], [evidence_id(c) for c in both])], *both)
+    assert allowed.recommended_action is A.BLOCK_CARD and allowed.overridden_by is None
+
+
+def test_a_mitigating_finding_stops_a_model_proposed_freeze() -> None:
+    cited = [evidence_id(c) for c in TAKEOVER]
+    decision = decide([answer(["freeze_account"], cited)], *TAKEOVER, C.TRAVEL_NOTICE)
+    assert decision.recommended_action is A.ESCALATE_TO_ANALYST
+    assert decision.overridden_by == "pattern_gate"
+
+
+def test_a_model_cannot_be_less_cautious_than_the_baseline_about_involving_a_human() -> None:
+    cited = [evidence_id(C.CARD_TESTING)]
+    decision = decide([answer(["monitor_account"], cited)], C.CARD_TESTING)  # rules would block
+    assert decision.recommended_action is A.ESCALATE_TO_ANALYST
+    assert decision.overridden_by == "human_floor_gate"
+
+
+def test_a_model_may_be_more_cautious_than_the_baseline() -> None:
+    cited = [evidence_id(C.CARD_TESTING)]
+    decision = decide([answer(["escalate_to_analyst"], cited)], C.CARD_TESTING)
+    assert decision.recommended_action is A.ESCALATE_TO_ANALYST and decision.overridden_by is None
+
+
+def test_the_floor_does_not_force_a_human_when_the_baseline_has_none() -> None:
+    decision = decide([answer(["monitor_account"])], C.HIGH_VALUE)  # rules also only monitor
+    assert decision.recommended_action is A.MONITOR_ACCOUNT and decision.overridden_by is None
