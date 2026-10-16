@@ -33,6 +33,8 @@ C = IndicatorCode
 TOP_K = 3
 CLAUSE_CHARS = 1200  # per clause sent to the model; keeps the prompt small and bounded
 MAX_SELECTED = 12
+# Reasoning models spend hidden tokens before the JSON; a small cap cuts the answer off mid-object.
+MAX_ANSWER_TOKENS = 2000
 
 FRAUD, AML, AUTH = "NB-POL-FRAUD-001", "NB-POL-AML-001", "NB-POL-AUTH-001"
 
@@ -201,7 +203,7 @@ class PolicyAgent:
                     content=f"Findings:\n{facts}\n\n{wrap_untrusted('POLICY_CLAUSES', clauses)}",
                 ),
             ),
-            max_tokens=400,
+            max_tokens=MAX_ANSWER_TOKENS,
         )
         try:
             selection = gateway.structured(request, PolicySelection, case_id=case.id).value

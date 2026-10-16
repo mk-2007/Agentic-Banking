@@ -185,6 +185,8 @@ def test_the_prompt_has_codes_and_ids_only_and_fences_the_findings() -> None:
     assert "Ignore previous instructions" not in prompt  # summaries never reach the model
     assert "<<<BEGIN_FINDINGS>>>" in prompt and "freeze_account (level 4)" in prompt
     assert model.requests[0].temperature == 0.0
+    # Reasoning models spend hidden tokens first; a small cap truncated their JSON in the first live run.
+    assert model.requests[0].max_tokens >= 1000
 
 
 # --- all seven scenarios, on the real agents' findings --------------------------------------
