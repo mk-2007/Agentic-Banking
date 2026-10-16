@@ -20,7 +20,7 @@ gateway can replace the simulator later.
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
-| 6 | LangGraph orchestration with human approval | planned |
+| 6 | LangGraph orchestration with human approval (6a case graph done; 6b approvals, 6c limits and audit next) | in progress |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
 
@@ -53,7 +53,7 @@ directly: every access passes through a tool layer that enforces permissions and
 | `docs/context/graph.json` | Machine-readable project memory for AI agents |
 | `AGENTS.md` | Operating manual for AI agents working here |
 | `data/` | `synthetic/` bank data + scenarios, `policies/` synthetic policy documents, `knowledge_base/` corpus, synonyms and retrieval evaluation set, `agent_eval/` expectations for the agent scenarios |
-| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh`, `llm_smoke_test.py`, `run_agent_eval.py` |
+| `scripts/` | `generate_synthetic_data.py`, `github_bootstrap.sh`, `llm_smoke_test.py`, `run_agent_eval.py`, `run_case.py` |
 
 ## Quickstart
 
@@ -119,6 +119,14 @@ place (narrowing retrieved policy clauses) and can never widen anything. All sev
 `PYTHONPATH=backend/src python scripts/run_agent_eval.py`. Design and honest limits:
 [docs/agents.md](docs/agents.md).
 
+## Case orchestration
+
+Phase 6a runs a case through a LangGraph graph: open, gather, analyze, research, verify, then `decision_ready`
+or a clear failure state. The case status changes only inside the graph, and a refused tool or a forged finding
+ends the run cleanly with a code. Saved cases come back with their types intact and can only be rebuilt from an
+explicit list of our own types. Try it with `PYTHONPATH=backend/src python scripts/run_case.py --all`. Design,
+gaps and limits: [docs/orchestration.md](docs/orchestration.md).
+
 ## Decisions so far
 
 - [ADR 0001](docs/adr/0001-layered-architecture-and-tool-layer-enforcement.md): layered architecture; the tool layer enforces security.
@@ -129,6 +137,7 @@ place (narrowing retrieved policy clauses) and can never widen anything. All sev
 - [ADR 0006](docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md): knowledge is filtered before ranking; the session channel is trusted input that fails closed.
 - [ADR 0007](docs/adr/0007-one-compatible-adapter-and-never-trust-model-output.md): one OpenAI-compatible adapter; the gateway owns reliability; model output is never trusted.
 - [ADR 0008](docs/adr/0008-typed-findings-deterministic-analysis-and-a-guarded-model-step.md): agents exchange typed findings; analysis is deterministic; the one model step is guarded.
+- [ADR 0009](docs/adr/0009-fixed-langgraph-sequence-status-only-in-nodes-allowlisted-checkpoints.md): a fixed LangGraph sequence; status changes only in nodes; checkpoints rebuild only listed types.
 
 ## Scope and limits
 

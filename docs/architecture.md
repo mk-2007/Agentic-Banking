@@ -1,6 +1,6 @@
 # Architecture
 
-> Status: phases 0-5 built (domain through specialist agents). Orchestration, decision providers and the API arrive in phases 6-8 (see README roadmap).
+> Status: phases 0-5 built (domain through specialist agents) and the Phase 6a case graph. Approvals, limits, decision providers and the API follow (see README roadmap).
 
 ## Principle: controlled autonomy
 
