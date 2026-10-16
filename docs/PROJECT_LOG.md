@@ -15,6 +15,11 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 7b: LLM decision provider
+- `decision.LlmDecisionProvider`: a model ranks actions and cites evidence (schema-validated, closed action set); the shared gates (`decision/gates.py`: uncertainty, no-action, justification) walk its ranking and the first allowed action wins, with `overridden_by` naming a skipped pick. Policy references come from retrieval, never the model; scores come from rank and confidence; confidence is stored uncalibrated and flagged below 0.5. Prompt carries codes, signals and ids only.
+- Any model failure falls back to the rule provider and the decision says so (`provider`). New `no_action_gate` applies to both providers. `facts.py` holds the shared finding reader.
+- 619 tests pass (26 new). Removing the justification gate, the error fallback or the id check each fails tests. Only a scripted model has been used; real-model behaviour is 7c.
+
 ## 2026-10-16 - Phase 7a: rule-based decision provider
 - `decision`: `DecisionProvider` protocol, `DecisionRequest` and `RuleBasedDecisionProvider`. Seven rules map typed findings to one action each, ranked by fixed scores; two hard gates choose the recommendation: blocking uncertainty allows only cautious actions, and a Level 3+ action needs supporting findings plus a clause from the document that governs it. A skipped top candidate is named in `overridden_by`.
 - `IndicatorCode`, `Signal` and `SIGNAL_OF` moved to `domain/indicators.py` (agents re-export them) because the decision layer may not import agents.
