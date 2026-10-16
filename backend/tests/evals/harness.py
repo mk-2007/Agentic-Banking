@@ -89,7 +89,7 @@ class _World:
     log: InMemoryAuditLog = field(default_factory=InMemoryAuditLog)
 
 
-def _build(gateway: LlmGateway | None) -> tuple[AgentContext, _World, ToolContext]:
+def build_context(gateway: LlmGateway | None) -> tuple[AgentContext, _World, ToolContext]:
     world = _World()
     tool_ctx = ToolContext(
         bank=load_bank(),
@@ -135,16 +135,24 @@ def _untrusted_text_leaks(scenario: ScenarioSpec, inv: Investigation) -> list[st
     return leaks
 
 
-def run_scenario(
-    scenario: ScenarioSpec, expectations: dict[str, object], gateway: LlmGateway | None = None
-) -> ScenarioResult:
-    """Run the agents on one scenario and evaluate the result."""
-    agent_ctx, world, tool_ctx = _build(gateway)
+def open_case(
+    scenario: ScenarioSpec, gateway: LlmGateway | None = None
+) -> tuple[Case, AgentContext, _World, ToolContext]:
+    """Build a fresh world and the case a scenario's alert opens, scoped to its own account."""
+    agent_ctx, world, tool_ctx = build_context(gateway)
     alert = scenario.alert
     case = Case(id=f"case_{scenario.id}", alert=alert, created_at=NOW, updated_at=NOW)
     world.scopes.scopes[case.id] = CaseScope(
         case_id=case.id, customer_id=alert.customer_id, account_ids=(alert.account_id,)
     )
+    return case, agent_ctx, world, tool_ctx
+
+
+def run_scenario(
+    scenario: ScenarioSpec, expectations: dict[str, object], gateway: LlmGateway | None = None
+) -> ScenarioResult:
+    """Run the agents on one scenario and evaluate the result."""
+    case, agent_ctx, world, tool_ctx = open_case(scenario, gateway)
     inv = investigate(case, agent_ctx)
 
     spec = expectations["scenarios"][scenario.id]  # type: ignore[index]

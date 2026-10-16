@@ -23,6 +23,11 @@ class Facts:
         """Return the findings with any of ``codes``."""
         return tuple(e for code in codes for e in self.by_code.get(code, ()))
 
+    @property
+    def codes(self) -> frozenset[IndicatorCode]:
+        """The codes of every finding in the case."""
+        return frozenset(self.by_code)
+
     def has(self, code: IndicatorCode) -> bool:
         """Return whether a finding with ``code`` exists."""
         return code in self.by_code

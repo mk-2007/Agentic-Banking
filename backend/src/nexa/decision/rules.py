@@ -25,15 +25,12 @@ from nexa.domain.evidence import Evidence
 from nexa.domain.indicators import IndicatorCode
 
 from .facts import Facts, read_facts, unique_ids
-from .gates import governing_refs, refusal
+from .gates import TAKEOVER_SIGNS, governing_refs, refusal, restriction_supported
 from .provider import DecisionRequest
 
 PROVIDER_NAME = "rule_based_v1"
 C = IndicatorCode
 
-# Indicators that together describe an account takeover (NB-POL-FRAUD-001 section 2).
-TAKEOVER_SIGNS = (C.RAPID_SERIES, C.NEW_BENEFICIARY, C.UNKNOWN_DEVICE, C.FAILED_AUTH)
-TAKEOVER_MINIMUM = 3
 KYC_GAPS = (C.KYC_ITEM_MISSING, C.KYC_NOT_VERIFIED)
 
 
@@ -46,16 +43,17 @@ class _Rule:
 
 
 def _takeover(f: Facts) -> tuple[Evidence, ...]:
-    present = [code for code in TAKEOVER_SIGNS if f.has(code)]
-    return f.of(*present) if len(present) >= TAKEOVER_MINIMUM and not f.mitigating else ()
+    if not restriction_supported(ActionType.FREEZE_ACCOUNT, f.codes, mitigated=bool(f.mitigating)):
+        return ()
+    return f.of(*(code for code in TAKEOVER_SIGNS if f.has(code)))
 
 
 def _card_fraud(f: Facts) -> tuple[Evidence, ...]:
+    if not restriction_supported(ActionType.BLOCK_CARD, f.codes, mitigated=bool(f.mitigating)):
+        return ()
     if f.has(C.CARD_TESTING):
         return f.of(C.CARD_TESTING)
-    if f.has(C.AMOUNT_ABOVE_AVERAGE) and f.has(C.UNUSUAL_GEOGRAPHY):
-        return f.of(C.AMOUNT_ABOVE_AVERAGE, C.UNUSUAL_GEOGRAPHY)
-    return ()
+    return f.of(C.AMOUNT_ABOVE_AVERAGE, C.UNUSUAL_GEOGRAPHY)
 
 
 RULES: tuple[_Rule, ...] = (
@@ -113,6 +111,8 @@ class RuleBasedDecisionProvider:
                 risk_ids=risk_ids,
                 refs=request.policy_refs,
                 flags=flags,
+                case_codes=facts.codes,
+                mitigated=bool(facts.mitigating),
             )
             if problem is None:
                 chosen = candidate

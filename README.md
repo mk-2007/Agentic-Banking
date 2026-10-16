@@ -21,7 +21,7 @@ gateway can replace the simulator later.
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
 | 6 | LangGraph orchestration with human approval (6a case graph, 6b approval pause and 6c limits and audit done; 6d execution of approved actions done; merging the stacked PRs next) | in progress |
-| 7 | Decision providers (7a rule-based and 7b LLM done; 7c evaluation and 7d comparison next) and evaluation | in progress |
+| 7 | Decision providers (7a rule-based, 7b LLM and 7c evaluation done; 7d comparison next) and evaluation | in progress |
 | 8 | API, frontend, demo | planned |
 
 ## Core idea: controlled autonomy
@@ -132,7 +132,10 @@ gaps and limits: [docs/orchestration.md](docs/orchestration.md).
 Phase 7a adds the first decision provider: transparent rules over the typed findings pick one action from the closed
 set, then two hard gates hold it back when evidence is missing or conflicting, or when a Level 3+ action lacks
 supporting findings or the governing policy. It recommends only; humans still authorize. Phase 7b adds an LLM provider behind the same interface: the model proposes a ranking, the same gates decide, and
-a failing model falls back to the rules. All seven scenarios get an
+a failing model falls back to the rules. Phase 7c scores the providers on the seven scenarios, safety apart from usefulness, and puts deliberately
+misbehaving stand-in models through the gates: `PYTHONPATH=backend/src python scripts/run_decision_eval.py`
+(`--live` adds a real model). Every provider comes out safe on all seven; the evaluation found two holes in the
+first version of the gates, now closed (ADR 0010). All seven scenarios get an
 acceptable action. Rules, gates and honest limits: [docs/decision.md](docs/decision.md).
 
 ## Decisions so far
@@ -145,6 +148,7 @@ acceptable action. Rules, gates and honest limits: [docs/decision.md](docs/decis
 - [ADR 0006](docs/adr/0006-filter-knowledge-before-ranking-and-fail-closed-channel.md): knowledge is filtered before ranking; the session channel is trusted input that fails closed.
 - [ADR 0007](docs/adr/0007-one-compatible-adapter-and-never-trust-model-output.md): one OpenAI-compatible adapter; the gateway owns reliability; model output is never trusted.
 - [ADR 0008](docs/adr/0008-typed-findings-deterministic-analysis-and-a-guarded-model-step.md): agents exchange typed findings; analysis is deterministic; the one model step is guarded.
+- [ADR 0010](docs/adr/0010-model-decisions-share-the-gates-and-keep-a-human-floor.md): every decision provider shares the hard gates; restrictions need an indicator pattern; model decisions keep a human floor.
 - [ADR 0009](docs/adr/0009-fixed-langgraph-sequence-status-only-in-nodes-allowlisted-checkpoints.md): a fixed LangGraph sequence; status changes only in nodes; checkpoints rebuild only listed types.
 
 ## Scope and limits

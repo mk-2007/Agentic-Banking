@@ -8,8 +8,8 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
   (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
-  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **Next: 7c** (harness scoring both providers on the seven scenarios, offline and `--live`), then 7d (written comparison). See `docs/TRACKER.md` for the split.
-- 619 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010). **Next: 7d** (run `--live` once keys allow, write the baseline-vs-LLM comparison in docs), then Phase 8. See `docs/TRACKER.md` for the split.
+- 632 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first
@@ -24,6 +24,8 @@ python -m pip install -e "backend[dev]"
 cd backend; python -m ruff check .; python -m ruff format --check .; python -m mypy; python -m pytest -q; cd ..
 python scripts/run_agent_eval.py            # offline, no keys
 python scripts/run_agent_eval.py --live     # real model in the policy step
+python scripts/run_decision_eval.py         # decision providers + stand-in models, offline
+python scripts/run_decision_eval.py --live  # also a real model as the decision provider
 python scripts/llm_smoke_test.py            # provider check (keys in .env)
 ```
 
@@ -41,5 +43,5 @@ python scripts/llm_smoke_test.py            # provider check (keys in .env)
 - `instruction_text` detection is a heuristic; conflict detection is coarse (over-escalates).
 
 ## Decisions to remember
-ADR 0001-0009 in `docs/adr/`. Latest: 0008 (typed findings, deterministic analysis, guarded model step),
+ADR 0001-0010 in `docs/adr/`. Latest: 0008 (typed findings, deterministic analysis, guarded model step),
 0009 (fixed LangGraph sequence, status only in nodes, allowlisted checkpoints).
