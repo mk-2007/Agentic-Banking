@@ -4,8 +4,8 @@ The single place to see what is done, what is next and whether the schedule hold
 **same pull request** as the work (the PR template asks). Newest facts win; history lives in
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
-**Hackathon deadline:** `____-__-__ __:__` (fill this in; every "days left" below depends on it)
-**Last updated:** 2026-10-14
+**Hackathon deadline:** `18-10-2026:__` (fill this in; every "days left" below depends on it)
+**Last updated:** 2026-10-16
 
 ## Phases
 
@@ -53,7 +53,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 |---|---|---|---|
 | Gemini has no successful live call | you | 2026-10-13 | 503 overloaded on 4 models; re-run `python scripts/llm_smoke_test.py` |
 | Model step in the policy agent never run live | you | 2026-10-14 | `python scripts/run_agent_eval.py --live` |
-| Repo public or private? | you | | Public is needed for GitHub badges; synthetic data only, no keys |
+| Repo public| synthetic data only, no keys |
 | Deadline above | you | | Fill in at the top |
 
 ## Pull request log
@@ -72,3 +72,5 @@ Add one row per merged PR. This is also the proof of work for judges.
 | #27 | feat/phase-5a2-smoke-test-and-docs | 2026-10-13 | Phase 5a-2: live smoke test, .env template and gateway docs |
 | #28 | feat/phase-5a3-gateway-diagnostics | 2026-10-13 | Phase 5a-3: gateway diagnostics after the first live run |
 | #29 | feat/phase-5b-specialist-agents | 2026-10-14 | feat(agents): specialist agents with scenario evals (phase 5b) |
+| #30 | docs/tracker-5b-merged | 2026-10-14 | docs(tracker): record phase 5b merge and PR history |
+| #31 | feat/phase-6a-case-graph | 2026-10-16 | feat(orchestration): LangGraph case graph (phase 6a) |
