@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="270" viewBox="0 0 1200 270" role="img" aria-labelledby="t d">
+  <title id="t">Who does what</title>
+  <desc id="d">Models and agents recommend; plain code enforces; humans authorize.</desc>
+  <defs>
+    <linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+    <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#059669"/></linearGradient>
+    <linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#d97706"/></linearGradient>
+  </defs>
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif">
+    <!-- card 1: agents -->
+    <rect x="6" y="6" width="380" height="258" rx="20" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+    <path d="M6,80 V26 a20,20 0 0 1 20,-20 H366 a20,20 0 0 1 20,20 V80 Z" fill="url(#gb)"/>
+    <circle cx="52" cy="43" r="22" fill="#ffffff" fill-opacity="0.95"/>
+    <path d="M42,43 h20 M52,33 v20" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+    <text x="88" y="52" font-size="26" font-weight="800" fill="#ffffff">Models and agents</text>
+    <text x="32" y="118" font-size="19" font-weight="700" fill="#1e3a8a">Recommend only</text>
+    <text x="32" y="150" font-size="17" fill="#1e40af">Investigate cases, search policy,</text>
+    <text x="32" y="176" font-size="17" fill="#1e40af">rank actions from a closed set.</text>
+    <text x="32" y="216" font-size="17" font-weight="600" fill="#1e3a8a">Output is validated, never trusted.</text>
+    <text x="32" y="242" font-size="15" fill="#3b82f6">Typed findings, never prose.</text>
+
+    <!-- card 2: code -->
+    <rect x="410" y="6" width="380" height="258" rx="20" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="2"/>
+    <path d="M410,80 V26 a20,20 0 0 1 20,-20 H770 a20,20 0 0 1 20,20 V80 Z" fill="url(#gg)"/>
+    <circle cx="456" cy="43" r="22" fill="#ffffff" fill-opacity="0.95"/>
+    <path d="M444,43 l9,9 l17,-18" fill="none" stroke="#059669" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="492" y="52" font-size="26" font-weight="800" fill="#ffffff">Plain code</text>
+    <text x="436" y="118" font-size="19" font-weight="700" fill="#064e3b">Enforces the rules</text>
+    <text x="436" y="150" font-size="17" fill="#047857">Permissions, thresholds, gates,</text>
+    <text x="436" y="176" font-size="17" fill="#047857">approvals, execution, audit.</text>
+    <text x="436" y="216" font-size="17" font-weight="600" fill="#064e3b">No permission logic in a prompt.</text>
+    <text x="436" y="242" font-size="15" fill="#10b981">Tested; layer rules fail CI.</text>
+
+    <!-- card 3: humans -->
+    <rect x="814" y="6" width="380" height="258" rx="20" fill="#fffbeb" stroke="#fcd34d" stroke-width="2"/>
+    <path d="M814,80 V26 a20,20 0 0 1 20,-20 H1174 a20,20 0 0 1 20,20 V80 Z" fill="url(#ga)"/>
+    <circle cx="860" cy="43" r="22" fill="#ffffff" fill-opacity="0.95"/>
+    <circle cx="860" cy="36" r="7" fill="#d97706"/>
+    <path d="M847,56 c0,-11 26,-11 26,0 z" fill="#d97706"/>
+    <text x="896" y="52" font-size="26" font-weight="800" fill="#ffffff">Humans</text>
+    <text x="840" y="118" font-size="19" font-weight="700" fill="#78350f">Authorize</text>
+    <text x="840" y="150" font-size="17" fill="#b45309">Approve, reject or escalate any</text>
+    <text x="840" y="176" font-size="17" fill="#b45309">action that restricts a customer.</text>
+    <text x="840" y="216" font-size="17" font-weight="600" fill="#78350f">Level 4 needs two different roles.</text>
+    <text x="840" y="242" font-size="15" fill="#d97706">Approvals expire and work once.</text>
+  </g>
+</svg>

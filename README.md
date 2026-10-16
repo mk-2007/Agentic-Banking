@@ -1,32 +1,42 @@
-<div align="center">
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="NexaBank Agentic Platform: agents recommend, code enforces, humans authorize" width="100%">
+</p>
 
-# NexaBank Agentic Platform
+<p align="center">
+  <img alt="tests" src="https://img.shields.io/badge/tests-652%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
+  <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
+  <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
+  <img alt="phases" src="https://img.shields.io/badge/phases-0%E2%80%937%20done-6d28d9?style=for-the-badge">
+</p>
 
-**AI agents that investigate. Deterministic code that decides what is allowed. Humans who authorize.**
+<p align="center">
+  <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white">
+  <img alt="LangGraph" src="https://img.shields.io/badge/LangGraph-1C3C3C?style=flat-square&logo=langchain&logoColor=white">
+  <img alt="Pydantic" src="https://img.shields.io/badge/Pydantic-E92063?style=flat-square&logo=pydantic&logoColor=white">
+  <img alt="Groq" src="https://img.shields.io/badge/Groq-F55036?style=flat-square">
+  <img alt="Gemini" src="https://img.shields.io/badge/Gemini-8E75B2?style=flat-square&logo=googlegemini&logoColor=white">
+  <img alt="Ruff" src="https://img.shields.io/badge/Ruff-D7FF64?style=flat-square&logo=ruff&logoColor=black">
+  <img alt="pytest" src="https://img.shields.io/badge/pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white">
+</p>
 
-An agentic environment for banking, built as a hackathon prototype on **synthetic data**.
+<p align="center">
+  <b>An agentic environment for banking, built as a hackathon prototype on synthetic data.</b><br>
+  <a href="#architecture">Architecture</a> &nbsp;·&nbsp;
+  <a href="#a-cases-life">A case's life</a> &nbsp;·&nbsp;
+  <a href="#decision-gates">Decision gates</a> &nbsp;·&nbsp;
+  <a href="#results">Results</a> &nbsp;·&nbsp;
+  <a href="#try-it">Try it</a> &nbsp;·&nbsp;
+  <a href="#honest-limits">Limits</a>
+</p>
 
-![tests](https://img.shields.io/badge/tests-652%20passing-brightgreen)
-![python](https://img.shields.io/badge/python-3.11%2B-blue)
-![typing](https://img.shields.io/badge/mypy-strict-informational)
-![data](https://img.shields.io/badge/data-synthetic%20only-orange)
-![phases](https://img.shields.io/badge/phases-0%E2%80%937%20done%2C%208%20in%20progress-yellow)
-
-[Architecture](#architecture) ·
-[A case's life](#a-cases-life) ·
-[Decision gates](#decision-gates) ·
-[Results](#results) ·
-[Try it](#try-it) ·
-[Limits](#honest-limits)
-
-</div>
-
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## The idea in one picture
 
-Most "AI for banking" demos let a model act. This one does not. A model may **read, reason and recommend**; every
-step that could hurt a customer is plain code or a named human.
+> [!IMPORTANT]
+> Most "AI for banking" demos let a model act. This one does not. A model may **read, reason and recommend**;
+> every step that could hurt a customer is plain code or a named human.
 
 ```mermaid
 flowchart LR
@@ -53,37 +63,19 @@ flowchart LR
     class J store
 ```
 
-<table>
-<tr>
-<td width="33%" valign="top">
-
-### 🔵 Models and agents
-Investigate, search policy, rank actions.
-**Recommend only.** Their output is validated and never trusted.
-
-</td>
-<td width="33%" valign="top">
-
-### 🟢 Plain code
-Permissions, thresholds, gates, approvals, execution, audit.
-**No permission logic lives in a prompt.**
-
-</td>
-<td width="33%" valign="top">
-
-### 🟠 Humans
-Approve, reject or escalate anything that restricts a customer.
-**Level 4 needs two different roles.**
-
-</td>
-</tr>
-</table>
+<p align="center">
+  <img src="docs/assets/principle.svg" alt="Models and agents recommend; plain code enforces; humans authorize" width="100%">
+</p>
 
 **Priorities, in order:** security and privacy · precise decisions · auditability · cost.
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## At a glance
+
+<p align="center">
+  <img src="docs/assets/stats.svg" alt="652 tests, 7 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
+</p>
 
 | | |
 |---|---|
@@ -95,7 +87,7 @@ Approve, reject or escalate anything that restricts a customer.
 | **Synthetic data** | 23 customers, 865 transactions, 3 policy documents |
 | **Quality** | 652 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Architecture
 
@@ -168,7 +160,7 @@ flowchart TB
 | Case status | `Case.transition_to` inside graph nodes | agents |
 | What was done | an append-only, hash-chained audit log | anything editable |
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## A case's life
 
@@ -239,7 +231,7 @@ sequenceDiagram
     G->>G: executed, verified, completed
 ```
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Decision gates
 
@@ -283,12 +275,13 @@ The first evaluation found two holes in an earlier version of these gates (a "re
 recommended on an incomplete-KYC case; a "lazy" model downgraded an account takeover to monitoring). Both are closed
 ([ADR 0010](docs/adr/0010-model-decisions-share-the-gates-and-keep-a-human-floor.md)).
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Results
 
-Everything below is reproducible from this repository. Numbers come from the synthetic scenarios, so they show that
-the rules do what the policy says, **not** that they would hold on real traffic.
+> [!NOTE]
+> Everything below is reproducible from this repository. Numbers come from the synthetic scenarios, so they show
+> that the rules do what the policy says, **not** that they would hold on real traffic.
 
 ### Specialist agents: 7 of 7 scenarios
 
@@ -330,7 +323,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 | MRR | 0.90 |
 | Access | decided **before** ranking: one index per clearance level; the clearance is the stricter of the caller's role and the session channel |
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Try it
 
@@ -366,7 +359,7 @@ then add `--live` to either evaluation.
 
 Details and limits: [docs/api.md](docs/api.md).
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Progress
 
@@ -406,7 +399,7 @@ gantt
 
 Live detail: [docs/TRACKER.md](docs/TRACKER.md) · history: [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md).
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Repository map
 
@@ -458,11 +451,12 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | Serving it | [HTTP API](docs/api.md) |
 | Working on it | [AGENTS.md](AGENTS.md) · [workflow](docs/WORKFLOW.md) · [context graph](docs/context/graph.json) |
 
----
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
 ## Honest limits
 
-This is a prototype, and these are the things it does **not** do.
+> [!WARNING]
+> This is a prototype, and these are the things it does **not** do.
 
 - **Synthetic data only.** No real banking systems, no production encryption. The design aims to scale by swapping
   `bank_sim` for a real gateway behind the same tool interface.
