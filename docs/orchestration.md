@@ -1,4 +1,4 @@
-# Case orchestration (Phase 6a, 6b, 6c)
+# Case orchestration (Phase 6a to 6d)
 
 A LangGraph graph that carries one case through the four agents and ends in a clear status. Code:
 `backend/src/nexa/orchestration/`. Try it: `python scripts/run_case.py --all`.
@@ -74,6 +74,22 @@ Audit events are written by the orchestrator (a `system` actor) and never by an 
 statuses, ids and codes only, never third-party text. Without a recorder nothing is written and behaviour is
 otherwise identical.
 
+## Executing the approved action (6d)
+
+Pass `approvals=InMemoryApprovalStore()` (the same store the tool registry's `ToolContext` uses) and an
+approved case continues: `settle -> execute`.
+
+| Step | What happens |
+|---|---|
+| `request_approval` | also stores the request, so the execution tool can find it |
+| `settle` | mirrors every vote received so far into the store before judging them |
+| `execute` | calls `execute_authorized_action` as the execution service with the approval id as the only authority. Success: `approved -> executed -> verified -> completed`. A refusal (replay, expiry, wrong account) ends `failed_tool` with the tool's code. An action that did not take effect (the output does not show the account frozen or the card blocked) ends `failed_validation` (`execution:not_applied`). |
+
+The tool, not the graph, re-checks action, account, case, approvers, expiry and single use, so a graph bug
+cannot execute something a human did not approve. Tests cover the Level 4 two-approver path, Level 3 with one
+analyst, one approver only, rejection, expiry, replay and an approval consumed behind the graph's back, and run
+all seven scenarios end to end (nothing changes on the bank without an approval).
+
 ## Not built yet (by design, and on the tracker)
 
 | Gap | Where it lands |
@@ -81,7 +97,6 @@ otherwise identical.
 | Loop-back to gather again when records are missing, and wall-clock timeouts per step | not planned; the limits exist, nothing loops back yet |
 | The decision itself (ranked actions, policy citations) | Phase 7, behind `decision_ready` |
 | A durable checkpoint store (only an in-memory saver is tested) | 8a (API) |
-| Executing the approved action and verifying it | 6d |
 
 ## Honest limits
 
