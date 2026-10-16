@@ -20,7 +20,7 @@ gateway can replace the simulator later.
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
-| 6 | LangGraph orchestration with human approval (6a case graph done; 6b approvals, 6c limits and audit next) | in progress |
+| 6 | LangGraph orchestration with human approval (6a case graph and 6b approval pause done; 6c limits and audit next) | in progress |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
 
@@ -121,7 +121,7 @@ place (narrowing retrieved policy clauses) and can never widen anything. All sev
 
 ## Case orchestration
 
-Phase 6a runs a case through a LangGraph graph: open, gather, analyze, research, verify, then `decision_ready`
+Phase 6a runs a case through a LangGraph graph (6b adds the human approval pause: a Level 3+ recommendation saves the run and waits for votes, judged by the pure approval rule): open, gather, analyze, research, verify, then `decision_ready`
 or a clear failure state. The case status changes only inside the graph, and a refused tool or a forged finding
 ends the run cleanly with a code. Saved cases come back with their types intact and can only be rebuilt from an
 explicit list of our own types. Try it with `PYTHONPATH=backend/src python scripts/run_case.py --all`. Design,
