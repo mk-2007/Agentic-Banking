@@ -63,7 +63,7 @@
       "type": "module",
       "status": "in_progress",
       "path": "backend/src/nexa/decision",
-      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a), LLM provider (7b) done; evaluation 7c; optional JEV adapter later"
+      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a), LLM provider (7b) and evaluation harness (7c) done; comparison 7d; optional JEV adapter later"
     },
     {
       "id": "module:approvals",
@@ -390,6 +390,13 @@
       "status": "done",
       "path": "docs/adr/0009-fixed-langgraph-sequence-status-only-in-nodes-allowlisted-checkpoints.md",
       "summary": "Fixed LangGraph sequence; status changes only in nodes; checkpoints rebuild only allowlisted types"
+    },
+    {
+      "id": "adr:0010",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0010-model-decisions-share-the-gates-and-keep-a-human-floor.md",
+      "summary": "All providers share the hard gates; restrictions need an indicator pattern; model decisions keep a human floor"
     },
     {
       "id": "doc:orchestration",
@@ -1000,6 +1007,11 @@
     {
       "from": "adr:0009",
       "to": "module:orchestration",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0010",
+      "to": "module:decision",
       "relation": "decides"
     },
     {

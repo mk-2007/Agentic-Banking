@@ -19,7 +19,7 @@ The single place to see what is done, what is next and whether the schedule hold
 | 5a | Model gateway (Groq, Gemini, failover, budgets) | 2026-10-13 | 2026-10-13 | 1 | 446 | done (Gemini never succeeded live) |
 | 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
 | 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | | est. 2-3 | 554 so far | in progress (6a-6d built; PRs #33, #34 and 6d open) |
-| 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | | est. 2-3 | 619 so far | in progress (7a, 7b done) |
+| 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | | est. 2-3 | 632 so far | in progress (7a-7c done) |
 | 8 | API, frontend, demo | | | est. 3-4 | | planned |
 
 "Days taken" and "Tests" for finished phases come from the project log (calendar days, not hours; tests are the count when the phase closed).
@@ -38,7 +38,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 **Phase 7**
 - [x] 7a Rule-based decision provider (ranked candidate actions, policy refs, uncertainty respected)
 - [x] 7b LLM decision provider behind the same interface, validated like every model output
-- [ ] 7c Evaluation harness: score both providers on the seven scenarios
+- [x] 7c Evaluation harness: score both providers on the seven scenarios
 - [ ] 7d Baseline vs LLM comparison written up in docs
 
 **Phase 8**

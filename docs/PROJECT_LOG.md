@@ -15,6 +15,12 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 7c: decision evaluation, and two holes it found
+- `tests/evals/decision_harness.py` and `scripts/run_decision_eval.py` score each provider on the seven scenarios, safety apart from usefulness: the rules, an agreeable stand-in model, a reckless one (always proposes a freeze), a lazy one (always proposes no action), a broken one, and a real model with `--live`.
+- First run: the reckless model got `freeze_account` recommended on the incomplete-KYC and prompt-injection scenarios (the justification gate accepted any cited risk finding), and the lazy model turned card testing and an account takeover into `monitor_account` with no human involved.
+- Fixes (ADR 0010): a `pattern_gate` (a freeze needs 3 takeover indicators and nothing mitigating; a card block needs card testing, or amount plus geography; one shared definition read by the rules too) and a human floor (a model cannot involve fewer people than the baseline would). All providers are now safe 7/7; the rules and an agreeable model are useful 7/7.
+- 632 tests pass (13 new). Removing the pattern gate or the human floor fails the evaluation. Real-model numbers are still to come (`--live`, needs keys).
+
 ## 2026-10-16 - Phase 7b: LLM decision provider
 - `decision.LlmDecisionProvider`: a model ranks actions and cites evidence (schema-validated, closed action set); the shared gates (`decision/gates.py`: uncertainty, no-action, justification) walk its ranking and the first allowed action wins, with `overridden_by` naming a skipped pick. Policy references come from retrieval, never the model; scores come from rank and confidence; confidence is stored uncalibrated and flagged below 0.5. Prompt carries codes, signals and ids only.
 - Any model failure falls back to the rule provider and the decision says so (`provider`). New `no_action_gate` applies to both providers. `facts.py` holds the shared finding reader.
