@@ -1,4 +1,4 @@
-# Case orchestration (Phase 6a, 6b)
+# Case orchestration (Phase 6a, 6b, 6c)
 
 A LangGraph graph that carries one case through the four agents and ends in a clear status. Code:
 `backend/src/nexa/orchestration/`. Try it: `python scripts/run_case.py --all`.
@@ -59,12 +59,26 @@ mark_ready -> propose -> request_approval -> await_votes (pauses) -> settle
 Execution of an approved action is not part of this graph yet; the run ends at `approved` and the request
 id is what the guarded execution tool needs.
 
+## Limits, retries and audit (6c)
+
+`build_case_graph(..., audit=AuditRecorder(...), limits=RunLimits(...))`.
+
+| Bound | Default | What happens at the limit |
+|---|---|---|
+| `max_attempts` per agent step | 2 | A tool error in `TRANSIENT_TOOL_CODES` (`timeout`, `internal_error`) moves the case `executing -> waiting_for_tool -> executing` and the step runs again; at the limit the case ends `failed_tool` with the code. Refusals (denied, out of scope, invalid arguments) are never retried. |
+| `max_vote_rounds` | 5 | A case still pending after this many resumes ends `escalated` with `approval:too_many_rounds`. |
+
+Audit events are written by the orchestrator (a `system` actor) and never by an agent: `case_created`, one
+`state_changed` per transition (`executing->verifying`), `decision_made`, `approval_requested`, one
+`approval_vote_cast` per vote (with the approver id) and an `error` carrying the failure code. Details are
+statuses, ids and codes only, never third-party text. Without a recorder nothing is written and behaviour is
+otherwise identical.
+
 ## Not built yet (by design, and on the tracker)
 
 | Gap | Where it lands |
 |---|---|
-| Loop limits, retries, timeouts, and loop-back when records are missing | 6c |
-| Audit event for every status change (the in-memory `trail` is the stand-in) | 6c |
+| Loop-back to gather again when records are missing, and wall-clock timeouts per step | not planned; the limits exist, nothing loops back yet |
 | The decision itself (ranked actions, policy citations) | Phase 7, behind `decision_ready` |
 | A durable checkpoint store (only an in-memory saver is tested) | 8a (API) |
 | Executing the approved action and verifying it | 6d |
@@ -76,7 +90,8 @@ id is what the guarded execution tool needs.
   path.
 - When verification reports missing records the case stops in `failed_validation` instead of looping back to
   gather them again. Looping safely needs the limits from 6c.
-- A tool problem ends the run at once; there is no retry yet.
+- Retries are immediate (no backoff) and only for two error codes; a real transient failure may need a pause between tries.
+- Audit events are written as the graph runs. A crash between a transition and its event, or a step LangGraph replays on resume, can leave a missing or duplicate event; the chain stays valid either way.
 - Checkpoint behaviour is proven with LangGraph's in-memory saver only (including resuming from a freshly
   built graph). A database-backed saver may serialize slightly differently.
 - The graph trusts that votes it is resumed with come from authenticated approvers; it checks roles,

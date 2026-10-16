@@ -7,8 +7,9 @@ r"""The case graph (Phase 6a): intake, four agents, then ready or failed.
 With a decision source (6b) the graph goes on: propose -> request_approval -> await_votes (pauses)
 -> settle, which ends in approved, rejected, escalated, timed out or back to decision-ready.
 
-Not built yet, by design: loop limits, retries and audit events for every transition (6c); and the
-decisions themselves, which arrive in Phase 7.
+Phase 6c bounds every loop (`RunLimits`: transient tool failures are retried, a case that keeps
+waiting on votes is escalated) and, given an audit recorder, writes an audit event for every
+transition. The decisions themselves arrive in Phase 7.
 """
 
 from dataclasses import dataclass
@@ -21,10 +22,12 @@ from langgraph.types import Command
 
 from nexa.agents import Investigation
 from nexa.agents.base import AgentContext
+from nexa.audit import AuditRecorder
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
 from nexa.domain.decision import Decision
 
+from .limits import RunLimits
 from .nodes import AgentSet, CaseNodes, DecisionSource
 from .state import CaseGraphState
 
@@ -55,7 +58,8 @@ def _after_request(state: CaseGraphState) -> str:
 
 
 def _after_settle(state: CaseGraphState) -> str:
-    return "await_votes" if state["approval"] is ApprovalStatus.PENDING else END
+    pending = state["approval"] is ApprovalStatus.PENDING
+    return "await_votes" if pending and not state.get("failure") else END
 
 
 def build_case_graph(
@@ -64,15 +68,21 @@ def build_case_graph(
     agents: AgentSet | None = None,
     checkpointer: BaseCheckpointSaver[Any] | None = None,
     decide: DecisionSource | None = None,
+    audit: AuditRecorder | None = None,
+    limits: RunLimits | None = None,
 ) -> CaseGraph:
     """Compile the case graph for ``ctx``. Pass ``agents`` to swap a specialist (tests do).
 
     With ``decide`` the graph continues past ``DECISION_READY``: a recommendation that needs humans
     pauses the run at ``WAITING_FOR_APPROVAL``. Pausing needs a ``checkpointer`` to save the run.
+    With ``audit`` every transition, decision, approval request and vote is written to the audit
+    chain; ``limits`` bounds retries and vote rounds (defaults are in `RunLimits`).
     """
     if decide is not None and checkpointer is None:
         raise ValueError("a graph that can pause for approval needs a checkpointer")
-    nodes = CaseNodes(agents or AgentSet.from_context(ctx), ctx.clock, decide)
+    nodes = CaseNodes(
+        agents or AgentSet.from_context(ctx), ctx.clock, decide, audit=audit, limits=limits
+    )
     graph = StateGraph(CaseGraphState)
     for name, step in (
         ("open_case", nodes.open_case),

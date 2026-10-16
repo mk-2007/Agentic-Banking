@@ -84,7 +84,7 @@
       "type": "module",
       "status": "in_progress",
       "path": "backend/src/nexa/orchestration",
-      "summary": "LangGraph case graph from intake to decision_ready/failed states; status only in nodes; allowlisted checkpoints (6a done; approvals 6b, limits and audit 6c)"
+      "summary": "LangGraph case graph from intake to decision_ready/failed states; status only in nodes; allowlisted checkpoints (6a, 6b approvals and 6c limits, retries and audit done; scenario tests 6d)"
     },
     {
       "id": "module:api",

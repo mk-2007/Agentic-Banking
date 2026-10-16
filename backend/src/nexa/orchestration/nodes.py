@@ -26,15 +26,21 @@ from nexa.agents import (
 )
 from nexa.agents.base import AgentContext
 from nexa.agents.verification_agent import BLOCKING
+from nexa.audit import AuditRecorder
 from nexa.config.approval_matrix import approval_rule_for
+from nexa.domain.actors import Actor, ActorKind
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote, evaluate_approval
+from nexa.domain.audit import AuditEventType
 from nexa.domain.case import Case, CaseStatus
 from nexa.domain.clock import Clock
 from nexa.domain.decision import BLOCKING_UNCERTAINTY, Decision
 from nexa.domain.evidence import Evidence
 from nexa.domain.ids import new_id
 
+from .limits import TRANSIENT_TOOL_CODES, RunLimits
 from .state import CaseGraphState
+
+ORCHESTRATOR = Actor(kind=ActorKind.SYSTEM, id="orchestrator")
 
 Update = dict[str, object]
 
@@ -68,43 +74,112 @@ class DecisionSource(Protocol):
 
 
 class CaseNodes:
-    """The step functions, bound to a set of agents, a clock and (optionally) a decision source."""
+    """The step functions, bound to agents, a clock, limits and (optionally) a decision source.
+
+    With an ``audit`` recorder, every status change, decision, approval request, vote and failure
+    is written to the audit chain by the orchestrator, so a case can be reconstructed afterwards.
+    """
 
     def __init__(
-        self, agents: AgentSet, clock: Clock, decide: DecisionSource | None = None
+        self,
+        agents: AgentSet,
+        clock: Clock,
+        decide: DecisionSource | None = None,
+        *,
+        audit: AuditRecorder | None = None,
+        limits: RunLimits | None = None,
     ) -> None:
         self._agents = agents
         self._clock = clock
         self._decide = decide
+        self._audit = audit
+        self._limits = limits or RunLimits()
 
     # --- helpers ---------------------------------------------------------------------
+    def _record(
+        self,
+        event: AuditEventType,
+        case: Case,
+        detail: str = "",
+        *,
+        decision_id: str | None = None,
+        approval_status: ApprovalStatus | None = None,
+        reviewer_id: str | None = None,
+    ) -> None:
+        if self._audit is not None:
+            self._audit.record(
+                event,
+                ORCHESTRATOR,
+                case_id=case.id,
+                detail=detail,
+                decision_id=decision_id,
+                approval_status=approval_status,
+                reviewer_id=reviewer_id,
+            )
+
     def _move(self, case: Case, *statuses: CaseStatus) -> tuple[Case, list[CaseStatus]]:
         for status in statuses:
+            before = case.status
             case = case.transition_to(status, self._clock())
+            self._record(AuditEventType.STATE_CHANGED, case, f"{before.value}->{status.value}")
         return case, list(statuses)
+
+    def _stop(self, case: Case, status: CaseStatus, code: str) -> Update:
+        """End the run in ``status`` with a short failure code, recording both."""
+        case, moved = self._move(case, status)
+        self._record(AuditEventType.ERROR, case, code)
+        return {"case": case, "trail": moved, "failure": code}
 
     def _fail_tool(self, case: Case, code: str) -> Update:
         # A tool problem surfaces while the case is executing, so it passes through waiting.
         case, moved = self._move(case, CaseStatus.WAITING_FOR_TOOL, CaseStatus.FAILED_TOOL)
+        self._record(AuditEventType.ERROR, case, code)
         return {"case": case, "trail": moved, "failure": code}
 
     def _guarded(
         self, step: Callable[[CaseGraphState], Update]
     ) -> Callable[[CaseGraphState], Update]:
+        """Run an agent step with bounded retries; failures become states, never crashes."""
+
         def run(state: CaseGraphState) -> Update:
-            try:
-                return step(state)
-            except AgentToolError as error:
-                return self._fail_tool(state["case"], f"{error.tool_name}:{error.error_code}")
-            except AgentDataError:
-                return self._fail_tool(state["case"], "records_inconsistent")
+            case = state["case"]
+            trail: list[CaseStatus] = []
+            attempt = 0
+            while True:
+                attempt += 1
+                try:
+                    update = step({**state, "case": case})
+                except (AgentToolError, AgentDataError) as error:
+                    transient = (
+                        isinstance(error, AgentToolError)
+                        and error.error_code in TRANSIENT_TOOL_CODES
+                    )
+                    if transient and attempt < self._limits.max_attempts:
+                        case, moved = self._move(
+                            case, CaseStatus.WAITING_FOR_TOOL, CaseStatus.EXECUTING
+                        )
+                        trail += moved
+                        continue
+                    code = (
+                        f"{error.tool_name}:{error.error_code}"
+                        if isinstance(error, AgentToolError)
+                        else "records_inconsistent"
+                    )
+                    failed = self._fail_tool(case, code)
+                    failed["trail"] = [*trail, *failed["trail"]]  # type: ignore[misc]
+                    return failed
+                if trail:  # retried: carry the moved case and the extra statuses forward
+                    return {**update, "case": case, "trail": trail}
+                return update
 
         return run
 
     # --- steps ---------------------------------------------------------------------------
     def open_case(self, state: CaseGraphState) -> Update:
         """Move the case from created to executing. The sequence is fixed; no model plans it."""
-        case, moved = self._move(state["case"], CaseStatus.PLANNING, CaseStatus.EXECUTING)
+        case = state["case"]
+        self._record(AuditEventType.CASE_CREATED, case, f"alert {case.alert.id}")
+        case, moved = self._move(case, CaseStatus.PLANNING, CaseStatus.EXECUTING)
         return {"case": case, "trail": moved}
 
     def gather(self, state: CaseGraphState) -> Update:
@@ -144,9 +219,9 @@ class CaseNodes:
 
     def fail_validation(self, state: CaseGraphState) -> Update:
         """Stop a case whose verification found a blocking problem, and say which kind."""
-        case, moved = self._move(state["case"], CaseStatus.FAILED_VALIDATION)
         issues = sorted({i.code.value for i in state["verification"].issues if i.code in BLOCKING})
-        return {"case": case, "trail": moved, "failure": "validation:" + ",".join(issues)}
+        code = "validation:" + ",".join(issues)
+        return self._stop(state["case"], CaseStatus.FAILED_VALIDATION, code)
 
     # --- decision and human approval (6b) --------------------------------------------------
     def propose(self, state: CaseGraphState) -> Update:
@@ -175,9 +250,14 @@ class CaseNodes:
             else None
         )
         if problem:
-            case, moved = self._move(case, CaseStatus.BLOCKED_BY_POLICY)
-            return {"case": case, "trail": moved, "failure": problem}
+            return self._stop(case, CaseStatus.BLOCKED_BY_POLICY, problem)
         case = case.model_copy(update={"decision_id": decision.id})
+        self._record(
+            AuditEventType.DECISION_MADE,
+            case,
+            decision.recommended_action.value,
+            decision_id=decision.id,
+        )
         return {"case": case, "decision": decision}
 
     def request_approval(self, state: CaseGraphState) -> Update:
@@ -185,8 +265,7 @@ class CaseNodes:
         case, decision = state["case"], state["decision"]
         rule = approval_rule_for(decision.recommended_action)
         if rule is None:  # a Level 3+ action with no matrix entry: refuse rather than guess
-            case, moved = self._move(case, CaseStatus.BLOCKED_BY_POLICY)
-            return {"case": case, "trail": moved, "failure": "approval:no_rule"}
+            return self._stop(case, CaseStatus.BLOCKED_BY_POLICY, "approval:no_rule")
         now = self._clock()
         request = ApprovalRequest(
             id=new_id("apr"),
@@ -200,6 +279,13 @@ class CaseNodes:
             expires_at=now + timedelta(minutes=rule.expiry_minutes),
         )
         case, moved = self._move(case, CaseStatus.WAITING_FOR_APPROVAL)
+        self._record(
+            AuditEventType.APPROVAL_REQUESTED,
+            case,
+            request.id,
+            decision_id=decision.id,
+            approval_status=ApprovalStatus.PENDING,
+        )
         return {"case": case, "trail": moved, "approval_request": request}
 
     def await_votes(self, state: CaseGraphState) -> Update:
@@ -213,7 +299,15 @@ class CaseNodes:
                 "expires_at": request.expires_at.isoformat(),
             }
         )
-        return {"votes": [ApprovalVote.model_validate(v) for v in received]}
+        votes = [ApprovalVote.model_validate(v) for v in received]
+        for vote in votes:
+            self._record(
+                AuditEventType.APPROVAL_VOTE_CAST,
+                state["case"],
+                f"{request.id}:{vote.role.value}:{vote.verdict.value}",
+                reviewer_id=vote.approver_id,
+            )
+        return {"votes": votes, "rounds": state.get("rounds", 0) + 1}
 
     def settle(self, state: CaseGraphState) -> Update:
         """Apply the pure approval rule to the votes; still pending means wait for more."""
@@ -226,7 +320,12 @@ class CaseNodes:
             ApprovalStatus.EXPIRED: CaseStatus.TIMED_OUT,
             ApprovalStatus.MODIFICATION_REQUESTED: CaseStatus.DECISION_READY,
         }.get(status)
-        if target is None:  # still pending
+        if target is None:  # still pending, unless humans have already been asked too often
+            if state.get("rounds", 0) >= self._limits.max_vote_rounds:
+                stopped = self._stop(
+                    state["case"], CaseStatus.ESCALATED, "approval:too_many_rounds"
+                )
+                return {**stopped, "approval": status}
             return {"approval": status}
         case, moved = self._move(state["case"], target)
         return {"case": case, "trail": moved, "approval": status}
