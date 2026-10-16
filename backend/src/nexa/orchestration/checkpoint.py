@@ -17,8 +17,11 @@ from nexa.agents.dossier import (
     TravelNoticeFact,
 )
 from nexa.agents.verification_agent import IssueCode, VerificationIssue
+from nexa.domain.actions import ActionType, RiskLevel
+from nexa.domain.actors import Role
+from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote, Verdict
 from nexa.domain.case import Alert, Case, CaseStatus
-from nexa.domain.decision import UncertaintyFlag
+from nexa.domain.decision import CandidateScore, Decision, UncertaintyFlag
 from nexa.domain.evidence import Evidence, EvidenceKind, PolicyRef, SourceRef
 
 _TYPES: tuple[type, ...] = (
@@ -26,6 +29,8 @@ _TYPES: tuple[type, ...] = (
     Evidence, EvidenceKind, SourceRef, PolicyRef,
     Dossier, TransactionFact, TravelNoticeFact, CustomerFact, AccountFact, KycFact,
     PolicyResult, VerificationReport, VerificationIssue, IssueCode, UncertaintyFlag,
+    Decision, CandidateScore, ActionType, RiskLevel,
+    ApprovalRequest, ApprovalVote, ApprovalStatus, Verdict, Role,
 )  # fmt: skip
 
 ALLOWED_TYPES: tuple[tuple[str, str], ...] = tuple((t.__module__, t.__qualname__) for t in _TYPES)

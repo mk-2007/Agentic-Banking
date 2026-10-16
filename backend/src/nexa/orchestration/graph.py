@@ -4,8 +4,11 @@ r"""The case graph (Phase 6a): intake, four agents, then ready or failed.
                     |         |          |           \-> fail_validation     (FAILED_VALIDATION)
                     \---------+----------+--> a tool problem ends the run     (FAILED_TOOL)
 
-Not built yet, by design: the human approval pause (6b); loop limits, retries and audit events for
-every transition (6c); and the decision itself, which arrives in Phase 7 behind ``DECISION_READY``.
+With a decision source (6b) the graph goes on: propose -> request_approval -> await_votes (pauses)
+-> settle, which ends in approved, rejected, escalated, timed out or back to decision-ready.
+
+Not built yet, by design: loop limits, retries and audit events for every transition (6c); and the
+decisions themselves, which arrive in Phase 7.
 """
 
 from dataclasses import dataclass
@@ -14,12 +17,15 @@ from typing import Any, Literal, TypeAlias
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.types import Command
 
 from nexa.agents import Investigation
 from nexa.agents.base import AgentContext
+from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
+from nexa.domain.decision import Decision
 
-from .nodes import AgentSet, CaseNodes
+from .nodes import AgentSet, CaseNodes, DecisionSource
 from .state import CaseGraphState
 
 CaseGraph: TypeAlias = CompiledStateGraph[CaseGraphState, Any, CaseGraphState, CaseGraphState]
@@ -38,14 +44,35 @@ def _after_verify(state: CaseGraphState) -> Literal["mark_ready", "fail_validati
     return "mark_ready" if state["verification"].passed else "fail_validation"
 
 
+def _after_propose(state: CaseGraphState) -> str:
+    if state.get("failure") or not state["decision"].approval_required:
+        return END
+    return "request_approval"
+
+
+def _after_request(state: CaseGraphState) -> str:
+    return END if state.get("failure") else "await_votes"
+
+
+def _after_settle(state: CaseGraphState) -> str:
+    return "await_votes" if state["approval"] is ApprovalStatus.PENDING else END
+
+
 def build_case_graph(
     ctx: AgentContext,
     *,
     agents: AgentSet | None = None,
     checkpointer: BaseCheckpointSaver[Any] | None = None,
+    decide: DecisionSource | None = None,
 ) -> CaseGraph:
-    """Compile the case graph for ``ctx``. Pass ``agents`` to swap a specialist (tests do)."""
-    nodes = CaseNodes(agents or AgentSet.from_context(ctx), ctx.clock)
+    """Compile the case graph for ``ctx``. Pass ``agents`` to swap a specialist (tests do).
+
+    With ``decide`` the graph continues past ``DECISION_READY``: a recommendation that needs humans
+    pauses the run at ``WAITING_FOR_APPROVAL``. Pausing needs a ``checkpointer`` to save the run.
+    """
+    if decide is not None and checkpointer is None:
+        raise ValueError("a graph that can pause for approval needs a checkpointer")
+    nodes = CaseNodes(agents or AgentSet.from_context(ctx), ctx.clock, decide)
     graph = StateGraph(CaseGraphState)
     for name, step in (
         ("open_case", nodes.open_case),
@@ -63,24 +90,70 @@ def build_case_graph(
     graph.add_conditional_edges("analyze", _continue_or_end("research"))
     graph.add_conditional_edges("research", _continue_or_end("verify"))
     graph.add_conditional_edges("verify", _after_verify)
-    graph.add_edge("mark_ready", END)
+    if decide is None:
+        graph.add_edge("mark_ready", END)
+    else:
+        for name, step in (
+            ("propose", nodes.propose),
+            ("request_approval", nodes.request_approval),
+            ("await_votes", nodes.await_votes),
+            ("settle", nodes.settle),
+        ):
+            graph.add_node(name, step)
+        graph.add_edge("mark_ready", "propose")
+        graph.add_conditional_edges("propose", _after_propose)
+        graph.add_conditional_edges("request_approval", _after_request)
+        graph.add_edge("await_votes", "settle")
+        graph.add_conditional_edges("settle", _after_settle)
     graph.add_edge("fail_validation", END)
     return graph.compile(checkpointer=checkpointer)
 
 
 @dataclass(frozen=True)
 class CaseRun:
-    """The outcome of running a case through the graph."""
+    """The outcome of running (or resuming) a case through the graph."""
 
     case: Case
     trail: tuple[CaseStatus, ...]
     failure: str | None
     investigation: Investigation | None
+    decision: Decision | None = None
+    approval_request: ApprovalRequest | None = None
+    votes: tuple[ApprovalVote, ...] = ()
+    approval: ApprovalStatus | None = None
 
     @property
     def ready_for_decision(self) -> bool:
         """True when the case reached ``DECISION_READY``."""
         return self.case.status is CaseStatus.DECISION_READY
+
+    @property
+    def awaiting_approval(self) -> bool:
+        """True when the run is paused for human votes."""
+        return self.case.status is CaseStatus.WAITING_FOR_APPROVAL
+
+
+def _to_run(final: dict[str, Any]) -> CaseRun:
+    investigation = (
+        Investigation(
+            dossier=final["dossier"],
+            findings=tuple(final["findings"]),
+            policy=final["policy"],
+            verification=final["verification"],
+        )
+        if {"dossier", "findings", "policy", "verification"} <= final.keys()
+        else None
+    )
+    return CaseRun(
+        final["case"],
+        tuple(final["trail"]),
+        final.get("failure"),
+        investigation,
+        decision=final.get("decision"),
+        approval_request=final.get("approval_request"),
+        votes=tuple(final.get("votes", ())),
+        approval=final.get("approval"),
+    )
 
 
 def run_case(
@@ -94,22 +167,24 @@ def run_case(
     """Run a new case through the graph and return what happened.
 
     ``graph`` lets a caller reuse one compiled graph (for example one with a checkpointer, in which
-    case ``thread_id`` names the saved run).
+    case ``thread_id`` names the saved run). A run that needs human approval returns paused, with
+    ``awaiting_approval`` true; continue it with `resume_case`.
     """
     if case.status is not CaseStatus.CREATED:
         raise ValueError(f"run_case starts new cases; this one is already {case.status.value}")
     compiled = graph or build_case_graph(ctx, agents=agents)
     config: Any = {"configurable": {"thread_id": thread_id or case.id}}
-    final = compiled.invoke({"case": case, "trail": [case.status]}, config)
+    return _to_run(compiled.invoke({"case": case, "trail": [case.status]}, config))
 
-    investigation = (
-        Investigation(
-            dossier=final["dossier"],
-            findings=tuple(final["findings"]),
-            policy=final["policy"],
-            verification=final["verification"],
-        )
-        if {"dossier", "findings", "policy", "verification"} <= final.keys()
-        else None
-    )
-    return CaseRun(final["case"], tuple(final["trail"]), final.get("failure"), investigation)
+
+def resume_case(graph: CaseGraph, thread_id: str, votes: list[ApprovalVote]) -> CaseRun:
+    """Give a paused case the votes received so far and continue it.
+
+    Votes are judged by the pure approval rule, not here. If they do not settle the request (for
+    example a second approver is still missing) the case stays paused and can be resumed again.
+    """
+    config: Any = {"configurable": {"thread_id": thread_id}}
+    saved = graph.get_state(config).values
+    if not saved or saved["case"].status is not CaseStatus.WAITING_FOR_APPROVAL:
+        raise ValueError(f"run {thread_id} is not waiting for approval")
+    return _to_run(graph.invoke(Command(resume=votes), config))

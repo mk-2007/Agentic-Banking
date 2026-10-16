@@ -7,9 +7,9 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
-  (LangGraph case graph, `docs/orchestration.md`). **Next: 6b**, the human approval pause and resume, then
-  6c (limits, retries, audit per transition). See `docs/TRACKER.md` for the split.
-- 508 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
+  `resume_case`). **Next: 6c** (limits, retries, audit per transition), then 6d. See `docs/TRACKER.md` for the split.
+- 523 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first

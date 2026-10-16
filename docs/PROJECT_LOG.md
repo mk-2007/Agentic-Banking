@@ -9,6 +9,12 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - Evaluation: `data/agent_eval/expectations.json`, harness under `backend/tests/evals/`, `scripts/run_agent_eval.py`. 7 of 7 scenarios pass offline; the harness was mutation-tested. 487 tests pass; ruff and mypy clean.
 - Next: Phase 6, LangGraph orchestration with the human approval pause. Not yet run: the model step against a live provider.
 
+## 2026-10-16 - Phase 6b: human approval pause (issue #15)
+- `orchestration`: with a decision source the graph goes `propose -> request_approval -> await_votes -> settle`. A Level 3+ recommendation saves the run at `waiting_for_approval`; `resume_case` continues it with votes, and the pure `evaluate_approval` rule picks the status (approved, rejected, escalated, timed out, modify, or still pending). Orchestration builds the request from the approval matrix, never the decision source.
+- A decision for another case, or one that drops a blocking uncertainty flag from verification, ends in `blocked_by_policy`. Pausing requires a checkpointer. Decision, approval and role types joined the checkpoint allowlist.
+- 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
+- Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
+
 ## 2026-10-14 - Phase 6a: case graph
 - `orchestration`: a LangGraph graph runs a case through open, gather, analyze, research and verify, then `decision_ready` or `failed_validation`; a refused tool or inconsistent records end in `failed_tool` with a short code. The status changes only in the nodes, via `Case.transition_to` (ADR 0009). `AgentSet` lets tests swap in failing agents.
 - Checkpointing is prepared for 6b: state is contracts and lists only (`PolicyResult` became a contract so its tuples survive), and `checkpoint_serde()` rebuilds only an explicit allowlist of our types, as LangGraph recommends. Proven with an in-memory saver; a test fails if a state type is missing from the list.

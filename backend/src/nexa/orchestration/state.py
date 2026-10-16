@@ -11,7 +11,9 @@ import operator
 from typing import Annotated, TypedDict
 
 from nexa.agents import Dossier, PolicyResult, VerificationReport
+from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
+from nexa.domain.decision import Decision
 from nexa.domain.evidence import Evidence
 
 
@@ -28,3 +30,10 @@ class CaseGraphState(TypedDict, total=False):
     # Set when the run stopped early. A short code such as "get_kyc_status:out_of_scope", never
     # free text from a tool, so it is safe to log and to show.
     failure: str
+    # Set once a decision provider has proposed an action (Phase 6b).
+    decision: Decision
+    # Set when the recommended action needs humans; built by orchestration, never by a model.
+    approval_request: ApprovalRequest
+    # Every vote received so far across resumes. Lists are appended to, not replaced.
+    votes: Annotated[list[ApprovalVote], operator.add]
+    approval: ApprovalStatus
