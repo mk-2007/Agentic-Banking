@@ -22,8 +22,9 @@ from nexa.domain.actions import ACTION_RISK_LEVEL, ActionType
 from nexa.domain.clock import Clock
 from nexa.domain.decision import BLOCKING_UNCERTAINTY, CandidateScore, Decision, UncertaintyFlag
 from nexa.domain.evidence import Evidence
-from nexa.domain.indicators import IndicatorCode, Signal
+from nexa.domain.indicators import IndicatorCode
 
+from .facts import Facts, read_facts, unique_ids
 from .gates import governing_refs, refusal
 from .provider import DecisionRequest
 
@@ -37,37 +38,19 @@ KYC_GAPS = (C.KYC_ITEM_MISSING, C.KYC_NOT_VERIFIED)
 
 
 @dataclass(frozen=True)
-class _Facts:
-    """The findings of one case, grouped by code and by signal."""
-
-    by_code: dict[IndicatorCode, tuple[Evidence, ...]]
-    risk: tuple[Evidence, ...]
-    mitigating: tuple[Evidence, ...]
-    info: tuple[Evidence, ...]
-
-    def of(self, *codes: IndicatorCode) -> tuple[Evidence, ...]:
-        """Return the findings with any of ``codes``."""
-        return tuple(e for code in codes for e in self.by_code.get(code, ()))
-
-    def has(self, code: IndicatorCode) -> bool:
-        """Return whether a finding with ``code`` exists."""
-        return code in self.by_code
-
-
-@dataclass(frozen=True)
 class _Rule:
     name: str
     action: ActionType
     score: float
-    fires: Callable[[_Facts], tuple[Evidence, ...]]  # the findings that justify it, or none
+    fires: Callable[[Facts], tuple[Evidence, ...]]  # the findings that justify it, or none
 
 
-def _takeover(f: _Facts) -> tuple[Evidence, ...]:
+def _takeover(f: Facts) -> tuple[Evidence, ...]:
     present = [code for code in TAKEOVER_SIGNS if f.has(code)]
     return f.of(*present) if len(present) >= TAKEOVER_MINIMUM and not f.mitigating else ()
 
 
-def _card_fraud(f: _Facts) -> tuple[Evidence, ...]:
+def _card_fraud(f: Facts) -> tuple[Evidence, ...]:
     if f.has(C.CARD_TESTING):
         return f.of(C.CARD_TESTING)
     if f.has(C.AMOUNT_ABOVE_AVERAGE) and f.has(C.UNUSUAL_GEOGRAPHY):
@@ -98,36 +81,6 @@ FALLBACK = ActionType.ESCALATE_TO_ANALYST
 FALLBACK_SCORE = 0.05
 
 
-def _facts(findings: tuple[Evidence, ...]) -> _Facts:
-    by_code: dict[IndicatorCode, list[Evidence]] = {}
-    risk: list[Evidence] = []
-    mitigating: list[Evidence] = []
-    info: list[Evidence] = []
-    for evidence in findings:
-        raw_code, raw_signal = evidence.data.get("code"), evidence.data.get("signal")
-        try:
-            code = IndicatorCode(raw_code) if isinstance(raw_code, str) else None
-            signal = Signal(raw_signal) if isinstance(raw_signal, str) else None
-        except ValueError:
-            continue  # not one of our findings: ignored, never interpreted
-        if code is None or signal is None:
-            continue
-        by_code.setdefault(code, []).append(evidence)
-        {Signal.RISK: risk, Signal.MITIGATING: mitigating, Signal.INFO: info}[signal].append(
-            evidence
-        )
-    return _Facts(
-        {code: tuple(items) for code, items in by_code.items()},
-        tuple(risk),
-        tuple(mitigating),
-        tuple(info),
-    )
-
-
-def _ids(evidence: tuple[Evidence, ...]) -> tuple[str, ...]:
-    return tuple(dict.fromkeys(e.id for e in evidence))  # unique, in order
-
-
 @dataclass(frozen=True)
 class _Candidate:
     rule: _Rule | None  # None for the safe fallback
@@ -147,11 +100,11 @@ class RuleBasedDecisionProvider:
 
     def decide(self, request: DecisionRequest) -> Decision:
         """Rank the actions the rules support and recommend the first one the gates allow."""
-        facts = _facts(request.findings)
+        facts = read_facts(request.findings)
         flags = request.uncertainty_flags
         candidates = self._rank(facts, flags)
         top = candidates[0]
-        risk_ids = _ids(facts.risk)
+        risk_ids = unique_ids(facts.risk)
         chosen, gate = top, None
         for candidate in candidates:
             problem = refusal(
@@ -190,11 +143,11 @@ class RuleBasedDecisionProvider:
             created_at=self._clock(),
         )
 
-    def _rank(self, facts: _Facts, flags: tuple[UncertaintyFlag, ...]) -> list[_Candidate]:
-        against = _ids(facts.mitigating)
+    def _rank(self, facts: Facts, flags: tuple[UncertaintyFlag, ...]) -> list[_Candidate]:
+        against = unique_ids(facts.mitigating)
         found: dict[ActionType, _Candidate] = {}
         for rule in RULES:
-            support = _ids(rule.fires(facts))
+            support = unique_ids(rule.fires(facts))
             if not support:
                 continue
             candidate = _Candidate(
@@ -207,7 +160,9 @@ class RuleBasedDecisionProvider:
             if rule.action not in found or candidate.score > found[rule.action].score:
                 found[rule.action] = candidate
         if BLOCKING_UNCERTAINTY & set(flags) and FALLBACK not in found:
-            found[FALLBACK] = _Candidate(None, FALLBACK, 0.50, _ids(facts.risk), against)
+            found[FALLBACK] = _Candidate(None, FALLBACK, 0.50, unique_ids(facts.risk), against)
         if FALLBACK not in found:  # always keep a safe way out, ranked last
-            found[FALLBACK] = _Candidate(None, FALLBACK, FALLBACK_SCORE, _ids(facts.risk), against)
+            found[FALLBACK] = _Candidate(
+                None, FALLBACK, FALLBACK_SCORE, unique_ids(facts.risk), against
+            )
         return sorted(found.values(), key=lambda c: (-c.score, c.action.value))
