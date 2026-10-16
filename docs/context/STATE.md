@@ -8,8 +8,8 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
   (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
-  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **Next: Phase 7** (decision providers) once PRs #33, #34 and the 6d PR are merged in order. See `docs/TRACKER.md` for the split.
-- 554 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based decision provider, `docs/decision.md`). **Next: 7b** (LLM provider behind `DecisionProvider`, validated like every model output). PRs #33, #34, #35 and the 7a PR are stacked; merge them in order. See `docs/TRACKER.md` for the split.
+- 593 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first

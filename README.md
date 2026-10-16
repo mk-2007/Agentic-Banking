@@ -21,7 +21,7 @@ gateway can replace the simulator later.
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
 | 6 | LangGraph orchestration with human approval (6a case graph, 6b approval pause and 6c limits and audit done; 6d execution of approved actions done; merging the stacked PRs next) | in progress |
-| 7 | Decision providers and evaluation | planned |
+| 7 | Decision providers (7a rule-based done; 7b LLM, 7c evaluation, 7d comparison next) and evaluation | in progress |
 | 8 | API, frontend, demo | planned |
 
 ## Core idea: controlled autonomy
@@ -126,6 +126,13 @@ or a clear failure state. 6c bounds every loop (one retry for temporary tool fai
 ends the run cleanly with a code. Saved cases come back with their types intact and can only be rebuilt from an
 explicit list of our own types. Try it with `PYTHONPATH=backend/src python scripts/run_case.py --all`. Design,
 gaps and limits: [docs/orchestration.md](docs/orchestration.md).
+
+## Decisions
+
+Phase 7a adds the first decision provider: transparent rules over the typed findings pick one action from the closed
+set, then two hard gates hold it back when evidence is missing or conflicting, or when a Level 3+ action lacks
+supporting findings or the governing policy. It recommends only; humans still authorize. All seven scenarios get an
+acceptable action. Rules, gates and honest limits: [docs/decision.md](docs/decision.md).
 
 ## Decisions so far
 

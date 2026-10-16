@@ -61,9 +61,9 @@
     {
       "id": "module:decision",
       "type": "module",
-      "status": "planned",
+      "status": "in_progress",
       "path": "backend/src/nexa/decision",
-      "summary": "DecisionProvider interface; rule scorer + LLM provider; optional JEV adapter later"
+      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a done); LLM provider 7b; optional JEV adapter later"
     },
     {
       "id": "module:approvals",
@@ -397,6 +397,13 @@
       "status": "done",
       "path": "docs/orchestration.md",
       "summary": "Case graph steps, statuses, rules, gaps and honest limits"
+    },
+    {
+      "id": "doc:decision",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/decision.md",
+      "summary": "Decision providers: the rule table, the two gates, tests and honest limits (7a)"
     }
   ],
   "edges": [
@@ -998,6 +1005,11 @@
     {
       "from": "doc:orchestration",
       "to": "module:orchestration",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:decision",
+      "to": "module:decision",
       "relation": "documents"
     }
   ]
