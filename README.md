@@ -20,8 +20,8 @@ gateway can replace the simulator later.
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
-| 6 | LangGraph orchestration with human approval (6a case graph, 6b approval pause and 6c limits and audit done; 6d execution of approved actions done; merging the stacked PRs next) | in progress |
-| 7 | Decision providers (7a rule-based, 7b LLM and 7c evaluation done; 7d comparison next) and evaluation | in progress |
+| 6 | LangGraph orchestration with human approval, limits, audit and execution of approved actions | done |
+| 7 | Decision providers (rule-based and LLM behind shared gates), evaluation and a live comparison | done |
 | 8 | API, frontend, demo | planned |
 
 ## Core idea: controlled autonomy
@@ -134,7 +134,7 @@ set, then two hard gates hold it back when evidence is missing or conflicting, o
 supporting findings or the governing policy. It recommends only; humans still authorize. Phase 7b adds an LLM provider behind the same interface: the model proposes a ranking, the same gates decide, and
 a failing model falls back to the rules. Phase 7c scores the providers on the seven scenarios, safety apart from usefulness, and puts deliberately
 misbehaving stand-in models through the gates: `PYTHONPATH=backend/src python scripts/run_decision_eval.py`
-(`--live` adds a real model). Every provider comes out safe on all seven; the evaluation found two holes in the
+(`--live` adds a real model; results in [docs/decision-comparison.md](docs/decision-comparison.md)). Every provider comes out safe on all seven; the evaluation found two holes in the
 first version of the gates, now closed (ADR 0010). All seven scenarios get an
 acceptable action. Rules, gates and honest limits: [docs/decision.md](docs/decision.md).
 

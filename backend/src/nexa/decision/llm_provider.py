@@ -42,6 +42,8 @@ FALLBACK_ACTION = ActionType.ESCALATE_TO_ANALYST
 FALLBACK_SCORE = 0.05
 MAX_RANKED = 4
 MAX_CITED = 8
+# Reasoning models spend hidden tokens before the JSON; a small cap cuts the answer off mid-object.
+MAX_ANSWER_TOKENS = 2000
 
 SYSTEM_PROMPT = (
     "You advise a bank's fraud analysts. From the findings of one case, rank the actions that fit "
@@ -173,5 +175,5 @@ class LlmDecisionProvider:
                     ),
                 ),
             ),
-            max_tokens=400,
+            max_tokens=MAX_ANSWER_TOKENS,
         )

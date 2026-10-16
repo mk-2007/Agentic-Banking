@@ -16,10 +16,10 @@ The single place to see what is done, what is next and whether the schedule hold
 | 2 | Simulated bank, synthetic data, policies, approval matrix | 2026-10-10 | 2026-10-10 | 1 | 107 | done |
 | 3 | Security, audit and tool layer | 2026-10-11 | 2026-10-11 | 1 | 256 | done |
 | 4 | RAG over knowledge base and policies | 2026-10-12 | 2026-10-12 | 1 | 381 | done |
-| 5a | Model gateway (Groq, Gemini, failover, budgets) | 2026-10-13 | 2026-10-13 | 1 | 446 | done (Gemini never succeeded live) |
+| 5a | Model gateway (Groq, Gemini, failover, budgets) | 2026-10-13 | 2026-10-13 | 1 | 446 | done (Gemini first succeeded live 2026-10-16, then hit its free-tier quota) |
 | 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
-| 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | | est. 2-3 | 554 so far | in progress (6a-6d built; PRs #33, #34 and 6d open) |
-| 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | | est. 2-3 | 632 so far | in progress (7a-7c done) |
+| 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | 2026-10-16 | 3 | 554 | done |
+| 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | 2026-10-16 | 1 | 632 | done |
 | 8 | API, frontend, demo | | | est. 3-4 | | planned |
 
 "Days taken" and "Tests" for finished phases come from the project log (calendar days, not hours; tests are the count when the phase closed).
@@ -39,7 +39,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 - [x] 7a Rule-based decision provider (ranked candidate actions, policy refs, uncertainty respected)
 - [x] 7b LLM decision provider behind the same interface, validated like every model output
 - [x] 7c Evaluation harness: score both providers on the seven scenarios
-- [ ] 7d Baseline vs LLM comparison written up in docs
+- [x] 7d Baseline vs LLM comparison written up in docs
 
 **Phase 8**
 - [ ] 8a API (cases, evidence, approvals) with the employee/customer channel decided by trusted code
@@ -51,8 +51,8 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 
 | Item | Owner | Since | Note |
 |---|---|---|---|
-| Gemini has no successful live call | you | 2026-10-13 | 503 overloaded on 4 models; re-run `python scripts/llm_smoke_test.py` |
-| Model step in the policy agent never run live | you | 2026-10-14 | `python scripts/run_agent_eval.py --live` |
+| Gemini free-tier quota runs out (HTTP 429) | you | 2026-10-16 | `gemini-flash-latest` works but is rate-limited; another provider (NVIDIA, DigitalOcean) would make failover real |
+| Live model scored on 7 scenarios only | | 2026-10-16 | see docs/decision-comparison.md; add scenarios the rules were not written for |
 | Repo public| synthetic data only, no keys |
 | Deadline above | you | | Fill in at the top |
 
@@ -74,3 +74,9 @@ Add one row per merged PR. This is also the proof of work for judges.
 | #29 | feat/phase-5b-specialist-agents | 2026-10-14 | feat(agents): specialist agents with scenario evals (phase 5b) |
 | #30 | docs/tracker-5b-merged | 2026-10-14 | docs(tracker): record phase 5b merge and PR history |
 | #31 | feat/phase-6a-case-graph | 2026-10-16 | feat(orchestration): LangGraph case graph (phase 6a) |
+| #33 | feat/phase-6b-approval-pause | 2026-10-16 | feat(orchestration): human approval pause and resume (phase 6b) |
+| #34 | feat/phase-6c-limits-and-audit | 2026-10-16 | feat(orchestration): loop limits, retries and audit per transition (phase 6c) |
+| #35 | feat/phase-6d-execution | 2026-10-16 | feat(orchestration): execute approved actions and run all scenarios (phase 6d) |
+| #36 | feat/phase-7a-rule-based-decision | 2026-10-16 | feat(decision): rule-based decision provider with gates (phase 7a) |
+| #37 | feat/phase-7b-llm-decision-provider | 2026-10-16 | feat(decision): LLM decision provider behind the same gates (phase 7b) |
+| #38 | feat/phase-7c-decision-eval | 2026-10-16 | feat(decision): decision evaluation and two gate fixes it found (phase 7c) |

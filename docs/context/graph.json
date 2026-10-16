@@ -63,7 +63,7 @@
       "type": "module",
       "status": "in_progress",
       "path": "backend/src/nexa/decision",
-      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a), LLM provider (7b) and evaluation harness (7c) done; comparison 7d; optional JEV adapter later"
+      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a), LLM provider (7b), evaluation harness (7c) and live comparison (7d) done; optional JEV adapter later"
     },
     {
       "id": "module:approvals",
@@ -218,7 +218,7 @@
     {
       "id": "phase:7",
       "type": "phase",
-      "status": "planned",
+      "status": "done",
       "summary": "Decision providers wired in; baseline vs LLM evaluation"
     },
     {
@@ -397,6 +397,13 @@
       "status": "done",
       "path": "docs/adr/0010-model-decisions-share-the-gates-and-keep-a-human-floor.md",
       "summary": "All providers share the hard gates; restrictions need an indicator pattern; model decisions keep a human floor"
+    },
+    {
+      "id": "doc:decision-comparison",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/decision-comparison.md",
+      "summary": "Rules versus LLM provider on the seven scenarios: live results, what they show and what they cannot"
     },
     {
       "id": "doc:orchestration",
@@ -1021,6 +1028,11 @@
     },
     {
       "from": "doc:decision",
+      "to": "module:decision",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:decision-comparison",
       "to": "module:decision",
       "relation": "documents"
     }

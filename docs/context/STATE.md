@@ -8,7 +8,7 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
   (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
-  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010). **Next: 7d** (run `--live` once keys allow, write the baseline-vs-LLM comparison in docs), then Phase 8. See `docs/TRACKER.md` for the split.
+  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010) and **7d done** (live comparison, `docs/decision-comparison.md`). **Phase 7 is complete. Next: Phase 8** (8a API, 8b frontend, 8c demo, 8d final README and release). See `docs/TRACKER.md` for the split.
 - 632 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
@@ -38,8 +38,8 @@ python scripts/llm_smoke_test.py            # provider check (keys in .env)
 - Synthetic data only. No keys or real personal data in the repo.
 
 ## Known gaps (also in docs/agents.md and docs/llm-gateway.md)
-- Gemini has never completed a live call (503 overloaded when tried). Groq works.
-- The policy agent's model step is tested with a scripted provider only.
+- Groq works (`openai/gpt-oss-20b`). Gemini (`gemini-flash-latest`) answers but its free-tier quota runs out (HTTP 429), so failover is only partly real; reasoning models need `max_tokens` of about 2000 or their JSON is cut off.
+- The live model has only been scored on the seven scenarios (3 runs); see `docs/decision-comparison.md` for what that cannot show.
 - `instruction_text` detection is a heuristic; conflict detection is coarse (over-escalates).
 
 ## Decisions to remember
