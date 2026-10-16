@@ -18,21 +18,16 @@ Third-party text never reaches this layer: it sees finding codes, evidence ids a
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from nexa.domain.actions import ACTION_RISK_LEVEL, UNCERTAINTY_SAFE_ACTIONS, ActionType
+from nexa.domain.actions import ACTION_RISK_LEVEL, ActionType
 from nexa.domain.clock import Clock
-from nexa.domain.decision import (
-    BLOCKING_UNCERTAINTY,
-    CandidateScore,
-    Decision,
-    UncertaintyFlag,
-)
-from nexa.domain.evidence import Evidence, PolicyRef
+from nexa.domain.decision import BLOCKING_UNCERTAINTY, CandidateScore, Decision, UncertaintyFlag
+from nexa.domain.evidence import Evidence
 from nexa.domain.indicators import IndicatorCode, Signal
 
+from .gates import governing_refs, refusal
 from .provider import DecisionRequest
 
 PROVIDER_NAME = "rule_based_v1"
-FRAUD, AML, AUTH = "NB-POL-FRAUD-001", "NB-POL-AML-001", "NB-POL-AUTH-001"
 C = IndicatorCode
 
 # Indicators that together describe an account takeover (NB-POL-FRAUD-001 section 2).
@@ -64,7 +59,6 @@ class _Rule:
     name: str
     action: ActionType
     score: float
-    documents: tuple[str, ...]  # the policies that govern this response
     fires: Callable[[_Facts], tuple[Evidence, ...]]  # the findings that justify it, or none
 
 
@@ -82,25 +76,23 @@ def _card_fraud(f: _Facts) -> tuple[Evidence, ...]:
 
 
 RULES: tuple[_Rule, ...] = (
-    _Rule("account_takeover", ActionType.FREEZE_ACCOUNT, 0.95, (FRAUD, AUTH), _takeover),
-    _Rule("card_fraud", ActionType.BLOCK_CARD, 0.85, (FRAUD, AUTH), _card_fraud),
-    _Rule("kyc_gap", ActionType.REQUEST_KYC_DOCUMENTS, 0.80, (AML,), lambda f: f.of(*KYC_GAPS)),
+    _Rule("account_takeover", ActionType.FREEZE_ACCOUNT, 0.95, _takeover),
+    _Rule("card_fraud", ActionType.BLOCK_CARD, 0.85, _card_fraud),
+    _Rule("kyc_gap", ActionType.REQUEST_KYC_DOCUMENTS, 0.80, lambda f: f.of(*KYC_GAPS)),
     _Rule(
         "identity_mismatch",
         ActionType.REQUEST_CUSTOMER_VERIFICATION,
         0.70,
-        (AML, FRAUD),
         lambda f: f.of(C.KYC_ADDRESS_MISMATCH),
     ),
     _Rule(
         "several_indicators",
         ActionType.ESCALATE_TO_ANALYST,
         0.50,
-        (FRAUD,),
         lambda f: f.risk if len(f.risk) >= 2 else (),
     ),
-    _Rule("any_indicator", ActionType.MONITOR_ACCOUNT, 0.40, (FRAUD,), lambda f: f.risk),
-    _Rule("no_indicator", ActionType.NO_ACTION, 0.90, (), lambda f: f.info if not f.risk else ()),
+    _Rule("any_indicator", ActionType.MONITOR_ACCOUNT, 0.40, lambda f: f.risk),
+    _Rule("no_indicator", ActionType.NO_ACTION, 0.90, lambda f: f.info if not f.risk else ()),
 )
 FALLBACK = ActionType.ESCALATE_TO_ANALYST
 FALLBACK_SCORE = 0.05
@@ -159,15 +151,22 @@ class RuleBasedDecisionProvider:
         flags = request.uncertainty_flags
         candidates = self._rank(facts, flags)
         top = candidates[0]
+        risk_ids = _ids(facts.risk)
         chosen, gate = top, None
         for candidate in candidates:
-            problem = self._gate(candidate, request, flags)
+            problem = refusal(
+                candidate.action,
+                support_ids=candidate.support,
+                risk_ids=risk_ids,
+                refs=request.policy_refs,
+                flags=flags,
+            )
             if problem is None:
                 chosen = candidate
                 break
             gate = gate or problem
-        refs = self._refs(chosen, request.policy_refs)
         action = chosen.action
+        refs = governing_refs(action, request.policy_refs)
         return Decision(
             id=f"dec_{request.case_id}",
             case_id=request.case_id,
@@ -212,22 +211,3 @@ class RuleBasedDecisionProvider:
         if FALLBACK not in found:  # always keep a safe way out, ranked last
             found[FALLBACK] = _Candidate(None, FALLBACK, FALLBACK_SCORE, _ids(facts.risk), against)
         return sorted(found.values(), key=lambda c: (-c.score, c.action.value))
-
-    @staticmethod
-    def _gate(
-        candidate: _Candidate, request: DecisionRequest, flags: tuple[UncertaintyFlag, ...]
-    ) -> str | None:
-        """Return the name of the gate that refuses ``candidate``, or None if it may be chosen."""
-        if BLOCKING_UNCERTAINTY & set(flags) and candidate.action not in UNCERTAINTY_SAFE_ACTIONS:
-            return "uncertainty_gate"
-        if ACTION_RISK_LEVEL[candidate.action].requires_human_approval and not (
-            candidate.support and RuleBasedDecisionProvider._refs(candidate, request.policy_refs)
-        ):
-            return "justification_gate"
-        return None
-
-    @staticmethod
-    def _refs(candidate: _Candidate, refs: tuple[PolicyRef, ...]) -> tuple[PolicyRef, ...]:
-        """Keep the retrieved clauses from the documents that govern the chosen response."""
-        documents = candidate.rule.documents if candidate.rule else (FRAUD,)
-        return tuple(dict.fromkeys(r for r in refs if r.doc_id in documents))
