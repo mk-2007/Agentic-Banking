@@ -15,6 +15,13 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 8a: HTTP API
+- `api`: FastAPI routes for cases, approvals, audit and chat, behind bearer tokens that map to a user and a role. Employees open and view cases and vote; customers can only chat. A vote carries a verdict only: approver id and role come from the token and extra body fields are rejected. The session channel is derived from the role, never read from a request. Responses omit the dossier, so third-party text stays inside.
+- `CaseService` wires bank, tools, graph, approval store and audit log once and serialises access; `scripts/run_api.py` starts it with random demo tokens or `NEXA_API_TOKENS`, optionally with the LLM provider.
+- Found while testing chat: the tool layer requires agents to name a case, so the chatbot names a conversation id (`chat_<user>`); the customer-service role is public-only in both channels, so employees ask as themselves with their own role.
+- 652 tests pass (20 new); removing the employee check fails a test. Also run against the real server: the full Level 4 path (two votes, then completed) and a 403 for a customer.
+- Limits: static in-memory tokens, one process, state lost on restart (docs/api.md). Next: 8b frontend.
+
 ## 2026-10-16 - Phase 7d: live comparison, and a bug it found
 - Smoke test: Groq `openai/gpt-oss-20b` and Gemini `gemini-flash-latest` both answered (Gemini's first success); Gemini then returned HTTP 429 (free-tier quota), so Groq carried the runs.
 - The first live run fell back to the rules on 4 of 7 scenarios: `max_tokens=400` cut the reasoning model's JSON off mid-object and Groq rejected it. The agent evaluation's `--live` had been silently doing the same (0 model calls). Both caps are now 2000, with tests; the policy step then made 6 real calls and still passed 7/7.

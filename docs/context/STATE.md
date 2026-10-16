@@ -8,8 +8,8 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
   (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
-  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010) and **7d done** (live comparison, `docs/decision-comparison.md`). **Phase 7 is complete. Next: Phase 8** (8a API, 8b frontend, 8c demo, 8d final README and release). See `docs/TRACKER.md` for the split.
-- 632 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010) and **7d done** (live comparison, `docs/decision-comparison.md`). **Phase 7 is complete. 8a done** (HTTP API, `docs/api.md`, `scripts/run_api.py`). **Next: 8b** (frontend: case view, evidence, approval screen; needs CORS), 8c (demo script and report), 8d (final README, release). See `docs/TRACKER.md` for the split.
+- 652 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first
@@ -26,6 +26,7 @@ python scripts/run_agent_eval.py            # offline, no keys
 python scripts/run_agent_eval.py --live     # real model in the policy step
 python scripts/run_decision_eval.py         # decision providers + stand-in models, offline
 python scripts/run_decision_eval.py --live  # also a real model as the decision provider
+python scripts/run_api.py --demo            # HTTP API with random demo tokens (docs at /docs)
 python scripts/llm_smoke_test.py            # provider check (keys in .env)
 ```
 

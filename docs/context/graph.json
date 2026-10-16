@@ -89,7 +89,7 @@
     {
       "id": "module:api",
       "type": "module",
-      "status": "planned",
+      "status": "in_progress",
       "path": "backend/src/nexa/api",
       "summary": "Thin FastAPI layer"
     },
@@ -404,6 +404,13 @@
       "status": "done",
       "path": "docs/decision-comparison.md",
       "summary": "Rules versus LLM provider on the seven scenarios: live results, what they show and what they cannot"
+    },
+    {
+      "id": "doc:api",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/api.md",
+      "summary": "HTTP routes, who may call what, rules the layer keeps, sign-in and honest limits (8a)"
     },
     {
       "id": "doc:orchestration",
@@ -1034,6 +1041,11 @@
     {
       "from": "doc:decision-comparison",
       "to": "module:decision",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:api",
+      "to": "module:api",
       "relation": "documents"
     }
   ]

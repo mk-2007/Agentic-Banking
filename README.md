@@ -22,7 +22,7 @@ gateway can replace the simulator later.
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
 | 6 | LangGraph orchestration with human approval, limits, audit and execution of approved actions | done |
 | 7 | Decision providers (rule-based and LLM behind shared gates), evaluation and a live comparison | done |
-| 8 | API, frontend, demo | planned |
+| 8 | API (8a done), frontend, demo | in progress |
 
 ## Core idea: controlled autonomy
 
@@ -126,6 +126,13 @@ or a clear failure state. 6c bounds every loop (one retry for temporary tool fai
 ends the run cleanly with a code. Saved cases come back with their types intact and can only be rebuilt from an
 explicit list of our own types. Try it with `PYTHONPATH=backend/src python scripts/run_case.py --all`. Design,
 gaps and limits: [docs/orchestration.md](docs/orchestration.md).
+
+## API
+
+Phase 8a serves the platform over HTTP: open a case from an alert, watch it run, cast approval votes and chat with
+the knowledge base. Voters and roles come from their sign-in token, never the request; the session channel is
+derived from the role; responses leave out merchant names and memos. Try it: `python scripts/run_api.py --demo`,
+then open `/docs`. Routes, rules and limits: [docs/api.md](docs/api.md).
 
 ## Decisions
 
