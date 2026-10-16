@@ -10,11 +10,13 @@ Modules:
     state       what a case carries through the graph (contracts and lists only)
     nodes       the steps, and the only place the case status changes
     limits      `RunLimits`: retries and vote-round bounds
+    decisions   `provider_source`: plugs a `DecisionProvider` into the graph
     graph       `build_case_graph` and `run_case`
     checkpoint  the types a saved case may be rebuilt from
 """
 
 from .checkpoint import ALLOWED_TYPES, checkpoint_serde
+from .decisions import provider_source
 from .graph import CaseGraph, CaseRun, build_case_graph, resume_case, run_case
 from .limits import RunLimits
 from .nodes import AgentSet, DecisionSource
@@ -30,6 +32,7 @@ __all__ = [
     "RunLimits",
     "build_case_graph",
     "checkpoint_serde",
+    "provider_source",
     "resume_case",
     "run_case",
 ]
