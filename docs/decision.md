@@ -79,7 +79,7 @@ where the scenario needs one, verification flags carried) and **useful** (an act
 The stand-ins are scripted, so these rows show that the gates hold against bad models, not how good a real model is.
 The first run found two holes (a reckless model got a freeze recommended on the incomplete-KYC and prompt-injection
 cases; a lazy model downgraded a takeover to monitoring); ADR 0010 closes them with the pattern gate and the human
-floor. Real-model rows are filled in by 7d.
+floor. Live results against a real model, three runs: [decision-comparison.md](decision-comparison.md).
 
 ## What changed elsewhere
 
@@ -96,8 +96,8 @@ frozen account with two humans. Disabling the uncertainty gate or lowering the t
 
 ## Honest limits
 
-- **The LLM provider has only been run against a scripted model.** Nothing here shows how a real model ranks;
-  that is what 7c measures (`--live`). Because the gates are the same, the worst a model can do is escalate too
+- **The LLM provider has been run live on seven scenarios, three times** (decision-comparison.md); that is a tiny
+  sample. Because the gates are the same, the worst a model can do is escalate too
   often or pick a weaker action, not slip a restriction past them.
 - A model may cite the right ids for the wrong reasons; the gates check that evidence exists and is a risk
   finding, not that it justifies the action.

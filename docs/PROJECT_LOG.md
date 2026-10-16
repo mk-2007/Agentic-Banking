@@ -15,6 +15,12 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 7d: live comparison, and a bug it found
+- Smoke test: Groq `openai/gpt-oss-20b` and Gemini `gemini-flash-latest` both answered (Gemini's first success); Gemini then returned HTTP 429 (free-tier quota), so Groq carried the runs.
+- The first live run fell back to the rules on 4 of 7 scenarios: `max_tokens=400` cut the reasoning model's JSON off mid-object and Groq rejected it. The agent evaluation's `--live` had been silently doing the same (0 model calls). Both caps are now 2000, with tests; the policy step then made 6 real calls and still passed 7/7.
+- Three live runs of the decision evaluation: safe 21/21, useful 6/7, 7/7, 6/7; the model asked for a freeze on the card-testing case every time (the pattern gate corrected it) and over-reacted to the prompt-injection case in 2 of 3 runs. Written up in `docs/decision-comparison.md`, including what seven scenarios and three runs cannot show. Prompt not tuned to the scenarios.
+- Phase 7 is complete. Next: Phase 8 (API, frontend, demo).
+
 ## 2026-10-16 - Phase 7c: decision evaluation, and two holes it found
 - `tests/evals/decision_harness.py` and `scripts/run_decision_eval.py` score each provider on the seven scenarios, safety apart from usefulness: the rules, an agreeable stand-in model, a reckless one (always proposes a freeze), a lazy one (always proposes no action), a broken one, and a real model with `--live`.
 - First run: the reckless model got `freeze_account` recommended on the incomplete-KYC and prompt-injection scenarios (the justification gate accepted any cited risk finding), and the lazy model turned card testing and an account takeover into `monitor_account` with no human involved.
