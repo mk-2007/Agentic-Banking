@@ -6,9 +6,11 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 (`git archive -o repo.zip HEAD`).
 
 ## Where we are
-- Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Next: Phase 6**
-  (LangGraph orchestration with the human approval pause). See `docs/TRACKER.md` for the split.
-- 487 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios.
+- Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
+  (LangGraph case graph, `docs/orchestration.md`). **Next: 6b**, the human approval pause and resume, then
+  6c (limits, retries, audit per transition). See `docs/TRACKER.md` for the split.
+- 508 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first
 1. `AGENTS.md` (rules every contributor and agent follows)
@@ -27,6 +29,7 @@ python scripts/llm_smoke_test.py            # provider check (keys in .env)
 
 ## Rules that must not erode
 - Layering is enforced by `tests/architecture/`; agents never touch the bank, only tools.
+- Case status changes only in `orchestration/nodes.py`; state holds contracts and lists; checkpoint types are allowlisted.
 - Agents exchange typed findings (`IndicatorCode`), never prose; third-party text never reaches evidence or prompts.
 - Model output is validated before use; a failed model never blocks an investigation.
 - Actions are risk-levelled; Level 4 needs two human approvers; orchestration code (never a model) builds approvals.
@@ -38,5 +41,5 @@ python scripts/llm_smoke_test.py            # provider check (keys in .env)
 - `instruction_text` detection is a heuristic; conflict detection is coarse (over-escalates).
 
 ## Decisions to remember
-ADR 0001-0008 in `docs/adr/`. Latest: 0007 (one OpenAI-compatible adapter, never trust model output),
-0008 (typed findings, deterministic analysis, guarded model step).
+ADR 0001-0009 in `docs/adr/`. Latest: 0008 (typed findings, deterministic analysis, guarded model step),
+0009 (fixed LangGraph sequence, status only in nodes, allowlisted checkpoints).

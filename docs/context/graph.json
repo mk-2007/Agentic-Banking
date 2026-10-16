@@ -82,9 +82,9 @@
     {
       "id": "module:orchestration",
       "type": "module",
-      "status": "planned",
+      "status": "in_progress",
       "path": "backend/src/nexa/orchestration",
-      "summary": "LangGraph graph + case state machine"
+      "summary": "LangGraph case graph from intake to decision_ready/failed states; status only in nodes; allowlisted checkpoints (6a done; approvals 6b, limits and audit 6c)"
     },
     {
       "id": "module:api",
@@ -212,7 +212,7 @@
     {
       "id": "phase:6",
       "type": "phase",
-      "status": "planned",
+      "status": "in_progress",
       "summary": "LangGraph orchestration, approval interrupt, loop limits"
     },
     {
@@ -383,6 +383,20 @@
       "status": "done",
       "path": "docs/WORKFLOW.md",
       "summary": "Branch, commit and pull request loop; merge-commit guidance; commit email and visibility notes"
+    },
+    {
+      "id": "adr:0009",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0009-fixed-langgraph-sequence-status-only-in-nodes-allowlisted-checkpoints.md",
+      "summary": "Fixed LangGraph sequence; status changes only in nodes; checkpoints rebuild only allowlisted types"
+    },
+    {
+      "id": "doc:orchestration",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/orchestration.md",
+      "summary": "Case graph steps, statuses, rules, gaps and honest limits"
     }
   ],
   "edges": [
@@ -975,6 +989,16 @@
       "from": "concept:typed-findings",
       "to": "module:agents",
       "relation": "constrains"
+    },
+    {
+      "from": "adr:0009",
+      "to": "module:orchestration",
+      "relation": "decides"
+    },
+    {
+      "from": "doc:orchestration",
+      "to": "module:orchestration",
+      "relation": "documents"
     }
   ]
 }

@@ -9,6 +9,12 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - Evaluation: `data/agent_eval/expectations.json`, harness under `backend/tests/evals/`, `scripts/run_agent_eval.py`. 7 of 7 scenarios pass offline; the harness was mutation-tested. 487 tests pass; ruff and mypy clean.
 - Next: Phase 6, LangGraph orchestration with the human approval pause. Not yet run: the model step against a live provider.
 
+## 2026-10-14 - Phase 6a: case graph
+- `orchestration`: a LangGraph graph runs a case through open, gather, analyze, research and verify, then `decision_ready` or `failed_validation`; a refused tool or inconsistent records end in `failed_tool` with a short code. The status changes only in the nodes, via `Case.transition_to` (ADR 0009). `AgentSet` lets tests swap in failing agents.
+- Checkpointing is prepared for 6b: state is contracts and lists only (`PolicyResult` became a contract so its tuples survive), and `checkpoint_serde()` rebuilds only an explicit allowlist of our types, as LangGraph recommends. Proven with an in-memory saver; a test fails if a state type is missing from the list.
+- `langgraph>=1.2,<2` added as a dependency. Shared test fixtures moved to `backend/tests/support`. `scripts/run_case.py` runs scenarios through the graph. 508 tests pass (21 new); the checks were mutation-tested (dropping an allowlisted type, ignoring a failed verification, not catching tool errors each fail a test).
+- Not built yet: approval pause (6b); loop limits, retries and an audit event per transition (6c); decisions (Phase 7). See docs/orchestration.md.
+
 ## 2026-10-14 - Process: tracker, resume-state and workflow
 - Added `docs/TRACKER.md` (phase dates, test counts, remaining work split into PR-sized steps, open items, PR log), `docs/context/STATE.md` (resume-here snapshot) and `docs/WORKFLOW.md` (small branches, small green commits, merge commits). The PR template now asks for the tracker and state updates.
 

@@ -18,7 +18,7 @@ The single place to see what is done, what is next and whether the schedule hold
 | 4 | RAG over knowledge base and policies | 2026-10-12 | 2026-10-12 | 1 | 381 | done |
 | 5a | Model gateway (Groq, Gemini, failover, budgets) | 2026-10-13 | 2026-10-13 | 1 | 446 | done (Gemini never succeeded live) |
 | 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
-| 6 | LangGraph orchestration, approval pause, loop limits | | | est. 2-3 | | next |
+| 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | | est. 2-3 | 508 so far | in progress (6a done) |
 | 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | | | est. 2-3 | | planned |
 | 8 | API, frontend, demo | | | est. 3-4 | | planned |
 
@@ -30,7 +30,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 ## Proposed split of the remaining phases (each line = one pull request)
 
 **Phase 6**
-- [ ] 6a Case state machine as a LangGraph graph, wiring the four agents (no approvals yet)
+- [x] 6a Case state machine as a LangGraph graph, wiring the four agents (no approvals yet)
 - [ ] 6b Approval interrupt and resume, using the existing approval contracts
 - [ ] 6c Loop limits, tool-failure states, audit events for every transition
 - [ ] 6d Orchestration tests for scenarios A-F, X (including the Level 4 two-approver path)
