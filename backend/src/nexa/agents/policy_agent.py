@@ -94,14 +94,16 @@ class PolicySelection(Contract):
     applicable_refs: tuple[str, ...] = Field(default=(), max_length=MAX_SELECTED)
 
 
-@dataclass(frozen=True)
-class PolicyResult:
-    """What the policy agent found."""
+class PolicyResult(Contract):
+    """What the policy agent found.
 
-    evidence: tuple[Evidence, ...]
-    gaps: tuple[str, ...]
-    llm_used: bool
-    dropped_refs: int
+    A `Contract` (not a dataclass) so it survives a LangGraph checkpoint with its tuples intact.
+    """
+
+    evidence: tuple[Evidence, ...] = ()
+    gaps: tuple[str, ...] = ()
+    llm_used: bool = False
+    dropped_refs: int = Field(default=0, ge=0)
 
     @property
     def policy_refs(self) -> tuple[PolicyRef, ...]:
@@ -167,7 +169,9 @@ class PolicyAgent:
 
         chosen, dropped, llm_used = self._select(case, findings, found)
         evidence = tuple(self._evidence(case.id, found[ref]) for ref in chosen)
-        return PolicyResult(evidence, tuple(gaps), llm_used, dropped)
+        return PolicyResult(
+            evidence=evidence, gaps=tuple(gaps), llm_used=llm_used, dropped_refs=dropped
+        )
 
     # --- model step ------------------------------------------------------------------
     def _select(
