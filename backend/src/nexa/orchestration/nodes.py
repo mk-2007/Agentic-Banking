@@ -26,9 +26,11 @@ from nexa.agents import (
 )
 from nexa.agents.base import AgentContext
 from nexa.agents.verification_agent import BLOCKING
+from nexa.approvals import InMemoryApprovalStore
 from nexa.audit import AuditRecorder
 from nexa.config.approval_matrix import approval_rule_for
-from nexa.domain.actors import Actor, ActorKind
+from nexa.domain.actions import ActionType
+from nexa.domain.actors import Actor, ActorKind, Role
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote, evaluate_approval
 from nexa.domain.audit import AuditEventType
 from nexa.domain.case import Case, CaseStatus
@@ -36,11 +38,15 @@ from nexa.domain.clock import Clock
 from nexa.domain.decision import BLOCKING_UNCERTAINTY, Decision
 from nexa.domain.evidence import Evidence
 from nexa.domain.ids import new_id
+from nexa.domain.tooling import ToolCall
+from nexa.tools import ToolRegistry
 
 from .limits import TRANSIENT_TOOL_CODES, RunLimits
 from .state import CaseGraphState
 
 ORCHESTRATOR = Actor(kind=ActorKind.SYSTEM, id="orchestrator")
+EXECUTOR = Actor(kind=ActorKind.SYSTEM, id="executor", role=Role.EXECUTION_SERVICE)
+EXECUTE_TOOL = "execute_authorized_action"
 
 Update = dict[str, object]
 
@@ -88,12 +94,16 @@ class CaseNodes:
         *,
         audit: AuditRecorder | None = None,
         limits: RunLimits | None = None,
+        approvals: InMemoryApprovalStore | None = None,
+        registry: ToolRegistry | None = None,
     ) -> None:
         self._agents = agents
         self._clock = clock
         self._decide = decide
         self._audit = audit
         self._limits = limits or RunLimits()
+        self._approvals = approvals
+        self._registry = registry
 
     # --- helpers ---------------------------------------------------------------------
     def _record(
@@ -278,6 +288,8 @@ class CaseNodes:
             requested_at=now,
             expires_at=now + timedelta(minutes=rule.expiry_minutes),
         )
+        if self._approvals is not None:
+            self._approvals.add_request(request)
         case, moved = self._move(case, CaseStatus.WAITING_FOR_APPROVAL)
         self._record(
             AuditEventType.APPROVAL_REQUESTED,
@@ -312,6 +324,8 @@ class CaseNodes:
     def settle(self, state: CaseGraphState) -> Update:
         """Apply the pure approval rule to the votes; still pending means wait for more."""
         request = state["approval_request"]
+        if self._approvals is not None:  # the store mirrors every vote received so far
+            self._approvals.set_votes(request.id, state.get("votes", []))
         status = evaluate_approval(request, state.get("votes", []), self._clock())
         target = {
             ApprovalStatus.APPROVED: CaseStatus.APPROVED,
@@ -329,3 +343,38 @@ class CaseNodes:
             return {"approval": status}
         case, moved = self._move(state["case"], target)
         return {"case": case, "trail": moved, "approval": status}
+
+    # --- execution of an approved action (6d) ------------------------------------------------
+    def execute(self, state: CaseGraphState) -> Update:
+        """Apply the approved action through the guarded tool, check it took effect, and finish.
+
+        The approval id is the only authority: the tool re-verifies action, account, case,
+        approvers, expiry and single use itself. A refusal ends the case ``FAILED_TOOL``; an action
+        that did not take effect ends it ``FAILED_VALIDATION``.
+        """
+        assert self._registry is not None  # the graph only has this step when execution is enabled
+        case, request = state["case"], state["approval_request"]
+        result = self._registry.invoke(
+            ToolCall(
+                id=f"{case.id}:execute",
+                tool_name=EXECUTE_TOOL,
+                actor=EXECUTOR,
+                case_id=case.id,
+                arguments={"account_id": request.target_account_id, "action": request.action.value},
+                approval_id=request.id,
+                requested_at=self._clock(),
+            )
+        )
+        if not result.ok:
+            return self._stop(case, CaseStatus.FAILED_TOOL, f"{EXECUTE_TOOL}:{result.error_code}")
+        case, moved = self._move(case, CaseStatus.EXECUTED)
+        took_effect = (
+            result.output.get("account_status") == "frozen"
+            if request.action is ActionType.FREEZE_ACCOUNT
+            else result.output.get("card_status") == "blocked"
+        )
+        if not took_effect:
+            stopped = self._stop(case, CaseStatus.FAILED_VALIDATION, "execution:not_applied")
+            return {**stopped, "trail": [*moved, *stopped["trail"]]}  # type: ignore[misc]
+        case, done = self._move(case, CaseStatus.VERIFIED, CaseStatus.COMPLETED)
+        return {"case": case, "trail": [*moved, *done]}
