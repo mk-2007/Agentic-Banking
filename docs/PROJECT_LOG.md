@@ -15,6 +15,12 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 6c: limits, retries and audit
+- `orchestration.limits`: `RunLimits` (2 attempts per step, 5 vote rounds). A temporary tool failure (`timeout`, `internal_error`) goes `executing -> waiting_for_tool -> executing` and retries once; refusals are never retried. A case that stays pending too long ends `escalated` (`approval:too_many_rounds`).
+- Optional `AuditRecorder` on the graph: the orchestrator writes `case_created`, a `state_changed` per transition, `decision_made`, `approval_requested`, `approval_vote_cast` and `error` (with the failure code). Nothing is written without a recorder.
+- 534 tests pass (11 new); disabling the transient codes fails three of them.
+- Not built: loop-back to gather when records are missing; scenario A-F orchestration tests (6d).
+
 ## 2026-10-14 - Phase 6a: case graph
 - `orchestration`: a LangGraph graph runs a case through open, gather, analyze, research and verify, then `decision_ready` or `failed_validation`; a refused tool or inconsistent records end in `failed_tool` with a short code. The status changes only in the nodes, via `Case.transition_to` (ADR 0009). `AgentSet` lets tests swap in failing agents.
 - Checkpointing is prepared for 6b: state is contracts and lists only (`PolicyResult` became a contract so its tuples survive), and `checkpoint_serde()` rebuilds only an explicit allowlist of our types, as LangGraph recommends. Proven with an in-memory saver; a test fails if a state type is missing from the list.
