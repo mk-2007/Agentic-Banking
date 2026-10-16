@@ -68,9 +68,9 @@
     {
       "id": "module:approvals",
       "type": "module",
-      "status": "planned",
+      "status": "in_progress",
       "path": "backend/src/nexa/approvals",
-      "summary": "Human-in-the-loop approve/reject/modify/escalate"
+      "summary": "In-memory approval store (requests, votes, single-use consumption); a durable queue and approver identity come with the API (8a)"
     },
     {
       "id": "module:agents",
@@ -84,7 +84,7 @@
       "type": "module",
       "status": "in_progress",
       "path": "backend/src/nexa/orchestration",
-      "summary": "LangGraph case graph from intake to decision_ready/failed states; status only in nodes; allowlisted checkpoints (6a, 6b approvals and 6c limits, retries and audit done; scenario tests 6d)"
+      "summary": "LangGraph case graph from intake to decision_ready/failed states; status only in nodes; allowlisted checkpoints (6a, 6b approvals and 6c limits, retries and audit done; execution and scenario tests 6d)"
     },
     {
       "id": "module:api",

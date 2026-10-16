@@ -3,4 +3,11 @@
 Why: Separates a recommendation from authorized execution (PRD sections 12, 13, 41).
 
 Where it sits: Layer 3. Uses security, audit and tools.
+
+Modules:
+    store  `InMemoryApprovalStore`: requests, votes and single-use consumption (Phase 6d)
 """
+
+from .store import InMemoryApprovalStore
+
+__all__ = ["InMemoryApprovalStore"]

@@ -15,6 +15,11 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - 523 tests pass (15 new), including a resume from a freshly built graph with nothing refused by the serializer.
 - Not built: executing the approved action (6d), limits and audit per transition (6c), who-voted authentication (8a).
 
+## 2026-10-16 - Phase 6d: execution of approved actions
+- `approvals.InMemoryApprovalStore` (requests, votes, atomic single-use consumption; implements `security.ApprovalSource`). New `execute` step after an approved `settle`: calls the guarded tool as the execution service, then `approved -> executed -> verified -> completed`; a refusal ends `failed_tool`, an effect that did not show ends `failed_validation`.
+- Tests: Level 4 with two approvers, Level 3 with one, one approver only, reject/escalate/modify, expiry, replay, approval consumed elsewhere, no store configured, and all seven scenarios end to end with no change to the bank without approval. 554 tests pass; routing around `execute` or ignoring a refusal each fail tests.
+- Limits: the store is in memory and does not authenticate approvers (8a); verification trusts the tool's own output because the execution role cannot read accounts.
+
 ## 2026-10-16 - Phase 6c: limits, retries and audit
 - `orchestration.limits`: `RunLimits` (2 attempts per step, 5 vote rounds). A temporary tool failure (`timeout`, `internal_error`) goes `executing -> waiting_for_tool -> executing` and retries once; refusals are never retried. A case that stays pending too long ends `escalated` (`approval:too_many_rounds`).
 - Optional `AuditRecorder` on the graph: the orchestrator writes `case_created`, a `state_changed` per transition, `decision_made`, `approval_requested`, `approval_vote_cast` and `error` (with the failure code). Nothing is written without a recorder.

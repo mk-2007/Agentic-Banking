@@ -22,6 +22,7 @@ from langgraph.types import Command
 
 from nexa.agents import Investigation
 from nexa.agents.base import AgentContext
+from nexa.approvals import InMemoryApprovalStore
 from nexa.audit import AuditRecorder
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
@@ -57,11 +58,6 @@ def _after_request(state: CaseGraphState) -> str:
     return END if state.get("failure") else "await_votes"
 
 
-def _after_settle(state: CaseGraphState) -> str:
-    pending = state["approval"] is ApprovalStatus.PENDING
-    return "await_votes" if pending and not state.get("failure") else END
-
-
 def build_case_graph(
     ctx: AgentContext,
     *,
@@ -70,6 +66,7 @@ def build_case_graph(
     decide: DecisionSource | None = None,
     audit: AuditRecorder | None = None,
     limits: RunLimits | None = None,
+    approvals: InMemoryApprovalStore | None = None,
 ) -> CaseGraph:
     """Compile the case graph for ``ctx``. Pass ``agents`` to swap a specialist (tests do).
 
@@ -77,12 +74,29 @@ def build_case_graph(
     pauses the run at ``WAITING_FOR_APPROVAL``. Pausing needs a ``checkpointer`` to save the run.
     With ``audit`` every transition, decision, approval request and vote is written to the audit
     chain; ``limits`` bounds retries and vote rounds (defaults are in `RunLimits`).
+    With ``approvals`` (the same store the tool registry's `ToolContext` uses) an approved case goes
+    on to execute the action through the guarded tool and verify it.
     """
+    if approvals is not None and decide is None:
+        raise ValueError("executing approved actions needs a decision source")
     if decide is not None and checkpointer is None:
         raise ValueError("a graph that can pause for approval needs a checkpointer")
     nodes = CaseNodes(
-        agents or AgentSet.from_context(ctx), ctx.clock, decide, audit=audit, limits=limits
+        agents or AgentSet.from_context(ctx),
+        ctx.clock,
+        decide,
+        audit=audit,
+        limits=limits,
+        approvals=approvals,
+        registry=ctx.registry,
     )
+
+    def after_settle(state: CaseGraphState) -> str:
+        if state["approval"] is ApprovalStatus.PENDING:
+            return END if state.get("failure") else "await_votes"
+        approved = state["approval"] is ApprovalStatus.APPROVED
+        return "execute" if approved and approvals is not None else END
+
     graph = StateGraph(CaseGraphState)
     for name, step in (
         ("open_case", nodes.open_case),
@@ -108,13 +122,14 @@ def build_case_graph(
             ("request_approval", nodes.request_approval),
             ("await_votes", nodes.await_votes),
             ("settle", nodes.settle),
+            *((("execute", nodes.execute),) if approvals is not None else ()),
         ):
             graph.add_node(name, step)
         graph.add_edge("mark_ready", "propose")
         graph.add_conditional_edges("propose", _after_propose)
         graph.add_conditional_edges("request_approval", _after_request)
         graph.add_edge("await_votes", "settle")
-        graph.add_conditional_edges("settle", _after_settle)
+        graph.add_conditional_edges("settle", after_settle)
     graph.add_edge("fail_validation", END)
     return graph.compile(checkpointer=checkpointer)
 

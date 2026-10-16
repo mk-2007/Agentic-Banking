@@ -20,7 +20,7 @@ gateway can replace the simulator later.
 | 3 | Security, audit and tool layer (before any LLM) | done |
 | 4 | RAG over knowledge base and policies | done |
 | 5 | Model gateway (5a) and specialist agents with scenario evals (5b) | done |
-| 6 | LangGraph orchestration with human approval (6a case graph, 6b approval pause and 6c limits and audit done; 6d scenario tests next) | in progress |
+| 6 | LangGraph orchestration with human approval (6a case graph, 6b approval pause and 6c limits and audit done; 6d execution of approved actions done; merging the stacked PRs next) | in progress |
 | 7 | Decision providers and evaluation | planned |
 | 8 | API, frontend, demo | planned |
 
