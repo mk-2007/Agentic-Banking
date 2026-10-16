@@ -63,7 +63,7 @@
       "type": "module",
       "status": "in_progress",
       "path": "backend/src/nexa/decision",
-      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a done); LLM provider 7b; optional JEV adapter later"
+      "summary": "DecisionProvider interface and the rule-based provider with uncertainty and justification gates (7a), LLM provider (7b) done; evaluation 7c; optional JEV adapter later"
     },
     {
       "id": "module:approvals",

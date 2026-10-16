@@ -1,4 +1,4 @@
-# Decision layer (Phase 7a: rule-based provider)
+# Decision layer (Phase 7a rules, 7b LLM)
 
 A decision provider turns verified findings into a **recommendation**. It never authorizes anything:
 `Decision` cannot be built unsafely (ADR 0003) and execution still needs a human approval. Code:
@@ -42,6 +42,24 @@ decision says which gate did it in `overridden_by`.
 Findings that are not in the closed `IndicatorCode` vocabulary are ignored, so forged evidence cannot steer a
 decision. With no recognisable findings at all the provider escalates, because nothing was assessed.
 
+## The LLM provider (7b, `decision/llm_provider.py`)
+
+`LlmDecisionProvider(gateway, clock, fallback)` asks a model to rank actions and cite evidence, then lets the same
+gates decide. The model **proposes; code decides**.
+
+| Step | What happens |
+|---|---|
+| Prompt | Finding codes, signals and evidence ids only, fenced as untrusted data, with the allowed actions and their levels. No summaries, merchant names or memos. Temperature 0. |
+| Answer | Validated against `LlmChoice` through `LlmGateway.structured` (bounded repair). An action outside the closed set cannot even be parsed. |
+| Citations | Evidence ids the model cites that do not exist are dropped. Policy references never come from the model: they come from retrieval, filtered to the document that governs the chosen action. |
+| Gates | `gates.refusal` (shared with the rule provider) walks the model's ranking; the first allowed action is recommended and `overridden_by` names the gate that skipped the model's pick. If every proposal is refused the case goes to an analyst. |
+| Scores | Made from the rank and the model's confidence (top = confidence, then 0.1 less per place). The confidence is stored as `model_confidence` and is **not calibrated**; below 0.5 the decision gets the `low_model_confidence` flag. |
+| Failure | Model missing, down, over budget or answering badly: the fallback (rules) decides and `decision.provider` says `rule_based_v1`, so a fallback is visible in any evaluation. |
+
+The gates are shared in `decision/gates.py`: `uncertainty_gate`, `no_action_gate` (no action only when no risk
+finding exists) and `justification_gate` (Level 3+ needs a cited *risk* finding and a clause from the governing
+document). The no-action gate is new in 7b and applies to both providers.
+
 ## What changed elsewhere
 
 `IndicatorCode`, `Signal` and `SIGNAL_OF` moved to `domain/indicators.py` so the decision layer (which may not
@@ -56,6 +74,13 @@ required). `tests/unit/orchestration/test_provider_in_graph.py` runs the provide
 frozen account with two humans. Disabling the uncertainty gate or lowering the takeover threshold fails tests.
 
 ## Honest limits
+
+- **The LLM provider has only been run against a scripted model.** Nothing here shows how a real model ranks;
+  that is what 7c measures (`--live`). Because the gates are the same, the worst a model can do is escalate too
+  often or pick a weaker action, not slip a restriction past them.
+- A model may cite the right ids for the wrong reasons; the gates check that evidence exists and is a risk
+  finding, not that it justifies the action.
+- The same cited evidence is attached to every candidate in the ranking (the model gives one list).
 
 - **The rules were written against the same seven scenarios they are tested on.** Passing shows they follow the
   policy text, not that they hold on real traffic. Phase 7c scores them again next to the LLM provider.
