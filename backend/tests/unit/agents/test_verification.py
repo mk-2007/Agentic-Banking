@@ -29,7 +29,7 @@ def clause(case_id: str = "case_1", version: str = "1.0") -> Evidence:
 
 
 def policy(*evidence: Evidence) -> PolicyResult:
-    return PolicyResult(evidence, (), False, 0)
+    return PolicyResult(evidence=evidence)
 
 
 def verify(alert, history, *, evidence=(), **kwargs):  # type: ignore[no-untyped-def]
