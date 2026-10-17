@@ -57,6 +57,10 @@ class InMemoryBank:
         """Return the account or raise RecordNotFoundError."""
         return self._lookup(self._accounts, account_id, "account")
 
+    def all_accounts(self) -> tuple[AccountRecord, ...]:
+        """Every account in the bank, for admin browsing (not part of the gateway protocol)."""
+        return tuple(self._accounts.values())
+
     def list_accounts(self, customer_id: str) -> tuple[AccountRecord, ...]:
         """Return every account owned by the customer (possibly none)."""
         return tuple(a for a in self._accounts.values() if a.customer_id == customer_id)

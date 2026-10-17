@@ -91,7 +91,7 @@
       "type": "module",
       "status": "done",
       "path": "backend/src/nexa/api",
-      "summary": "Thin FastAPI layer plus a static dashboard page (8b)"
+      "summary": "Thin FastAPI layer plus a static dashboard page: agent pipeline replay, approval seats, audit ribbon (8b)"
     },
     {
       "id": "doc:prd",
@@ -439,6 +439,34 @@
       "status": "done",
       "path": "docs/decision.md",
       "summary": "Decision providers: the rule table, the two gates, tests and honest limits (7a)"
+    },
+    {
+      "id": "module:evaluation",
+      "type": "module",
+      "status": "done",
+      "path": "backend/src/nexa/evaluation",
+      "summary": "Scores finished case runs against their labels; the scorecard the admin lab reports"
+    },
+    {
+      "id": "adr:0011",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0011-an-auditor-role-and-a-private-evaluation-lab.md",
+      "summary": "Auditor role, private evaluation lab, labels kept apart from the bank"
+    },
+    {
+      "id": "doc:how-it-works",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/how-it-works.md",
+      "summary": "Plain-English walk through one case"
+    },
+    {
+      "id": "doc:code-tour",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/code-tour.md",
+      "summary": "File-by-file map of a case and where to change things"
     }
   ],
   "edges": [
@@ -1059,6 +1087,56 @@
     },
     {
       "from": "doc:api",
+      "to": "module:api",
+      "relation": "documents"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:domain",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:config",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:bank_sim",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:agents",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:orchestration",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:api",
+      "to": "module:evaluation",
+      "relation": "depends_on"
+    },
+    {
+      "from": "adr:0011",
+      "to": "module:evaluation",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0011",
+      "to": "module:api",
+      "relation": "decides"
+    },
+    {
+      "from": "doc:how-it-works",
+      "to": "module:orchestration",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:code-tour",
       "to": "module:api",
       "relation": "documents"
     }

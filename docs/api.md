@@ -21,8 +21,13 @@ audit log, and demo tokens change on every start.
 | `GET /approvals/pending` | employee | cases waiting for votes |
 | `POST /cases/{id}/votes` | employee | cast `approve`, `reject`, `escalate` or `modify` and continue the case |
 | `POST /chat` | customer or employee | cited passages from the knowledge base |
+| `GET /admin/lab/cases` | auditor | the 82 labelled lab cases with their latest score |
+| `POST /admin/lab/run` | auditor | run all cases, some `ids`, or one `archetype` on a private platform copy and score them |
+| `GET /admin/lab/scorecard` | auditor | pass, safe, useful and human-routed rates over the cases run so far |
+| `GET /admin/lab/cases/{id}` | auditor | one case's report: label, run, audit chain and account profile |
+| `GET /admin/accounts`, `GET /admin/accounts/{id}` | auditor | every synthetic account; one profile (no merchant names or memos) |
 
-Employees are the fraud analyst, risk officer and compliance officer roles. A customer can only chat.
+Employees are the fraud analyst, risk officer and compliance officer roles. A customer can only chat. The auditor is not an employee: it cannot open live cases or vote, and it alone may use `/admin`. Lab runs use their own platform copy and never appear among live cases.
 
 ## Rules this layer keeps
 
@@ -46,7 +51,7 @@ Employees are the fraud analyst, risk officer and compliance officer roles. A cu
 ## Sign-in
 
 Bearer tokens map to a user id and a role. Provide them as `NEXA_API_TOKENS="token:user_id:role,..."` (roles:
-`fraud_analyst`, `risk_officer`, `compliance_officer`, `customer`), or use `--demo` for random ones. Tokens are
+`fraud_analyst`, `risk_officer`, `compliance_officer`, `auditor`, `customer`), or use `--demo` for random ones. Tokens are
 never in the repository.
 
 ## Honest limits

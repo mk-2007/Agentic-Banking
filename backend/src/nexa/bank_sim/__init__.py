@@ -10,20 +10,24 @@ Modules:
     gateway    Protocol interfaces a real bank integration would implement
     in_memory  deterministic simulator implementing those interfaces
     scenarios  predefined evaluation scenarios A-E (+F, X) as data
-    seed       loads the committed synthetic dataset
+    seed       loads the committed synthetic dataset and the labelled lab cohort
 """
 
 from .errors import DuplicateRecordError, RecordNotFoundError
 from .gateway import BankGateway
 from .in_memory import InMemoryBank
-from .seed import default_data_dir, load_bank, load_scenarios
+from .scenarios import LabCaseSpec
+from .seed import default_data_dir, load_bank, load_lab_bank, load_lab_cases, load_scenarios
 
 __all__ = [
     "BankGateway",
     "DuplicateRecordError",
     "InMemoryBank",
+    "LabCaseSpec",
     "RecordNotFoundError",
     "default_data_dir",
     "load_bank",
+    "load_lab_bank",
+    "load_lab_cases",
     "load_scenarios",
 ]

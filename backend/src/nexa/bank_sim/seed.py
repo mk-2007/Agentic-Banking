@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from .in_memory import InMemoryBank
 from .models import AccountRecord, CustomerRecord, KycRecord, TransactionRecord
-from .scenarios import ScenarioSpec
+from .scenarios import LabCaseSpec, ScenarioSpec
 
 
 def default_data_dir() -> Path:
@@ -44,3 +44,33 @@ def load_scenarios(data_dir: Path | None = None) -> tuple[ScenarioSpec, ...]:
     """Load the predefined evaluation scenarios."""
     directory = data_dir or default_data_dir()
     return tuple(_read(directory, "scenarios.json", ScenarioSpec))
+
+
+def lab_data_dir() -> Path:
+    """Return ``data/synthetic/lab``: the extra labelled cohort used by the admin lab."""
+    return default_data_dir() / "lab"
+
+
+def load_lab_bank() -> InMemoryBank:
+    """Build a bank holding the core dataset plus the lab cohort (ids never overlap)."""
+    core, lab = default_data_dir(), lab_data_dir()
+    return InMemoryBank(
+        customers=[
+            *_read(core, "customers.json", CustomerRecord),
+            *_read(lab, "customers.json", CustomerRecord),
+        ],
+        accounts=[
+            *_read(core, "accounts.json", AccountRecord),
+            *_read(lab, "accounts.json", AccountRecord),
+        ],
+        transactions=[
+            *_read(core, "transactions.json", TransactionRecord),
+            *_read(lab, "transactions.json", TransactionRecord),
+        ],
+        kyc=[*_read(core, "kyc.json", KycRecord), *_read(lab, "kyc.json", KycRecord)],
+    )
+
+
+def load_lab_cases() -> tuple[LabCaseSpec, ...]:
+    """Load the labelled lab cases (the answer key lives here, never in the bank)."""
+    return tuple(_read(lab_data_dir(), "lab_cases.json", LabCaseSpec))

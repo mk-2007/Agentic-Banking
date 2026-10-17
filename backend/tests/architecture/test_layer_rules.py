@@ -33,6 +33,7 @@ ALLOWED: dict[str, set[str]] = {
         "approvals",
         "agents",
     },  # fmt: skip
+    "evaluation": {"domain", "config", "bank_sim", "agents", "orchestration"},
     "api": {
         "domain",
         "config",
@@ -46,6 +47,7 @@ ALLOWED: dict[str, set[str]] = {
         "approvals",
         "agents",
         "orchestration",
+        "evaluation",
     },  # fmt: skip
 }
 

@@ -11,6 +11,7 @@ a voter is and which role they vote as come from their token, never from the req
     POST /cases/{id}/votes      cast a verdict and continue the case        (employee)
     POST /chat                  answer from the knowledge base              (customer or employee)
     GET  /scenarios             sample alerts to open cases from            (employee)
+    GET  /admin/...             lab cases, run, scorecard, reports, accounts (auditor only)
     GET  /health                liveness, no authentication
     GET  /                      the dashboard page (static; every call it makes needs a token)
 """
@@ -24,6 +25,17 @@ from fastapi.responses import FileResponse
 
 from nexa.bank_sim import RecordNotFoundError, load_scenarios
 
+from .lab import (
+    AccountProfile,
+    AccountRow,
+    LabCaseRow,
+    LabReport,
+    LabRunRequest,
+    LabRunView,
+    LabService,
+    ScorecardView,
+    UnknownLabCaseError,
+)
 from .principals import Principal
 from .schemas import (
     AuditEventView,
@@ -41,9 +53,15 @@ from .schemas import (
 from .service import CaseNotFoundError, CaseService, InvalidAlertError, NotWaitingError
 
 
-def create_app(service: CaseService, principals: Mapping[str, Principal]) -> FastAPI:
-    """Build the API around ``service``. ``principals`` maps bearer tokens to callers."""
+def create_app(
+    service: CaseService, principals: Mapping[str, Principal], lab: LabService | None = None
+) -> FastAPI:
+    """Build the API around ``service``. ``principals`` maps bearer tokens to callers.
+
+    ``lab`` is the auditor's evaluation lab; it is built on first use if not given.
+    """
     app = FastAPI(title="NexaBank Agentic Platform", version="0.1.0")
+    lab_box: list[LabService] = [lab] if lab else []
 
     def caller(authorization: Annotated[str | None, Header()] = None) -> Principal:
         scheme, _, token = (authorization or "").partition(" ")
@@ -61,8 +79,20 @@ def create_app(service: CaseService, principals: Mapping[str, Principal]) -> Fas
             raise HTTPException(status.HTTP_403_FORBIDDEN, "employees only")
         return who
 
+    def auditor(who: Annotated[Principal, Depends(caller)]) -> Principal:
+        if not who.is_auditor:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "auditors only")
+        return who
+
+    def the_lab() -> LabService:
+        if not lab_box:
+            lab_box.append(LabService())
+        return lab_box[0]
+
     Who = Annotated[Principal, Depends(caller)]
     Employee = Annotated[Principal, Depends(employee)]
+    Auditor = Annotated[Principal, Depends(auditor)]
+    Lab = Annotated[LabService, Depends(the_lab)]
 
     @app.get("/health")
     def health() -> dict[str, str]:
@@ -153,5 +183,45 @@ def create_app(service: CaseService, principals: Mapping[str, Principal]) -> Fas
         return ChatResponse(
             passages=[PassageView(**vars(p)) for p in service.chat(body.question, who)]
         )
+
+    # --- the auditor's lab -------------------------------------------------------------------
+    @app.get("/admin/lab/cases")
+    def lab_cases(who: Auditor, lab: Lab) -> list[LabCaseRow]:
+        """Every labelled case, with its latest score if it has been run."""
+        return lab.cases()
+
+    @app.post("/admin/lab/run")
+    def lab_run(body: LabRunRequest, who: Auditor, lab: Lab) -> LabRunView:
+        """Run the chosen cases (all by default) on a private platform copy and score them."""
+        try:
+            return lab.run(body.ids, body.archetype)
+        except UnknownLabCaseError as error:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, f"no such lab case: {error}") from None
+
+    @app.get("/admin/lab/scorecard")
+    def lab_scorecard(who: Auditor, lab: Lab) -> ScorecardView:
+        """Headline numbers over the cases run so far."""
+        return lab.scorecard()
+
+    @app.get("/admin/lab/cases/{case_id}")
+    def lab_report(case_id: str, who: Auditor, lab: Lab) -> LabReport:
+        """Return the full report for one case: label, run, audit chain and account."""
+        try:
+            return lab.report(case_id)
+        except UnknownLabCaseError:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "no such lab case") from None
+
+    @app.get("/admin/accounts")
+    def admin_accounts(who: Auditor, lab: Lab) -> list[AccountRow]:
+        """Every synthetic account, with its lab case if one exists."""
+        return lab.accounts()
+
+    @app.get("/admin/accounts/{account_id}")
+    def admin_account(account_id: str, who: Auditor, lab: Lab) -> AccountProfile:
+        """One account's profile (no merchant names or memos)."""
+        try:
+            return lab.account(account_id)
+        except UnknownLabCaseError:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "no such account") from None
 
     return app

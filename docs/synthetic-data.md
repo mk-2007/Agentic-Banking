@@ -21,6 +21,17 @@ python scripts/generate_synthetic_data.py      # rewrites data/synthetic/
 The baseline also contains duplicate transactions, foreign activity, and salary credits, so analysis
 has realistic noise to work through (PRD section 16).
 
+## Lab cohort (`data/synthetic/lab/`)
+
+An extra 72 labelled cases for the auditor's lab: 60 variants of eleven archetypes (different amounts,
+countries, devices and histories) and 12 threshold-boundary cases. It has its own customers, accounts,
+transactions and KYC files plus `lab_cases.json`, which holds the answer key (acceptable and forbidden
+actions, whether a human must be involved). Agents never read the answer key. The same generator writes it
+(`python scripts/generate_synthetic_data.py`) and a test regenerates it byte for byte. See ADR 0011.
+
+Note: the scenario table below describes the original seven; G to J were added later, so the platform now
+runs eleven core scenarios (ten score-able in the lab, since E is an authorization test).
+
 ## Scenarios
 
 | Id | PRD | What happens | Correct handling |

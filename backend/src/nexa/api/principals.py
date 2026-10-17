@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from nexa.domain.actors import Role, SessionChannel
 
 EMPLOYEE_ROLES = frozenset({Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_OFFICER})
-ALLOWED_ROLES = EMPLOYEE_ROLES | {Role.CUSTOMER}
+ALLOWED_ROLES = EMPLOYEE_ROLES | {Role.CUSTOMER, Role.AUDITOR}
 
 
 @dataclass(frozen=True)
@@ -31,6 +31,11 @@ class Principal:
     def is_employee(self) -> bool:
         """True for the human investigator roles."""
         return self.role in EMPLOYEE_ROLES
+
+    @property
+    def is_auditor(self) -> bool:
+        """True for the auditor, who may use the evaluation lab but not the live case desk."""
+        return self.role is Role.AUDITOR
 
     @property
     def channel(self) -> SessionChannel:
@@ -62,10 +67,11 @@ def parse_tokens(spec: str) -> dict[str, Principal]:
 
 
 def demo_tokens() -> dict[str, Principal]:
-    """Create random tokens for a demo analyst, risk officer and customer (new on every start)."""
+    """Create random tokens for a demo analyst, risk officer, auditor and customer."""
     people = (
         ("demo_analyst", Role.FRAUD_ANALYST),
         ("demo_risk_officer", Role.RISK_OFFICER),
+        ("demo_auditor", Role.AUDITOR),
         ("demo_customer", Role.CUSTOMER),
     )
     return {secrets.token_urlsafe(24): Principal(user, role) for user, role in people}
