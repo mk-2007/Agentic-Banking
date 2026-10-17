@@ -9,15 +9,18 @@ Nothing here decides anything. It runs the same graph the live desk uses, stops 
 desk would wait for votes, and scores the recommendation with `nexa.evaluation`.
 """
 
+import json
 import threading
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 from pydantic import BaseModel, Field
 
 from nexa.bank_sim import (
     InMemoryBank,
     RecordNotFoundError,
+    default_data_dir,
     load_lab_bank,
     load_lab_cases,
     load_scenarios,
@@ -25,7 +28,14 @@ from nexa.bank_sim import (
 from nexa.bank_sim.models import AccountRecord
 from nexa.bank_sim.scenarios import ScenarioSpec
 from nexa.domain.clock import Clock, utc_now
-from nexa.evaluation import CaseScore, score_case, scorecard
+from nexa.evaluation import (
+    CaseScore,
+    Scorecard,
+    run_baselines,
+    run_hostile,
+    score_case,
+    scorecard,
+)
 from nexa.orchestration import CaseRun
 
 from .schemas import AuditEventView, CaseView, Request, view_of
@@ -75,6 +85,8 @@ class ScoreView(BaseModel):
     flags: list[str]
     checks: list[CheckView]
     useful: bool
+    preferred: bool
+    over_escalated: bool
     safe: bool
     passed: bool
     duration_ms: float
@@ -120,6 +132,9 @@ class ScorecardView(BaseModel):
     safe: int
     useful: int
     human_routed: int
+    preferred: int
+    over_escalated: int
+    unjustified: int
     by_archetype: list[ArchetypeView]
     failed_case_ids: list[str]
     average_ms: float
@@ -194,6 +209,79 @@ class LabReport(BaseModel):
     account: AccountProfile
 
 
+class CardView(BaseModel):
+    """Headline numbers for one decision maker over the lab cases."""
+
+    total: int
+    passed: int
+    safe: int
+    useful: int
+    preferred: int
+    over_escalated: int
+    human_routed: int
+    unjustified: int
+
+
+class BaselineRow(BaseModel):
+    """One decision maker (the agents or a simple rule) on the same cases."""
+
+    key: str
+    title: str
+    description: str
+    card: CardView
+
+
+class HostileRow(BaseModel):
+    """One misbehaving stand-in model behind the real gates."""
+
+    key: str
+    title: str
+    description: str
+    total: int
+    raw_unsafe: int
+    safe: int
+    useful: int
+    gate_interventions: int
+    fallbacks: int
+
+
+class LiveCaseView(BaseModel):
+    """One case from a saved live-model run."""
+
+    case_id: str
+    archetype: str
+    rules_action: str
+    llm_action: str
+    agree: bool
+    gate: str | None
+    fell_back: bool
+    safe: bool
+    useful: bool
+    preferred: bool
+
+
+class LiveView(BaseModel):
+    """A saved run of a real model against the rules (see scripts/run_lab_live.py)."""
+
+    available: bool
+    provider: str = ""
+    saved_at: str = ""
+    total: int = 0
+    agree: int = 0
+    safe: int = 0
+    useful: int = 0
+    preferred: int = 0
+    gate_interventions: int = 0
+    fallbacks: int = 0
+    seconds: float = 0.0
+    cases: list[LiveCaseView] = []
+
+
+def live_results_path() -> Path:
+    """Where the latest live-model comparison is saved: ``data/lab_results/live.json``."""
+    return default_data_dir().parent / "lab_results" / "live.json"
+
+
 class UnknownLabCaseError(LookupError):
     """No lab case or account has this id."""
 
@@ -218,6 +306,8 @@ def _score_view(result: _Result) -> ScoreView:
         flags=list(s.flags),
         checks=[CheckView(name=c.name, ok=c.ok, detail=c.detail) for c in s.checks],
         useful=s.useful,
+        preferred=s.preferred,
+        over_escalated=s.over_escalated,
         safe=s.safe,
         passed=s.passed,
         duration_ms=round(result.millis, 1),
@@ -234,6 +324,7 @@ class LabService:
         lab = ((c, c.archetype) for c in load_lab_cases())
         self._specs: dict[str, tuple[ScenarioSpec, str]] = {s.id: (s, a) for s, a in (*core, *lab)}
         self._results: dict[str, _Result] = {}
+        self._clock = clock
         self._lock = threading.RLock()  # run() reads the scorecard while holding it
 
     # --- cases -----------------------------------------------------------------------------
@@ -297,6 +388,9 @@ class LabService:
                 safe=card.safe,
                 useful=card.useful,
                 human_routed=card.human_routed,
+                preferred=card.preferred,
+                over_escalated=card.over_escalated,
+                unjustified=card.unjustified,
                 by_archetype=[
                     ArchetypeView(
                         archetype=t.archetype,
@@ -340,6 +434,71 @@ class LabService:
             )
             for e in self._service.audit(result.run.case.id)
         ]
+
+    # --- capability views ------------------------------------------------------------------
+    def finished_runs(self) -> list[tuple[ScenarioSpec, str, CaseRun]]:
+        """Finished runs of every lab case, running any that have not been run yet."""
+        with self._lock:
+            pending = [i for i in self._specs if i not in self._results]
+        if pending:
+            self.run(pending)
+        with self._lock:
+            return [(s, a, self._results[i].run) for i, (s, a) in self._specs.items()]
+
+    @staticmethod
+    def _card(c: Scorecard) -> CardView:
+        return CardView(
+            total=c.total, passed=c.passed, safe=c.safe, useful=c.useful, preferred=c.preferred,
+            over_escalated=c.over_escalated, human_routed=c.human_routed, unjustified=c.unjustified,
+        )  # fmt: skip
+
+    def baselines(self) -> list[BaselineRow]:
+        """Return the agents and each simple rule, scored on the same cases with the same checks."""
+        runs = self.finished_runs()
+        agents = scorecard([self._results[s.id].score for s, _, _ in runs])
+        rows = [
+            BaselineRow(
+                key="agents",
+                title="Nexa agents",
+                description="Four agents, typed findings, hard gates, cited policy.",
+                card=self._card(agents),
+            )
+        ]
+        for result in run_baselines(self._bank, [(s, a) for s, a, _ in runs]):
+            rows.append(
+                BaselineRow(
+                    key=result.key,
+                    title=result.title,
+                    description=result.description,
+                    card=self._card(result.card),
+                )  # fmt: skip
+            )
+        return rows
+
+    def hostile(self) -> list[HostileRow]:
+        """Misbehaving stand-in models behind the real gates, on every lab case."""
+        return [
+            HostileRow(
+                key=r.key,
+                title=r.title,
+                description=r.description,
+                total=r.total,
+                raw_unsafe=r.raw_unsafe,
+                safe=r.safe,
+                useful=r.useful,
+                gate_interventions=r.gate_interventions,
+                fallbacks=r.fallbacks,
+            )  # fmt: skip
+            for r in run_hostile(self.finished_runs(), self._clock)
+        ]
+
+    def live(self) -> LiveView:
+        """Return the latest saved live-model comparison, or ``available=False`` if none was run."""
+        path = live_results_path()
+        if not path.exists():
+            return LiveView(available=False)
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return LiveView(available=True, **data)
 
     # --- accounts --------------------------------------------------------------------------
     def accounts(self) -> list[AccountRow]:

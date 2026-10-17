@@ -21,10 +21,13 @@ audit log, and demo tokens change on every start.
 | `GET /approvals/pending` | employee | cases waiting for votes |
 | `POST /cases/{id}/votes` | employee | cast `approve`, `reject`, `escalate` or `modify` and continue the case |
 | `POST /chat` | customer or employee | cited passages from the knowledge base |
-| `GET /admin/lab/cases` | auditor | the 82 labelled lab cases with their latest score |
+| `GET /admin/lab/cases` | auditor | the 98 labelled lab cases with their latest score |
 | `POST /admin/lab/run` | auditor | run all cases, some `ids`, or one `archetype` on a private platform copy and score them |
 | `GET /admin/lab/scorecard` | auditor | pass, safe, useful and human-routed rates over the cases run so far |
 | `GET /admin/lab/cases/{id}` | auditor | one case's report: label, run, audit chain and account profile |
+| `GET /admin/lab/baselines` | auditor | the agents and five simple rules scored on the same cases with the same checks |
+| `GET /admin/lab/hostile` | auditor | misbehaving stand-in models behind the real gates: unsafe if accepted versus unsafe after the gates |
+| `GET /admin/lab/live` | auditor | the latest saved run of a real model against the rules (`python scripts/run_lab_live.py`), or `available: false` |
 | `GET /admin/accounts`, `GET /admin/accounts/{id}` | auditor | every synthetic account; one profile (no merchant names or memos) |
 
 Employees are the fraud analyst, risk officer and compliance officer roles. A customer can only chat. The auditor is not an employee: it cannot open live cases or vote, and it alone may use `/admin`. Lab runs use their own platform copy and never appear among live cases.

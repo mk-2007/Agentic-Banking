@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/mk-2007/Agentic-Banking/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/mk-2007/Agentic-Banking/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge"></a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-702%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
+  <img alt="tests" src="https://img.shields.io/badge/tests-713%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
   <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
@@ -41,7 +41,7 @@ pip install -e "backend[dev]"
 python scripts/run_api.py --demo      # prints sign-in tokens; open http://127.0.0.1:8000
 ```
 
-Paste the analyst token, open a sample case (or paste the **auditor** token for the evaluation lab: run 82 labelled cases, see a scorecard and a report per account), and watch it go from alert to evidence to a recommendation. For the
+Paste the analyst token, open a sample case (or paste the **auditor** token for the evaluation lab: run 98 labelled cases, compare the agents with simple rules and hostile models, and read a report per account), and watch it go from alert to evidence to a recommendation. For the
 Level 4 freeze, approve as the analyst and then as the risk officer (two windows). The full walkthrough is in
 [docs/demo.md](docs/demo.md); a recorded run of the same flow is [docs/demo-report.md](docs/demo-report.md).
 
@@ -89,7 +89,7 @@ flowchart LR
 ## At a glance
 
 <p align="center">
-  <img src="docs/assets/stats.svg" alt="702 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
+  <img src="docs/assets/stats.svg" alt="713 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
 </p>
 
 | | |
@@ -99,8 +99,8 @@ flowchart LR
 | **Decision providers** | 2 behind one interface: rule-based and LLM, sharing the same hard gates |
 | **Actions** | 7 in a closed set, risk-levelled 1 to 4; Level 4 (freeze account) needs fraud analyst **and** risk officer |
 | **Knowledge base** | 98 cited chunks, access decided *before* ranking; recall@3 = 92.5% on 40 labelled questions |
-| **Synthetic data** | 23 customers, 865 transactions, 3 policy documents, plus a 72-case labelled lab cohort (11 archetypes plus 12 threshold-boundary cases, 76 more accounts) |
-| **Quality** | 702 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
+| **Synthetic data** | 23 customers, 865 transactions, 3 policy documents, plus an 88-case labelled lab cohort (11 archetypes, 12 threshold-boundary cases and a 16-case hard tier, 88 more accounts) |
+| **Quality** | 713 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -380,7 +380,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 cd backend
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                             # 702 tests, incl. architecture rules
+pytest -q                                             # 713 tests, incl. architecture rules
 ruff check . && ruff format --check . && mypy
 ```
 
@@ -517,7 +517,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 - **The indicator patterns for a freeze or card block are our reading of the fraud policy**, which names the
   indicators but not the condition. They live in one function.
 - **Authentication is a static in-memory bearer token.** No identity provider, expiry or rate limiting.
-- **The lab scores variants of the scenario types the thresholds were designed around.** An 82 of 82 pass rate shows
+- **The lab scores variants of the scenario types the thresholds were designed around.** A 98 of 98 pass rate shows
   consistency inside those regimes, not accuracy on unseen traffic. Labels are our reading of the policy and one was
   widened after the first run (see `docs/PROJECT_LOG.md`). The 12 boundary cases (just below and just at each policy line) are the exception: they probe the thresholds themselves, and all passed.
 - **The dashboard is one static page** with a pasted token: no login screen, no live updates (the pipeline replays from the audit log, it is not streamed).

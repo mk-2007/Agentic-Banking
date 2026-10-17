@@ -33,7 +33,7 @@ ALLOWED: dict[str, set[str]] = {
         "approvals",
         "agents",
     },  # fmt: skip
-    "evaluation": {"domain", "config", "bank_sim", "agents", "orchestration"},
+    "evaluation": {"domain", "config", "bank_sim", "llm", "decision", "agents", "orchestration"},
     "api": {
         "domain",
         "config",

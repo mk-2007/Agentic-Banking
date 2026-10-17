@@ -2,6 +2,15 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-17 - Capability evidence: baselines, hostile models, hard tier, live model
+- **Why:** 82 of 82 is the expected score on cases built around the thresholds; it shows consistency, not capability, and `escalate_to_analyst` is accepted almost everywhere so passing alone flatters an over-escalating system. Added two stricter measures: **preferred** (the label's first-listed action) and **over-escalated**.
+- **Hard tier:** 16 realistic stories (wedding jewellery, dormant account wake-up, mule cash-out, split transfers, family remittance, small-caps injection, salary cash-out, same payee round amounts...). Labels were written before the first run. First run: 16 of 16 accepted, **11 of 16 match the preferred action**; the 5 misses are the system escalating where watching would do (festival shopping, family remittance, ATM cash-out after salary, round-amount payee) plus a merchant-name injection answered with monitor.
+- **Agents versus simple rules (98 cases, same checks):** agents pass 98/98, preferred 72%, over-escalated 10, 0 unjustified restrictions. Always escalate passes 62% (preferred 40%, 46 over-escalated). Unusual-amount rule 60% (preferred 55%). Multi-signal risk score 36% with 42 unjustified restrictions. The baselines were not tuned; the agents' thresholds were tuned on the original scenarios.
+- **Hostile models behind the real gates:** reckless proposed an unsafe action in 81 of 98 cases and lazy in 67; after the gates **0** unsafe recommendations came out for every stand-in. A test fails otherwise.
+- **Live model:** `scripts/run_lab_live.py` (Groq with Gemini failover) saves `data/lab_results/live.json`; free-tier retries make it slow (about 30 s per case in a 6-case trial). The Capability tab shows the saved result; the server never calls a model.
+- ADR 0012. `evaluation` now imports `decision` and `llm`. 713 tests, ruff and mypy clean.
+- Note: the narrated explainer video and `presentation/` were made when the lab had 82 cases; they say 82.
+
 ## 2026-10-17 - Lab boundary cases
 - Added 12 threshold-boundary cases to the lab (a just-below and a just-at case for each of: 5x average, PKR 300,000, 5 payments in 60 minutes, 3 failed logins, 10 earlier payments, travel-notice coverage). Labels were written from the wording of NB-POL-FRAUD-001 sections 2 and 3 **before** running the system, and none was changed afterwards.
 - Result: 12 of 12 pass, so the indicators fire exactly on the policy line and not below it. Lab is now 82 cases, 82 of 82.

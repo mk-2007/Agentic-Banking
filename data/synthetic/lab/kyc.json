@@ -70,5 +70,21 @@
 {"address_on_document": "Flat 30, Block 1, Elsewhere", "customer_id": "cust_269", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
 {"address_on_document": "Flat 31, Block 2, Elsewhere", "customer_id": "cust_270", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
 {"address_on_document": "Flat 32, Block 3, Elsewhere", "customer_id": "cust_271", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
-{"address_on_document": "Flat 33, Block 4, Elsewhere", "customer_id": "cust_272", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"}
+{"address_on_document": "Flat 33, Block 4, Elsewhere", "customer_id": "cust_272", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 273, Street 14", "customer_id": "cust_273", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 274, Street 15", "customer_id": "cust_274", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 275, Street 16", "customer_id": "cust_275", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 276, Street 17", "customer_id": "cust_276", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 277, Street 18", "customer_id": "cust_277", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 278, Street 19", "customer_id": "cust_278", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 279, Street 20", "customer_id": "cust_279", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 280, Street 1", "customer_id": "cust_280", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 281, Street 2", "customer_id": "cust_281", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 282, Street 3", "customer_id": "cust_282", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 283, Street 4", "customer_id": "cust_283", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": null, "customer_id": "cust_284", "last_reviewed_on": null, "missing_items": ["proof_of_address"], "status": "pending"},
+{"address_on_document": "House 285, Street 6", "customer_id": "cust_285", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 286, Street 7", "customer_id": "cust_286", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 287, Street 8", "customer_id": "cust_287", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 288, Street 9", "customer_id": "cust_288", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"}
 ]
