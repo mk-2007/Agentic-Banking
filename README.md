@@ -3,6 +3,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/mk-2007/Agentic-Banking/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/mk-2007/Agentic-Banking/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge"></a>
   <img alt="tests" src="https://img.shields.io/badge/tests-654%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
@@ -29,6 +31,19 @@
   <a href="#try-it">Try it</a> &nbsp;·&nbsp;
   <a href="#honest-limits">Limits</a>
 </p>
+
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
+
+## Quick start
+
+```bash
+pip install -e "backend[dev]"
+python scripts/run_api.py --demo      # prints sign-in tokens; open http://127.0.0.1:8000
+```
+
+Paste the analyst token, open a sample case, and watch it go from alert to evidence to a recommendation. For the
+Level 4 freeze, approve as the analyst and then as the risk officer (two windows). The full walkthrough is in
+[docs/demo.md](docs/demo.md); a recorded run of the same flow is [docs/demo-report.md](docs/demo-report.md).
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -477,3 +492,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
   more records.
 
 Each layer's design doc lists its own gaps in more detail.
+
+## License
+
+[MIT](LICENSE) © 2026 Mahandar Khatri. Built for the Allied Bank Hackathon on synthetic data only.
