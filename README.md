@@ -111,53 +111,57 @@ simulator. The rule is a test (`backend/tests/architecture/`), so CI fails if it
 
 ```mermaid
 flowchart TB
-    subgraph L5[Layer 5 - Interface]
-        API[api<br/>FastAPI, bearer tokens, thin routes]
+    subgraph L5["<b>Layer 5 · Interface</b>"]
+        API("<b>api</b><br/>FastAPI · bearer tokens · thin routes")
     end
-    subgraph L4[Layer 4 - Coordination]
-        ORCH[orchestration<br/>LangGraph case graph, limits, audit, execution]
+    subgraph L4["<b>Layer 4 · Coordination</b>"]
+        ORCH("<b>orchestration</b><br/>LangGraph case graph · limits · audit · execution")
     end
-    subgraph L3[Layer 3 - Reasoning]
-        AG[agents<br/>data, analysis, policy, verification]
-        DEC[decision<br/>rules, LLM, shared gates]
-        APP[approvals<br/>single-use store]
+    subgraph L3["<b>Layer 3 · Reasoning</b>"]
+        direction LR
+        AG("<b>agents</b><br/>data · analysis · policy · verification")
+        DEC("<b>decision</b><br/>rules · LLM · shared gates")
+        APP("<b>approvals</b><br/>single-use store")
     end
-    subgraph L2[Layer 2 - Controlled access]
-        TOOLS[tools<br/>the only door to the bank]
-        RAG[rag<br/>BM25, filtered before ranking]
+    subgraph L2["<b>Layer 2 · Controlled access</b>"]
+        direction LR
+        TOOLS("<b>tools</b><br/>the only door to the bank")
+        RAG("<b>rag</b><br/>BM25 · filtered before ranking")
     end
-    subgraph L1[Layer 1 - Services]
-        SEC[security<br/>deny by default, scope, approval gate]
-        AUD[audit<br/>hash chain]
-        BANK[bank_sim<br/>gateway protocols]
-        LLM[llm<br/>gateway: retries, failover, budget]
+    subgraph L1["<b>Layer 1 · Services</b>"]
+        direction LR
+        SEC("<b>security</b><br/>deny by default · scope · approval gate")
+        AUD("<b>audit</b><br/>hash chain")
+        BANK("<b>bank_sim</b><br/>gateway protocols")
+        LLM("<b>llm</b><br/>retries · failover · budget")
     end
-    subgraph L0[Layer 0 - Contracts]
-        DOM[domain<br/>immutable, strict contracts]
-        CFG[config<br/>thresholds, approval matrix, permissions]
+    subgraph L0["<b>Layer 0 · Contracts</b>"]
+        direction LR
+        DOM("<b>domain</b><br/>immutable, strict contracts")
+        CFG("<b>config</b><br/>thresholds · approval matrix · permissions")
     end
 
     API --> ORCH
-    ORCH --> AG
-    ORCH --> DEC
-    ORCH --> APP
+    ORCH --> AG & DEC & APP
     AG --> TOOLS
-    AG --> RAG
-    AG --> LLM
-    DEC --> LLM
-    TOOLS --> SEC
-    TOOLS --> AUD
-    TOOLS --> BANK
-    TOOLS --> RAG
+    AG -.-> LLM
+    DEC -.-> LLM
+    TOOLS --> SEC & AUD & BANK & RAG
     APP --> SEC
     L1 --> L0
 
-    classDef top fill:#e8f1ff,stroke:#3b73d4
-    classDef mid fill:#e9f7ef,stroke:#2e8b57
-    classDef low fill:#f3f0ff,stroke:#7a5cd6
+    classDef top fill:#e8f1ff,stroke:#3b73d4,color:#0b2a5b
+    classDef mid fill:#e9f7ef,stroke:#2e8b57,color:#0b3d22
+    classDef low fill:#f3f0ff,stroke:#7a5cd6,color:#2a1a66
     class API,ORCH top
     class AG,DEC,APP,TOOLS,RAG mid
     class SEC,AUD,BANK,LLM,DOM,CFG low
+    style L5 fill:#f5f9ff,stroke:#b9d0f5
+    style L4 fill:#f5f9ff,stroke:#b9d0f5
+    style L3 fill:#f4fbf7,stroke:#b5e0c8
+    style L2 fill:#f4fbf7,stroke:#b5e0c8
+    style L1 fill:#f8f6ff,stroke:#d3c9f5
+    style L0 fill:#f8f6ff,stroke:#d3c9f5
 ```
 
 > Agents have **no arrow to the bank**: the only path is through `tools`, which authorizes and audits every call.
@@ -183,34 +187,31 @@ Every case is a state machine. Illegal jumps are impossible: the status changes 
 `Case.transition_to`, which rejects any move the diagram does not allow.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> created
-    created --> planning
-    planning --> executing
+flowchart TB
+    created([created]) --> planning --> executing --> verifying --> ready{{decision_ready}}
+    ready -->|"Level 1-2: recommendation logged"| done1([end])
+    ready -->|"Level 3-4"| wait[/waiting_for_approval/]
+    wait -->|"enough valid votes"| approved --> executed["executed<br/>guarded tool, once"] --> verified --> completed([completed])
+
+    executing -->|"tool problem"| wft[waiting_for_tool]
+    wft -->|"retry once"| executing
+    wft --> failed_tool
     planning --> escalated
-    executing --> waiting_for_tool: tool problem
-    waiting_for_tool --> executing: retry once
-    waiting_for_tool --> failed_tool
-    executing --> verifying
-    verifying --> decision_ready
-    verifying --> failed_validation: forged or unsupported finding
-    decision_ready --> blocked_by_policy: decision refused
-    decision_ready --> waiting_for_approval: Level 3 or 4
-    waiting_for_approval --> approved
-    waiting_for_approval --> rejected_by_human
-    waiting_for_approval --> escalated: escalate or too many rounds
-    waiting_for_approval --> timed_out: approval expired
-    approved --> executed: guarded tool, once
-    executed --> verified
-    verified --> completed
-    completed --> [*]
-    failed_tool --> [*]
-    failed_validation --> [*]
-    blocked_by_policy --> [*]
-    rejected_by_human --> [*]
-    escalated --> [*]
-    timed_out --> [*]
+    verifying -->|"forged or unsupported finding"| failed_validation
+    ready -->|"decision refused"| blocked_by_policy
+    wait -->|"reject"| rejected_by_human
+    wait -->|"escalate or too many rounds"| escalated
+    wait -->|"approval expired"| timed_out
+
+    classDef happy fill:#e9f7ef,stroke:#2e8b57,color:#0b3d22
+    classDef human fill:#fff4e0,stroke:#e08a00,color:#5a3600
+    classDef stop fill:#fdecea,stroke:#c0392b,color:#5b1a12
+    class created,planning,executing,verifying,approved,executed,verified,completed,done1 happy
+    class ready,wait human
+    class wft,failed_tool,failed_validation,blocked_by_policy,rejected_by_human,escalated,timed_out stop
 ```
+
+<sub>Green is the normal path, amber is where a person is involved, red is a stop where nothing further runs.</sub>
 
 ### The Level 4 path, end to end
 
@@ -248,35 +249,51 @@ sequenceDiagram
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
+## Decision providers
+
+A **decision provider** turns verified findings into a ranked list of actions from a closed set of seven. It sees only
+finding codes, uncertainty flags and cited policy references, never merchant names, memos or customer details, and it
+can never reach the bank. Two providers sit behind one interface, so either can be swapped in:
+
+| | Rule-based provider | LLM provider |
+|---|---|---|
+| How it ranks | seven fixed rules written from the fraud, AML and authentication policies | a model ranks the allowed actions and cites evidence ids |
+| Output checked by | typed contract, gates | typed contract (an action outside the closed set cannot even be parsed), then the **same** gates |
+| If it fails | n/a | the rule provider decides, and `provider` says so |
+| Scores | order only, not probabilities | model confidence, **not calibrated** |
+| Role in this project | the baseline and the safety fallback | the experiment: can a model help without being trusted? |
+
+Either way the provider only **proposes**. The gates below dispose, and a recommendation still needs a human approval
+before anything runs.
+
+<p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
+
 ## Decision gates
 
 A provider, whether rules or an LLM, only **proposes**. The same plain-code gates then walk its ranking and the
 first allowed action wins. If a gate skips the top pick, the decision says which one (`overridden_by`).
 
 ```mermaid
-flowchart TB
-    P([Provider's ranked proposals]) --> U{Evidence missing or<br/>conflicting?}
-    U -->|yes, action is not cautious| X1[/uncertainty_gate: refused/]
-    U -->|no| N{No action while a<br/>risk finding exists?}
-    N -->|yes| X2[/no_action_gate: refused/]
-    N -->|no| J{Level 3+ without a cited risk<br/>finding and governing policy?}
-    J -->|yes| X3[/justification_gate: refused/]
-    J -->|no| T{Freeze or card block without<br/>its indicator pattern?}
-    T -->|yes| X4[/pattern_gate: refused/]
-    T -->|no| H{Model less cautious than the<br/>rules about involving a human?}
-    H -->|yes| X5[/human_floor_gate: refused/]
-    H -->|no| OK([Recommend this action])
-    X1 --> NEXT[Try the next proposal;<br/>if none passes, escalate to an analyst]
-    X2 --> NEXT
-    X3 --> NEXT
-    X4 --> NEXT
-    X5 --> NEXT
-    NEXT --> OK
+flowchart LR
+    P(["Provider's<br/>ranked proposals"]) --> G1
+    subgraph GATES["Hard gates, plain code, checked in order for each proposal"]
+        direction LR
+        G1["1 · uncertainty<br/>evidence missing or conflicting? only cautious actions"] --> G2["2 · no-action<br/>no 'no action' while a risk finding exists"]
+        G2 --> G3["3 · justification<br/>Level 3+ needs a cited risk finding and governing policy"]
+        G3 --> G4["4 · pattern<br/>freeze or card block needs its indicator pattern"]
+        G4 --> G5["5 · human floor<br/>never less cautious than the rules"]
+    end
+    G5 -->|"all pass"| OK(["Recommend this action"])
+    GATES -.->|"a gate refuses"| NEXT["Try the next proposal<br/>none passes: escalate to an analyst"]
+    NEXT -.-> G1
 
     classDef gate fill:#fdecea,stroke:#c0392b,color:#5b1a12
     classDef ok fill:#e9f7ef,stroke:#2e8b57,color:#0b3d22
-    class X1,X2,X3,X4,X5 gate
+    classDef step fill:#fff4e0,stroke:#e08a00,color:#5a3600
+    class G1,G2,G3,G4,G5 gate
     class OK ok
+    class NEXT step
+    style GATES fill:#fffafa,stroke:#f0b9b3
 ```
 
 | Restriction | Needs |
