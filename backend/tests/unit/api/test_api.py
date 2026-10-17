@@ -255,3 +255,9 @@ def test_dashboard_page_is_served_and_scenarios_need_an_employee(client: TestCli
     assert len(rows) == len(SCENARIOS)
     body = {k: rows[0][k] for k in ("account_id", "customer_id", "transaction_id", "trigger")}
     assert client.post("/cases", json=body, headers=auth("t-analyst")).status_code == 201
+
+
+def test_dashboard_uses_the_real_waiting_status(client: TestClient) -> None:
+    # The page shows vote buttons only for this exact status; a typo hid them (found in a browser run).
+    page = client.get("/").text
+    assert '"waiting_for_approval"' in page and "awaiting" not in page

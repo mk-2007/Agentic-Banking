@@ -7,6 +7,8 @@ Newest first. Add an entry whenever a step is finished or a decision is made.
 - J failed: three weak takeover signs on a PKR 18,000 payment produced a Level 4 freeze. `restriction_supported` now also requires a material sign (rapid series, unusual amount or high value). J now escalates; a unit test pins it. J is therefore no longer an independent test.
 - I escalates only because nothing risky was recognised; structuring is not detected (documented as a blind spot, not claimed). A first draft of G was scenario D again (policy section 4) and was redesigned.
 - Rules and stand-in models re-scored on 11 scenarios (README, decision.md); the live model has not been re-run on G to J. 679 tests pass.
+## 2026-10-17 - Browser test of the dashboard
+- Drove the real page with headless Chrome (open cases, Level 4 with two people, customer refused): 10 checks. It found a real bug: vote buttons were keyed on `awaiting_approval` but the status is `waiting_for_approval`, so they never appeared. Fixed, with a regression test. Also `completed` now shows green.
 
 ## 2026-10-17 - Docs: gates aligned
 - `docs/decision.md` said "two gates"; the code has four shared gates plus the LLM-only human floor. decision.md and the README now say the same, and mark the human floor as LLM-only.

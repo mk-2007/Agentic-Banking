@@ -65,7 +65,7 @@ async function api(path, opts = {}) {
 }
 const guard = fn => async (...a) => { try { note(""); await fn(...a); } catch (e) { note(e.message, true); } };
 function pill(text, kind) { return el("span", text, "pill " + (kind || "")); }
-function statusKind(s) { return /execut|approved|decision_ready|closed/.test(s) ? "ok" : /fail|reject|expire|escalat/.test(s) ? "bad" : "warn"; }
+function statusKind(s) { return /execut|approved|decision_ready|completed|verified/.test(s) ? "ok" : /fail|reject|expire|escalat/.test(s) ? "bad" : "warn"; }
 
 function list(box, items) {
   box.replaceChildren();
@@ -129,7 +129,7 @@ function approvalCard(v) {
   const a = v.approval, c = section("Approval");
   c.append(pill(a.status || "pending", statusKind(a.status || "pending")), el("div", `${a.action} on ${a.target_account_id} · needs: ${a.required_roles.join(" + ")} · expires ${a.expires_at}`, "mute"));
   c.append(a.votes.length ? table(["Approver", "Role", "Verdict"], a.votes.map(x => [x.approver_id, x.role, x.verdict])) : el("div", "No votes yet.", "mute"));
-  if (v.status === "awaiting_approval") {
+  if (v.status === "waiting_for_approval") {
     const box = el("textarea"); box.placeholder = "Comment (optional)"; box.maxLength = 500;
     c.append(box);
     for (const verdict of ["approve", "reject", "escalate", "modify"]) {
