@@ -258,7 +258,7 @@ can never reach the bank. Two providers sit behind one interface, so either can 
 | | Rule-based provider | LLM provider |
 |---|---|---|
 | How it ranks | seven fixed rules written from the fraud, AML and authentication policies | a model ranks the allowed actions and cites evidence ids |
-| Output checked by | typed contract, gates | typed contract (an action outside the closed set cannot even be parsed), then the **same** gates |
+| Output checked by | typed contract, gates 1 to 4 | typed contract (an action outside the closed set cannot even be parsed), then gates 1 to 4 **and** the human floor |
 | If it fails | n/a | the rule provider decides, and `provider` says so |
 | Scores | order only, not probabilities | model confidence, **not calibrated** |
 | Role in this project | the baseline and the safety fallback | the experiment: can a model help without being trusted? |
@@ -270,8 +270,8 @@ before anything runs.
 
 ## Decision gates
 
-A provider, whether rules or an LLM, only **proposes**. The same plain-code gates then walk its ranking and the
-first allowed action wins. If a gate skips the top pick, the decision says which one (`overridden_by`).
+A provider, whether rules or an LLM, only **proposes**. Plain-code gates then walk its ranking and the first
+allowed action wins. Gates 1 to 4 apply to every provider; gate 5, the human floor, is added for the LLM provider. If a gate skips the top pick, the decision says which one (`overridden_by`).
 
 ```mermaid
 flowchart LR
@@ -281,7 +281,7 @@ flowchart LR
         G1["1 · uncertainty<br/>evidence missing or conflicting? only cautious actions"] --> G2["2 · no-action<br/>no 'no action' while a risk finding exists"]
         G2 --> G3["3 · justification<br/>Level 3+ needs a cited risk finding and governing policy"]
         G3 --> G4["4 · pattern<br/>freeze or card block needs its indicator pattern"]
-        G4 --> G5["5 · human floor<br/>never less cautious than the rules"]
+        G4 --> G5["5 · human floor (LLM only)<br/>never involves fewer people than the rules would"]
     end
     G5 -->|"all pass"| OK(["Recommend this action"])
     GATES -.->|"a gate refuses"| NEXT["Try the next proposal<br/>none passes: escalate to an analyst"]
