@@ -3,6 +3,8 @@ name = "nexa"
 version = "0.1.0"
 description = "Agentic banking intelligence platform (hackathon prototype on synthetic data)"
 requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Mahandar Khatri"}]
 dependencies = ["pydantic>=2.6", "httpx>=0.27", "langgraph>=1.2,<2", "fastapi>=0.110", "uvicorn>=0.29"]
 
 [project.optional-dependencies]

@@ -2,6 +2,9 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-17 - Professional polish
+- Added MIT `LICENSE`, license and CI badges, a Quick start section and a License section to the README; package metadata carries the license and author. Repo description and topics set on GitHub.
+
 ## 2026-10-17 - Phase 8d: final README
 - README: phase table and badge now cover phase 8, run instructions include the dashboard and `run_demo.py`, honest limits mention the static dashboard. Release `v0.1.0` to be tagged after PRs #42 and 8c/8d merge.
 - Next (agreed with the user): full testing and improvement pass; record screenshots or a short video of the demo.
