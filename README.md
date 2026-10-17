@@ -7,7 +7,7 @@
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
   <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
-  <img alt="phases" src="https://img.shields.io/badge/phases-0%E2%80%937%20done-6d28d9?style=for-the-badge">
+  <img alt="phases" src="https://img.shields.io/badge/phases-0%E2%80%938%20done-6d28d9?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -341,7 +341,8 @@ From the repository root:
 python scripts/run_case.py --all             # run every scenario through the case graph
 python scripts/run_agent_eval.py             # agents on the seven scenarios (offline)
 python scripts/run_decision_eval.py          # decision providers + misbehaving stand-in models (offline)
-python scripts/run_api.py --demo             # HTTP API with random demo sign-ins; docs at /docs
+python scripts/run_api.py --demo             # API + dashboard at http://127.0.0.1:8000 (docs at /docs)
+python scripts/run_demo.py                   # whole demo through the API, with pass/fail checks
 ```
 
 Live model runs need keys in `.env` (copy `.env.example`; it is git-ignored): `python scripts/llm_smoke_test.py`,
@@ -382,7 +383,7 @@ gantt
     8a API                           :done, p8a, 2026-10-16, 1d
     8b Frontend                      :done, p8b, 2026-10-17, 1d
     8c Demo script and report        :done, p8c, 2026-10-17, 1d
-    8d Final README and release      :active, p8d, 2026-10-18, 1d
+    8d Final README and release      :done, p8d, 2026-10-18, 1d
 ```
 
 | Phase | What | State |
@@ -395,7 +396,7 @@ gantt
 | 5 | Model gateway and specialist agents with scenario evals | ✅ |
 | 6 | LangGraph orchestration: approvals, limits, audit, execution | ✅ |
 | 7 | Decision providers, evaluation and live comparison | ✅ |
-| 8 | API ✅ · frontend ⬜ · demo script and report ⬜ · release ⬜ | 🔄 |
+| 8 | API, dashboard, demo script and report, release | ✅ |
 
 Live detail: [docs/TRACKER.md](docs/TRACKER.md) · history: [docs/PROJECT_LOG.md](docs/PROJECT_LOG.md).
 
@@ -467,6 +468,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 - **The indicator patterns for a freeze or card block are our reading of the fraud policy**, which names the
   indicators but not the condition. They live in one function.
 - **Authentication is a static in-memory bearer token.** No identity provider, expiry or rate limiting.
+- **The dashboard is one static page** with a pasted token: no login screen, no live updates (refresh by clicking).
 - **State is in memory.** Restarting forgets cases, approvals and the audit log (the audit log can persist to JSONL;
   the API does not use it yet).
 - **Gemini's free tier ran out of quota during testing**, so failover to it is only partly proven. Groq carried the
