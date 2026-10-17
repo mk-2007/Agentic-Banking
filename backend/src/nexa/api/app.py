@@ -28,11 +28,14 @@ from nexa.bank_sim import RecordNotFoundError, load_scenarios
 from .lab import (
     AccountProfile,
     AccountRow,
+    BaselineRow,
+    HostileRow,
     LabCaseRow,
     LabReport,
     LabRunRequest,
     LabRunView,
     LabService,
+    LiveView,
     ScorecardView,
     UnknownLabCaseError,
 )
@@ -210,6 +213,21 @@ def create_app(
             return lab.report(case_id)
         except UnknownLabCaseError:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "no such lab case") from None
+
+    @app.get("/admin/lab/baselines")
+    def lab_baselines(who: Auditor, lab: Lab) -> list[BaselineRow]:
+        """Return the agents and simple rules scored on the same cases with the same checks."""
+        return lab.baselines()
+
+    @app.get("/admin/lab/hostile")
+    def lab_hostile(who: Auditor, lab: Lab) -> list[HostileRow]:
+        """Misbehaving stand-in models behind the real gates."""
+        return lab.hostile()
+
+    @app.get("/admin/lab/live")
+    def lab_live(who: Auditor, lab: Lab) -> LiveView:
+        """Return the latest saved comparison of a real model against the rules, if one was run."""
+        return lab.live()
 
     @app.get("/admin/accounts")
     def admin_accounts(who: Auditor, lab: Lab) -> list[AccountRow]:

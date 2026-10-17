@@ -23,8 +23,9 @@ has realistic noise to work through (PRD section 16).
 
 ## Lab cohort (`data/synthetic/lab/`)
 
-An extra 72 labelled cases for the auditor's lab: 60 variants of eleven archetypes (different amounts,
-countries, devices and histories) and 12 threshold-boundary cases. It has its own customers, accounts,
+An extra 88 labelled cases for the auditor's lab: 60 variants of eleven archetypes (different amounts,
+countries, devices and histories), 12 threshold-boundary cases and a 16-case hard tier of realistic stories
+written without tuning the thresholds to them (some are known blind spots; labels were fixed before the first run). It has its own customers, accounts,
 transactions and KYC files plus `lab_cases.json`, which holds the answer key (acceptable and forbidden
 actions, whether a human must be involved). Agents never read the answer key. The same generator writes it
 (`python scripts/generate_synthetic_data.py`) and a test regenerates it byte for byte. See ADR 0011.

@@ -467,6 +467,13 @@
       "status": "done",
       "path": "docs/code-tour.md",
       "summary": "File-by-file map of a case and where to change things"
+    },
+    {
+      "id": "adr:0012",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0012-capability-evidence-baselines-hostile-models-and-a-hard-tier.md",
+      "summary": "Baselines, hostile models, a hard tier and a live model as capability evidence; evaluation may import decision and llm"
     }
   ],
   "edges": [
@@ -1139,6 +1146,21 @@
       "from": "doc:code-tour",
       "to": "module:api",
       "relation": "documents"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:decision",
+      "relation": "depends_on"
+    },
+    {
+      "from": "module:evaluation",
+      "to": "module:llm",
+      "relation": "depends_on"
+    },
+    {
+      "from": "adr:0012",
+      "to": "module:evaluation",
+      "relation": "decides"
     }
   ]
 }

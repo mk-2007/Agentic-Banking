@@ -70,5 +70,21 @@
 {"balance": 140000, "card_status": "active", "customer_id": "cust_269", "id": "acc_269", "opened_on": "2024-09-15", "product": "current", "status": "active"},
 {"balance": 80000, "card_status": "active", "customer_id": "cust_270", "id": "acc_270", "opened_on": "2019-01-15", "product": "savings", "status": "active"},
 {"balance": 180000, "card_status": "active", "customer_id": "cust_271", "id": "acc_271", "opened_on": "2020-02-15", "product": "current", "status": "active"},
-{"balance": 120000, "card_status": "active", "customer_id": "cust_272", "id": "acc_272", "opened_on": "2021-03-15", "product": "savings", "status": "active"}
+{"balance": 120000, "card_status": "active", "customer_id": "cust_272", "id": "acc_272", "opened_on": "2021-03-15", "product": "savings", "status": "active"},
+{"balance": 60000, "card_status": "active", "customer_id": "cust_273", "id": "acc_273", "opened_on": "2022-04-15", "product": "current", "status": "active"},
+{"balance": 160000, "card_status": "active", "customer_id": "cust_274", "id": "acc_274", "opened_on": "2023-05-15", "product": "savings", "status": "active"},
+{"balance": 100000, "card_status": "active", "customer_id": "cust_275", "id": "acc_275", "opened_on": "2024-06-15", "product": "current", "status": "active"},
+{"balance": 40000, "card_status": "active", "customer_id": "cust_276", "id": "acc_276", "opened_on": "2019-07-15", "product": "savings", "status": "active"},
+{"balance": 140000, "card_status": "active", "customer_id": "cust_277", "id": "acc_277", "opened_on": "2020-08-15", "product": "current", "status": "active"},
+{"balance": 80000, "card_status": "active", "customer_id": "cust_278", "id": "acc_278", "opened_on": "2021-09-15", "product": "savings", "status": "active"},
+{"balance": 30000, "card_status": "active", "customer_id": "cust_279", "id": "acc_279", "opened_on": "2022-01-15", "product": "current", "status": "active"},
+{"balance": 130000, "card_status": "active", "customer_id": "cust_280", "id": "acc_280", "opened_on": "2023-02-15", "product": "savings", "status": "active"},
+{"balance": 70000, "card_status": "active", "customer_id": "cust_281", "id": "acc_281", "opened_on": "2024-03-15", "product": "current", "status": "active"},
+{"balance": 170000, "card_status": "active", "customer_id": "cust_282", "id": "acc_282", "opened_on": "2019-04-15", "product": "savings", "status": "active"},
+{"balance": 110000, "card_status": "active", "customer_id": "cust_283", "id": "acc_283", "opened_on": "2020-05-15", "product": "current", "status": "active"},
+{"balance": 50000, "card_status": "active", "customer_id": "cust_284", "id": "acc_284", "opened_on": "2021-06-15", "product": "savings", "status": "active"},
+{"balance": 150000, "card_status": "active", "customer_id": "cust_285", "id": "acc_285", "opened_on": "2022-07-15", "product": "current", "status": "active"},
+{"balance": 90000, "card_status": "active", "customer_id": "cust_286", "id": "acc_286", "opened_on": "2023-08-15", "product": "savings", "status": "active"},
+{"balance": 30000, "card_status": "active", "customer_id": "cust_287", "id": "acc_287", "opened_on": "2024-09-15", "product": "current", "status": "active"},
+{"balance": 130000, "card_status": "active", "customer_id": "cust_288", "id": "acc_288", "opened_on": "2019-01-15", "product": "savings", "status": "active"}
 ]

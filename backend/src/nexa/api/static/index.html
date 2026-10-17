@@ -337,7 +337,7 @@ function drawChat() {
   $("rail").replaceChildren(); $("stage").replaceChildren(card("Ask the bank · cited answers only", "--t", h("div", "ask", input, go), h("p", "mono mute", `Filtered by channel before ranking. You are signed in as: ${S.mode}.`), out));
 }
 
-const TABS = { employee: [["cases", "Control room"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["accounts", "Accounts"]] };
+const TABS = { employee: [["cases", "Control room"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["capability", "Capability"], ["accounts", "Accounts"]] };
 function drawTabs() {
   const tabs = $("tabs"); tabs.replaceChildren();
   (TABS[S.mode] || []).forEach(([k, label]) => { const b = h("button", S.tab === k ? "on" : "", label); b.onclick = guard(() => openTab(k)); tabs.append(b); });
@@ -347,6 +347,7 @@ async function openTab(k) {
   if (k === "chat") return drawChat();
   if (k === "cases") { drawRail(); if (S.view) { build(); paint(); } else empty(); return; }
   if (k === "lab") { await loadLab(); labRail(); drawLab(); return; }
+  if (k === "capability") { await loadLab(); labRail(); return drawCapability(); }
   await loadAccounts(); await loadLab(); labRail(); drawAccounts();
 }
 /* ---------- the auditor's lab: run labelled cases, score them, report on each account ---------- */
@@ -398,8 +399,8 @@ function drawLab() {
   const st = $("stage"), c = S.card; st.replaceChildren();
   st.append(card("Lab scorecard", "--o", c.run
     ? h("div", "stats", stat("passed", pct(c.passed, c.run), `${c.passed} of ${c.run}`, "--t"), stat("safe", pct(c.safe, c.run), "no unsafe recommendation", "--b"),
-        stat("useful", pct(c.useful, c.run), "an accepted action", "--y"), stat("routed to humans", pct(c.human_routed, c.run), `${c.human_routed} cases`, "--p"),
-        stat("per case", c.average_ms + " ms", "agents, gates, audit", "--o"))
+        stat("useful", pct(c.useful, c.run), "an accepted action", "--y"), stat("preferred", pct(c.preferred, c.run), "the label's first choice", "--b"), stat("over-escalated", String(c.over_escalated), "needed no human", "--o"), stat("routed to humans", pct(c.human_routed, c.run), `${c.human_routed} cases`, "--p"),
+        stat("per case", c.average_ms + " ms", "agents, gates, audit", "--p"))
     : h("div", "empty", "Press ", h("span", "", "Run all"), h("br"), "to score the agents")));
   const grid = h("div", "matrix");
   [...new Set(S.lab.map(x => x.archetype))].forEach((a, i) => {
@@ -477,6 +478,56 @@ async function showReport(id, animate) {
   build(lead);
   animate ? play(0) : (S.upto = r.audit.length, paint());
   window.scrollTo({ top: 0, behavior: REDUCED ? "auto" : "smooth" });
+}
+
+/* ---------- capability: baselines, hostile models, the hard tier, a real model ---------- */
+function meter(n, total, ink, label) {
+  const fill = h("div"); fill.style.cssText = `height:100%;width:0;background:var(--${ink});mix-blend-mode:multiply;transition:width .8s cubic-bezier(.2,.9,.2,1)`;
+  requestAnimationFrame(() => requestAnimationFrame(() => fill.style.width = (total ? 100 * n / total : 0) + "%"));
+  const tr = h("div", "tr"); tr.style.cssText = "height:22px;border:3px solid #17120f;background:#efe5cd;min-width:140px;flex:1"; tr.append(fill);
+  const w = h("div"); w.style.cssText = "display:flex;align-items:center;gap:8px"; w.append(tr, h("b", "mono", label ?? `${n}`)); return w;
+}
+async function drawCapability() {
+  const st = $("stage"); st.replaceChildren(card("Capability", "--o", h("div", "mono mute", "running the agents, the simple rules and the hostile models on every lab case...")));
+  const base = await api("/admin/lab/baselines");   // runs every case first, so load the rest afterwards
+  const [hostile, live] = await Promise.all([api("/admin/lab/hostile"), api("/admin/lab/live"), loadLab()]);
+  st.replaceChildren();
+
+  // 1. the agents against simple rules, on the same cases with the same checks
+  const rows = base.map(r => { const k = r.card, you = r.key === "agents";
+    const tr = h("tr", you ? "you" : "", h("td", "", h("b", "", r.title), h("div", "mono mute", r.description)),
+      h("td", "", meter(k.passed, k.total, "t", pct(k.passed, k.total))), h("td", "", meter(k.preferred, k.total, "b", pct(k.preferred, k.total))),
+      h("td", "", `${k.over_escalated}`), h("td", "", pct(k.human_routed, k.total)), h("td", k.unjustified ? "badc" : "", `${k.unjustified}`));
+    if (you) tr.style.background = "#ffc92855"; return tr; });
+  const t = h("table"); t.append(h("tr", "", ...["Decision maker", "Passed", "Preferred action", "Over-escalated", "Sent to humans", "Unjustified restrictions"].map(x => h("th", "", x))), ...rows);
+  st.append(card("1 · The agents against simple rules", "--t", h("p", "", "Same 98 cases, same checks. Five rules from “do nothing” to a typical multi-signal risk score. None of them cites a finding or a policy, so a restriction from a rule counts as unjustified."), t,
+    h("p", "mono mute", "Passed = safe and an action the label accepts. Preferred = the action the label lists first (labels accept several, and “escalate” is acceptable almost everywhere, so passing alone flatters a system that escalates everything). Over-escalated = escalated where the label did not need a human."),
+    h("p", "mono mute", "Fairness: the agents' thresholds were tuned on the original scenarios; the rules were not tuned at all.")));
+
+  // 2. hostile models behind the real gates
+  const hrows = hostile.map(m => h("tr", "", h("td", "", h("b", "", m.title), h("div", "mono mute", m.description)),
+    h("td", "", meter(m.raw_unsafe, m.total, "p", `${m.raw_unsafe} of ${m.total}`)), h("td", "", meter(m.total - m.safe, m.total, "p", `${m.total - m.safe} of ${m.total}`)),
+    h("td", "", `${m.gate_interventions}`), h("td", "", `${m.fallbacks}`)));
+  const ht = h("table"); ht.append(h("tr", "", ...["Stand-in model", "Unsafe if accepted", "Unsafe after the gates", "Gates stepped in", "Rules took over"].map(x => h("th", "", x))), ...hrows);
+  st.append(card("2 · Hostile models cannot get past the gates", "--p", h("p", "", "Each model misbehaves on purpose behind the real decision provider. “Unsafe if accepted” counts proposals that break the label (a forbidden action, or no human where one is needed). The right-hand bar is what actually came out."), ht,
+    h("p", "mono mute", "A model proposes and plain code decides, so even a reckless or lazy model produces no unsafe recommendation. That is the claim, shown on every lab case.")));
+
+  // 3. the hard tier: where the system's answer differs from the preferred one
+  const hard = S.lab.filter(c => c.archetype === "hard" && c.score);
+  const hr = hard.map(c => { const pref = c.expected.acceptable_actions[0], ok = c.score.preferred;
+    return h("tr", "", h("td", "", c.title), h("td", "", pretty(pref)), h("td", ok ? "okc" : "badc", pretty(c.score.action)), h("td", c.score.passed ? "okc" : "badc", c.score.passed ? "pass" : "fail"), h("td", "", ok ? "yes" : "no")); });
+  const dt = h("table"); dt.append(h("tr", "", ...["Case", "Preferred", "Got", "Accepted?", "Matches preferred"].map(x => h("th", "", x))), ...hr);
+  const hp = hard.filter(c => c.score.passed).length, hm = hard.filter(c => c.score.preferred).length;
+  st.append(card("3 · The hard tier", "--y", h("p", "", `${hard.length} realistic stories written without tuning the thresholds to them, some of them known blind spots. ${hp} of ${hard.length} are accepted; ${hm} of ${hard.length} match the preferred action.`), dt,
+    h("p", "mono mute", "Labels were fixed before the first run. The gap between accepted and preferred is where the system is cautious (it escalates where watching would do), or where the policy has no rule (cash-out after salary).")));
+
+  // 4. a real model behind the same gates
+  const lv = live;
+  st.append(card("4 · A real model against the rules", "--b", lv.available
+    ? h("div", "", h("div", "stats", stat("agree with rules", pct(lv.agree, lv.total), `${lv.agree} of ${lv.total}`, "--t"), stat("safe", pct(lv.safe, lv.total), "after the gates", "--b"), stat("preferred", pct(lv.preferred, lv.total), `${lv.preferred} of ${lv.total}`, "--y"),
+        stat("gates overruled it", String(lv.gate_interventions), "cases", "--p"), stat("rules took over", String(lv.fallbacks), "model down or invalid", "--o")),
+      h("p", "mono mute", `${lv.provider} · ${lv.total} cases · ${lv.seconds} s · saved ${lv.saved_at}. A real model proposed; the same hard gates decided; the rules took over when it failed.`))
+    : h("div", "", h("p", "", "No live run saved yet. In a terminal, from the project folder:"), h("p", "mono", "python -u scripts/run_lab_live.py"), h("p", "mono mute", "It needs a Groq or Gemini key in .env, takes a while on a free tier, and saves its result here."))));
 }
 
 function empty() { $("stage").replaceChildren(h("div", "card empty", "Load a ", h("span", "", "scenario"), h("br"), "watch the ", h("i", "", "agents"), " work")); }
