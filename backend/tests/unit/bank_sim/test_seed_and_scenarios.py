@@ -67,6 +67,10 @@ def test_every_scenario_alert_points_at_real_records(
         "scenario_e_unauthorized_action",
         "scenario_f_account_takeover",
         "scenario_x_prompt_injection",
+        "scenario_g_legitimate_traveller",
+        "scenario_h_thin_history",
+        "scenario_i_structuring",
+        "scenario_j_new_phone",
     }
     for scenario in scenarios.values():
         alert = scenario.alert

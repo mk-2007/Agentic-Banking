@@ -71,18 +71,18 @@ reports gaps for restricted policy instead of quietly using weaker material.
 
 `data/agent_eval/expectations.json` states, per scenario, which findings must surface, which risk codes
 are allowed, the exact uncertainty flags, and which policies must be cited. `python scripts/run_agent_eval.py`
-runs all seven (`--live` lets a real model do the narrowing). Each scenario gets up to 12 checks, including: verification
+runs all eleven (`--live` lets a real model do the narrowing). Each scenario gets up to 12 checks, including: verification
 passes; required findings from `scenarios.json` surface (each sentence is mapped to a code, and an
 unmapped sentence fails); no unexpected risk findings; flags match; policies cited; no governing policy
 missing; third-party text absent from evidence and prompts; agents never triggered a denied tool call;
 and, for scenario E, the unauthorized freeze is refused and the account stays active.
 
-Scenario results (deterministic run): 7 of 7 pass. I mutation-tested the harness (asking for a finding
+Scenario results (deterministic run): 11 of 11 pass. I mutation-tested the harness (asking for a finding
 that should not exist, a wrong flag, an empty allow-list) and each correctly failed.
 
 ## Honest limits
 
-- **Scenario data is small and ours.** The thresholds fit the seven synthetic scenarios; passing them
+- **Scenario data is small and ours.** The thresholds fit the first seven synthetic scenarios (G to J were added later); passing them
   shows the rules do what the policy says, not that they would hold on real traffic.
 - **`instruction_text` is a heuristic.** Seven regular expressions catch obvious attempts ("ignore all
   previous instructions", "system notice to AI agents", "freeze the account"). A paraphrased or

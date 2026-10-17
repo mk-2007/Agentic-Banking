@@ -1,4 +1,4 @@
-"""Run the specialist agents on the seven scenarios and print a pass/fail report.
+"""Run the specialist agents on all the scenarios and print a pass/fail report.
 
     python scripts/run_agent_eval.py          # deterministic: no model, no network, no key
     python scripts/run_agent_eval.py --live   # let a real model narrow the policy clauses

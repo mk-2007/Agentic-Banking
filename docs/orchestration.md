@@ -88,7 +88,7 @@ approved case continues: `settle -> execute`.
 The tool, not the graph, re-checks action, account, case, approvers, expiry and single use, so a graph bug
 cannot execute something a human did not approve. Tests cover the Level 4 two-approver path, Level 3 with one
 analyst, one approver only, rejection, expiry, replay and an approval consumed behind the graph's back, and run
-all seven scenarios end to end (nothing changes on the bank without an approval).
+all scenarios end to end (nothing changes on the bank without an approval).
 
 ## Not built yet (by design, and on the tracker)
 

@@ -39,5 +39,5 @@ signed in at once: paste the **analyst** token in one and the **risk officer** t
 
 ## Honest limits to say out loud
 
-Static tokens in memory, state lost on restart, rules written for these seven scenarios, live model scored on seven
+Static tokens in memory, state lost on restart, rules written for the first seven scenarios, live model scored on seven
 cases only (see [decision-comparison.md](decision-comparison.md) and [api.md](api.md)).

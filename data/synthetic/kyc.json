@@ -21,5 +21,9 @@
 {"address_on_document": "Flat 4B, Gulshan-e-Iqbal, Karachi", "customer_id": "cust_104", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
 {"address_on_document": "House 105, Street 6", "customer_id": "cust_105", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
 {"address_on_document": "House 106, Street 7", "customer_id": "cust_106", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
-{"address_on_document": "House 107, Street 8", "customer_id": "cust_107", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"}
+{"address_on_document": "House 107, Street 8", "customer_id": "cust_107", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 108, Street 9", "customer_id": "cust_108", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 109, Street 10", "customer_id": "cust_109", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 110, Street 11", "customer_id": "cust_110", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"},
+{"address_on_document": "House 111, Street 12", "customer_id": "cust_111", "last_reviewed_on": "2026-03-10", "missing_items": [], "status": "verified"}
 ]
