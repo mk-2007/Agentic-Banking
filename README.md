@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img alt="tests" src="https://img.shields.io/badge/tests-652%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
+  <img alt="tests" src="https://img.shields.io/badge/tests-653%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
   <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
@@ -74,7 +74,7 @@ flowchart LR
 ## At a glance
 
 <p align="center">
-  <img src="docs/assets/stats.svg" alt="652 tests, 7 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
+  <img src="docs/assets/stats.svg" alt="653 tests, 7 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
 </p>
 
 | | |
@@ -85,7 +85,7 @@ flowchart LR
 | **Actions** | 7 in a closed set, risk-levelled 1 to 4; Level 4 (freeze account) needs fraud analyst **and** risk officer |
 | **Knowledge base** | 98 cited chunks, access decided *before* ranking; recall@3 = 92.5% on 40 labelled questions |
 | **Synthetic data** | 23 customers, 865 transactions, 3 policy documents |
-| **Quality** | 652 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
+| **Quality** | 653 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -331,7 +331,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 cd backend
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                             # 652 tests, incl. architecture rules
+pytest -q                                             # 653 tests, incl. architecture rules
 ruff check . && ruff format --check . && mypy
 ```
 
@@ -380,8 +380,8 @@ gantt
     7 Decision providers and eval    :done, p7, 2026-10-16, 1d
     section Delivery
     8a API                           :done, p8a, 2026-10-16, 1d
-    8b Frontend                      :active, p8b, 2026-10-17, 1d
-    8c Demo script and report        :p8c, 2026-10-17, 1d
+    8b Frontend                      :done, p8b, 2026-10-17, 1d
+    8c Demo script and report        :active, p8c, 2026-10-17, 1d
     8d Final README and release      :p8d, 2026-10-18, 1d
 ```
 
