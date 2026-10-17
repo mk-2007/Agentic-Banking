@@ -42,6 +42,18 @@ class ChatRequest(Request):
     question: str = Field(min_length=2, max_length=500)
 
 
+class ScenarioView(BaseModel):
+    """A sample alert from the synthetic scenarios, ready to open as a case."""
+
+    id: str
+    title: str
+    description: str
+    account_id: str
+    customer_id: str
+    transaction_id: str
+    trigger: str
+
+
 class FindingView(BaseModel):
     """One finding: a code from the closed vocabulary and our own summary of it."""
 

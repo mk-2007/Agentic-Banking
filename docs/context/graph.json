@@ -89,9 +89,9 @@
     {
       "id": "module:api",
       "type": "module",
-      "status": "in_progress",
+      "status": "done",
       "path": "backend/src/nexa/api",
-      "summary": "Thin FastAPI layer"
+      "summary": "Thin FastAPI layer plus a static dashboard page (8b)"
     },
     {
       "id": "doc:prd",

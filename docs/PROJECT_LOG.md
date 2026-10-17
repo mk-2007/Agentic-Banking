@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-17 - Phase 8b: dashboard
+- One static page (`api/static/index.html`) served at `/` by the API: open a case from a sample scenario, evidence, recommendation, approval votes, audit chain. Same origin, so no CORS and no build tooling (decided over a separate SPA to stay small before the deadline).
+- New `GET /scenarios` (employee only) returns the synthetic sample alerts. The page uses `textContent` only and keeps the token in `sessionStorage`.
+- Fixed a latent bug: `status.HTTP_422_UNPROCESSABLE_CONTENT` does not exist in older Starlette, so a mismatched alert crashed with AttributeError instead of 422; now a literal 422.
+- 653 tests pass. Next: 8c demo script and report.
+
 ## 2026-10-14 - Phase 5b: specialist agents with scenario evals
 - `agents`: data, analysis, policy and verification agents, plus `ToolSession` (tool calls under the agent's own role, case and a channel set by trusted code). Findings are evidence with a closed code set (ADR 0008). Analysis is plain code against the policy thresholds, judged on history before the suspicious burst. Verification recomputes each finding and sets the insufficient / conflicting evidence flags. The policy agent may use a model only to narrow retrieved clauses; any failure keeps every clause.
 - Policy topics count as covered only when their governing policy was retrieved, so a customer-channel session reports gaps instead of using weaker material.

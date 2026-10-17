@@ -243,3 +243,15 @@ def test_tokens_parse_and_reject_bad_input() -> None:
         with pytest.raises(ValueError):
             parse_tokens(bad)
     assert parse_tokens("") == {}
+
+
+# --- dashboard ------------------------------------------------------------------------------
+def test_dashboard_page_is_served_and_scenarios_need_an_employee(client: TestClient) -> None:
+    page = client.get("/")
+    assert page.status_code == 200 and "NexaBank" in page.text
+    assert client.get("/scenarios").status_code == 401
+    assert client.get("/scenarios", headers=auth("t-customer")).status_code == 403
+    rows = client.get("/scenarios", headers=auth("t-analyst")).json()
+    assert len(rows) == len(SCENARIOS)
+    body = {k: rows[0][k] for k in ("account_id", "customer_id", "transaction_id", "trigger")}
+    assert client.post("/cases", json=body, headers=auth("t-analyst")).status_code == 201

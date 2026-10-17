@@ -5,7 +5,7 @@ The single place to see what is done, what is next and whether the schedule hold
 [PROJECT_LOG.md](PROJECT_LOG.md).
 
 **Hackathon deadline:** `18-10-2026:__` (fill this in; every "days left" below depends on it)
-**Last updated:** 2026-10-16
+**Last updated:** 2026-10-17
 
 ## Phases
 
@@ -20,7 +20,7 @@ The single place to see what is done, what is next and whether the schedule hold
 | 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
 | 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | 2026-10-16 | 3 | 554 | done |
 | 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | 2026-10-16 | 1 | 632 | done |
-| 8 | API, frontend, demo | 2026-10-16 | | est. 3-4 | 652 so far | in progress (8a done) |
+| 8 | API, frontend, demo | 2026-10-16 | | est. 3-4 | 653 so far | in progress (8a, 8b done) |
 
 "Days taken" and "Tests" for finished phases come from the project log (calendar days, not hours; tests are the count when the phase closed).
 "est." figures are **my estimates** from the pace of phases 0-5, not measurements; correct them as
@@ -43,7 +43,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 
 **Phase 8**
 - [x] 8a API (cases, evidence, approvals) with the employee/customer channel decided by trusted code
-- [ ] 8b Frontend: case view, evidence, approval screen
+- [x] 8b Frontend: case view, evidence, approval screen (one static page served by the API, no build step)
 - [ ] 8c Demo script, seeded run, screenshots or short video
 - [ ] 8d Final README, honest-limits pass, release tag
 
