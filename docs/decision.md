@@ -29,15 +29,22 @@ dossier. `orchestration.provider_source(provider)` builds that request from an i
 Scores only order the candidates (they are not probabilities, and are not calibrated). Escalating to an analyst
 is always kept in the ranking as a safe fallback; with blocking uncertainty it ranks at 0.50.
 
-## The two gates
+## The gates
 
-The recommendation is the highest-ranked candidate that passes both. If the top candidate is skipped, the
-decision says which gate did it in `overridden_by`.
+The recommendation is the highest-ranked candidate that passes every gate. If the top candidate is skipped, the
+decision says which gate did it in `overridden_by`. Four gates are shared by every provider (`decision/gates.py`,
+checked in this order); a fifth applies to the LLM provider only.
 
 1. **`uncertainty_gate`**: with `insufficient_evidence` or `conflicting_evidence`, only escalation, KYC requests
    or customer verification are allowed (NB-POL-FRAUD-001 sections 3 and 4).
-2. **`justification_gate`**: a Level 3+ action needs supporting findings and at least one cited clause **from
-   the document that governs that response**. A freeze that cites only the AML policy is refused.
+2. **`no_action_gate`**: "no action" is allowed only when no risk finding exists (section 5).
+3. **`justification_gate`**: a Level 3+ action needs supporting findings, at least one of them a risk finding, and
+   at least one cited clause **from the document that governs that response**. A freeze that cites only the AML
+   policy is refused.
+4. **`pattern_gate`** (from 7c): a freeze needs 3 takeover indicators and nothing mitigating; a card block needs
+   card testing, or amount plus geography.
+5. **`human_floor_gate`** (LLM provider only, ADR 0010): the model may not involve fewer people than the rule
+   baseline would for the same case.
 
 Findings that are not in the closed `IndicatorCode` vocabulary are ignored, so forged evidence cannot steer a
 decision. With no recognisable findings at all the provider escalates, because nothing was assessed.
@@ -56,11 +63,8 @@ gates decide. The model **proposes; code decides**.
 | Scores | Made from the rank and the model's confidence (top = confidence, then 0.1 less per place). The confidence is stored as `model_confidence` and is **not calibrated**; below 0.5 the decision gets the `low_model_confidence` flag. |
 | Failure | Model missing, down, over budget or answering badly: the fallback (rules) decides and `decision.provider` says `rule_based_v1`, so a fallback is visible in any evaluation. |
 
-The gates are shared in `decision/gates.py`: `uncertainty_gate`, `no_action_gate` (no action only when no risk
-finding exists), `justification_gate` (Level 3+ needs a cited *risk* finding and a clause from the governing
-document) and, from 7c, `pattern_gate` (a freeze needs 3 takeover indicators and nothing mitigating; a card block
-needs card testing, or amount plus geography). They apply to both providers. The LLM provider also has a human
-floor: it cannot involve fewer people than the rule baseline would (ADR 0010).
+The first four gates are shared in `decision/gates.py` and apply to both providers. The human floor is applied
+by the LLM provider on top of them (ADR 0010).
 
 ## Evaluation (7c)
 
@@ -88,7 +92,7 @@ import agents) and the agents share one vocabulary. `nexa.agents` still re-expor
 
 ## Tests
 
-`tests/unit/decision/`: every rule, the mitigating-finding and single-sign cases, both gates (also with the
+`tests/unit/decision/`: every rule, the mitigating-finding and single-sign cases, every gate (also with the
 wrong policy document), non-blocking flags, forged evidence, determinism, ranking invariants, and all seven
 scenarios on the real agents' findings (acceptable action, never a forbidden one, human involved when
 required). `tests/unit/orchestration/test_provider_in_graph.py` runs the provider through the graph to a

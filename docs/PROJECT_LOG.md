@@ -2,6 +2,9 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-17 - Docs: gates aligned
+- `docs/decision.md` said "two gates"; the code has four shared gates plus the LLM-only human floor. decision.md and the README now say the same, and mark the human floor as LLM-only.
+
 ## 2026-10-17 - Professional polish
 - Added MIT `LICENSE`, license and CI badges, a Quick start section and a License section to the README; package metadata carries the license and author. Repo description and topics set on GitHub.
 
