@@ -65,3 +65,9 @@ class ScenarioSpec(Contract):
         if (self.attempt is not None) != self.expected.authorization_must_block:
             raise ValueError("attempt and expected.authorization_must_block must go together")
         return self
+
+
+class LabCaseSpec(ScenarioSpec):
+    """One labelled lab case: a scenario variant of a named archetype (``data/synthetic/lab``)."""
+
+    archetype: str = Field(min_length=1)

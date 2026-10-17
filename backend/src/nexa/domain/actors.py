@@ -16,6 +16,7 @@ class Role(StrEnum):
     FRAUD_ANALYST = "fraud_analyst"
     RISK_OFFICER = "risk_officer"
     COMPLIANCE_OFFICER = "compliance_officer"
+    AUDITOR = "auditor"  # reviews and runs the evaluation lab; cannot vote or open live cases
     # Agents
     SUPERVISOR_AGENT = "supervisor_agent"
     DATA_AGENT = "data_agent"
@@ -38,7 +39,7 @@ class Role(StrEnum):
 SERVICE_ROLES: Final[frozenset[Role]] = frozenset({Role.EXECUTION_SERVICE})
 
 HUMAN_ROLES: Final[frozenset[Role]] = frozenset(
-    {Role.CUSTOMER, Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_OFFICER}
+    {Role.CUSTOMER, Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_OFFICER, Role.AUDITOR}
 )
 # Humans who work at the bank and may approve actions (customers never approve).
 APPROVER_ROLES: Final[frozenset[Role]] = frozenset(

@@ -207,3 +207,18 @@ def test_scenario_expectations_are_internally_consistent(
 ) -> None:
     for s in scenarios.values():
         assert not set(s.expected.acceptable_actions) & set(s.expected.forbidden_actions)
+
+
+def test_lab_data_is_reproducible(tmp_path: Path) -> None:
+    spec = importlib.util.spec_from_file_location(
+        "generate_synthetic_data", ROOT / "scripts" / "generate_synthetic_data.py"
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.generate(tmp_path)
+    for generated in (tmp_path / "lab").glob("*.json"):
+        committed = default_data_dir() / "lab" / generated.name
+        assert generated.read_text(encoding="utf-8") == committed.read_text(encoding="utf-8"), (
+            f"lab/{generated.name} differs; rerun scripts/generate_synthetic_data.py"
+        )
