@@ -31,6 +31,10 @@ C = IndicatorCode
 # the policy: the prototype policy names the indicators but not the freeze condition.
 TAKEOVER_SIGNS = (C.RAPID_SERIES, C.NEW_BENEFICIARY, C.UNKNOWN_DEVICE, C.FAILED_AUTH)
 TAKEOVER_MINIMUM = 3
+# Freezing locks the whole account, so three weak signs are not enough: the money moving must also
+# be material (a fast series, an unusual amount or a high value). Found by scenario J (a customer
+# on a new phone, PKR 18,000), which the signs alone would have frozen.
+MATERIAL_SIGNS = (C.RAPID_SERIES, C.AMOUNT_ABOVE_AVERAGE, C.HIGH_VALUE)
 
 A = ActionType
 # The policy documents that govern each response (NB-POL-FRAUD-001 section 5, NB-POL-AUTH-001).
@@ -63,7 +67,11 @@ def restriction_supported(
     """
     present = set(codes)
     if action is ActionType.FREEZE_ACCOUNT:
-        return len(present & set(TAKEOVER_SIGNS)) >= TAKEOVER_MINIMUM and not mitigated
+        return (
+            len(present & set(TAKEOVER_SIGNS)) >= TAKEOVER_MINIMUM
+            and bool(present & set(MATERIAL_SIGNS))
+            and not mitigated
+        )
     if action is ActionType.BLOCK_CARD:
         return C.CARD_TESTING in present or {C.AMOUNT_ABOVE_AVERAGE, C.UNUSUAL_GEOGRAPHY} <= present
     return True

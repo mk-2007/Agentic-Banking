@@ -44,7 +44,7 @@ def main() -> int:
     """Return 0 when every run reached a decision-ready case."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("scenario", nargs="?", help="scenario id, for example scenario_b_suspicious")
-    parser.add_argument("--all", action="store_true", help="run all seven scenarios")
+    parser.add_argument("--all", action="store_true", help="run all scenarios")
     args = parser.parse_args()
     if not args.all and args.scenario not in SCENARIOS:
         print("choose one of:\n  " + "\n  ".join(SCENARIOS) + "\nor use --all")

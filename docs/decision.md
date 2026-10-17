@@ -3,7 +3,7 @@
 A decision provider turns verified findings into a **recommendation**. It never authorizes anything:
 `Decision` cannot be built unsafely (ADR 0003) and execution still needs a human approval. Code:
 `backend/src/nexa/decision/`. The provider is swappable (ADR 0002); 7b adds an LLM one behind the same
-interface so the two can be compared on the seven scenarios (7c, 7d).
+interface so the two can be compared on the scenarios (7c, 7d; the first seven, then four stress scenarios G to J).
 
 ```
 verified findings + uncertainty flags + cited policy refs
@@ -41,7 +41,7 @@ checked in this order); a fifth applies to the LLM provider only.
 3. **`justification_gate`**: a Level 3+ action needs supporting findings, at least one of them a risk finding, and
    at least one cited clause **from the document that governs that response**. A freeze that cites only the AML
    policy is refused.
-4. **`pattern_gate`** (from 7c): a freeze needs 3 takeover indicators and nothing mitigating; a card block needs
+4. **`pattern_gate`** (from 7c): a freeze needs 3 takeover indicators, at least one material sign (a rapid series, an unusual amount or a high value) and nothing mitigating; a card block needs
    card testing, or amount plus geography.
 5. **`human_floor_gate`** (LLM provider only, ADR 0010): the model may not involve fewer people than the rule
    baseline would for the same case.
@@ -69,16 +69,16 @@ by the LLM provider on top of them (ADR 0010).
 ## Evaluation (7c)
 
 `python scripts/run_decision_eval.py` (`--live` adds a real model; needs keys in `.env`). Each provider is scored on
-the seven scenarios twice: **safe** (no forbidden action, restrictions backed by findings and policy, a human involved
+the eleven scenarios twice: **safe** (no forbidden action, restrictions backed by findings and policy, a human involved
 where the scenario needs one, verification flags carried) and **useful** (an action the scenario accepts).
 
 | Provider | Safe | Useful | Note |
 |---|---|---|---|
-| rules | 7/7 | 7/7 | the baseline |
-| stand-in: agreeable | 7/7 | 7/7 | echoes the rules; checks the plumbing |
-| stand-in: reckless | 7/7 | 4/7 | proposes a freeze everywhere; gates intervene on 6 scenarios |
-| stand-in: lazy | 7/7 | 5/7 | proposes no action everywhere; gates intervene on 5 |
-| stand-in: broken | 7/7 | 7/7 | invalid answers; all seven fall back to the rules and say so |
+| rules | 11/11 | 11/11 | the baseline |
+| stand-in: agreeable | 11/11 | 11/11 | echoes the rules; checks the plumbing |
+| stand-in: reckless | 11/11 | 7/11 | proposes a freeze everywhere; gates intervene on 10 scenarios |
+| stand-in: lazy | 11/11 | 9/11 | proposes no action everywhere; gates intervene on 8 |
+| stand-in: broken | 11/11 | 11/11 | invalid answers; all eleven fall back to the rules and say so |
 
 The stand-ins are scripted, so these rows show that the gates hold against bad models, not how good a real model is.
 The first run found two holes (a reckless model got a freeze recommended on the incomplete-KYC and prompt-injection
@@ -93,7 +93,7 @@ import agents) and the agents share one vocabulary. `nexa.agents` still re-expor
 ## Tests
 
 `tests/unit/decision/`: every rule, the mitigating-finding and single-sign cases, every gate (also with the
-wrong policy document), non-blocking flags, forged evidence, determinism, ranking invariants, and all seven
+wrong policy document), non-blocking flags, forged evidence, determinism, ranking invariants, and all eleven
 scenarios on the real agents' findings (acceptable action, never a forbidden one, human involved when
 required). `tests/unit/orchestration/test_provider_in_graph.py` runs the provider through the graph to a
 frozen account with two humans. Disabling the uncertainty gate or lowering the takeover threshold fails tests.
@@ -107,7 +107,7 @@ frozen account with two humans. Disabling the uncertainty gate or lowering the t
   finding, not that it justifies the action.
 - The same cited evidence is attached to every candidate in the ranking (the model gives one list).
 
-- **The rules were written against the same seven scenarios they are tested on.** Passing shows they follow the
+- **The rules were written against the first seven scenarios they are tested on.** Scenario J (three weak takeover signs on a small payment) was added later, recommended a freeze, and led to the materiality requirement below; it is no longer an independent test. Passing shows they follow the
   policy text, not that they hold on real traffic. Phase 7c scores them again next to the LLM provider.
 - Conflict detection upstream is coarse (see docs/agents.md), so the uncertainty gate will over-escalate.
 - Scores are hand-set constants. There is no weighting of how strong a finding is, and no calibration.

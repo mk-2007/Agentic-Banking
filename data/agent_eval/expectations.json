@@ -12,7 +12,8 @@
     "rapid series of transfers": "code:rapid_series",
     "new beneficiaries": "code:new_beneficiary",
     "unknown device": "code:unknown_device",
-    "failed authentication attempts": "code:failed_auth"
+    "failed authentication attempts": "code:failed_auth",
+    "history too thin to judge": "flag:insufficient_evidence"
   },
   "scenarios": {
     "scenario_a_normal": {
@@ -47,6 +48,27 @@
       "allowed_risk_codes": ["instruction_text"],
       "expected_flags": [],
       "must_have_codes": ["instruction_text"],
+      "must_cite_documents": ["NB-POL-FRAUD-001"]
+    },
+    "scenario_g_legitimate_traveller": {
+      "allowed_risk_codes": [],
+      "expected_flags": [],
+      "must_have_codes": ["travel_notice", "trusted_device"],
+      "must_cite_documents": ["NB-POL-FRAUD-001"]
+    },
+    "scenario_h_thin_history": {
+      "expected_flags": ["insufficient_evidence"],
+      "must_have_codes": ["insufficient_history"],
+      "must_cite_documents": ["NB-POL-FRAUD-001"]
+    },
+    "scenario_i_structuring": {
+      "allowed_risk_codes": [],
+      "expected_flags": [],
+      "must_cite_documents": ["NB-POL-FRAUD-001"]
+    },
+    "scenario_j_new_phone": {
+      "expected_flags": [],
+      "must_have_codes": ["failed_auth", "new_beneficiary", "unknown_device"],
       "must_cite_documents": ["NB-POL-FRAUD-001"]
     }
   }

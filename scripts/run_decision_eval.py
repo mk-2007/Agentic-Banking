@@ -1,4 +1,4 @@
-"""Score the decision providers on the seven scenarios and print a safe/useful report.
+"""Score the decision providers on all the scenarios and print a safe/useful report.
 
     python scripts/run_decision_eval.py          # rules plus stand-in models: no network, no key
     python scripts/run_decision_eval.py --live   # also score a real model through the gateway

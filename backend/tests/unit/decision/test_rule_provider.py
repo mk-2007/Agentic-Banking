@@ -75,6 +75,14 @@ def test_a_single_takeover_sign_is_not_enough_to_freeze() -> None:
     assert decide(*TAKEOVER[:2]).recommended_action is not A.FREEZE_ACCOUNT
 
 
+def test_three_weak_signs_without_material_money_do_not_freeze() -> None:
+    # Scenario J: new device, new beneficiary and failed logins on a PKR 18,000 payment.
+    weak = (C.NEW_BENEFICIARY, C.UNKNOWN_DEVICE, C.FAILED_AUTH)
+    assert decide(*weak).recommended_action is A.ESCALATE_TO_ANALYST
+    for material in (C.AMOUNT_ABOVE_AVERAGE, C.HIGH_VALUE, C.RAPID_SERIES):
+        assert decide(*weak, material).recommended_action is A.FREEZE_ACCOUNT
+
+
 def test_a_mitigating_finding_stops_a_freeze() -> None:
     decision = decide(*TAKEOVER, C.TRAVEL_NOTICE)
     assert decision.recommended_action is not A.FREEZE_ACCOUNT
