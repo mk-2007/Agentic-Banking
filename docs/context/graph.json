@@ -413,6 +413,20 @@
       "summary": "HTTP routes, who may call what, rules the layer keeps, sign-in and honest limits (8a)"
     },
     {
+      "id": "doc:demo",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/demo.md",
+      "summary": "Six-minute demo walkthrough, fallbacks and limits to state (8c)"
+    },
+    {
+      "id": "doc:demo-report",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/demo-report.md",
+      "summary": "Generated report from scripts/run_demo.py: seven scenarios, Level 4 path, checks (8c)"
+    },
+    {
       "id": "doc:orchestration",
       "type": "doc",
       "status": "done",

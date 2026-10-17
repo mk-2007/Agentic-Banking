@@ -20,7 +20,7 @@ The single place to see what is done, what is next and whether the schedule hold
 | 5b | Specialist agents + scenario evals | 2026-10-14 | 2026-10-14 | 1 | 487 | done |
 | 6 | LangGraph orchestration, approval pause, loop limits | 2026-10-14 | 2026-10-16 | 3 | 554 | done |
 | 7 | Decision providers (rule-based, LLM), baseline vs LLM evaluation | 2026-10-16 | 2026-10-16 | 1 | 632 | done |
-| 8 | API, frontend, demo | 2026-10-16 | | est. 3-4 | 653 so far | in progress (8a, 8b done) |
+| 8 | API, frontend, demo | 2026-10-16 | | est. 3-4 | 654 so far | in progress (8a-8c done) |
 
 "Days taken" and "Tests" for finished phases come from the project log (calendar days, not hours; tests are the count when the phase closed).
 "est." figures are **my estimates** from the pace of phases 0-5, not measurements; correct them as
@@ -44,7 +44,7 @@ real numbers arrive. Rough remaining effort: 7 to 10 calendar days at the curren
 **Phase 8**
 - [x] 8a API (cases, evidence, approvals) with the employee/customer channel decided by trusted code
 - [x] 8b Frontend: case view, evidence, approval screen (one static page served by the API, no build step)
-- [ ] 8c Demo script, seeded run, screenshots or short video
+- [x] 8c Demo script (`docs/demo.md`), seeded run and report (`scripts/run_demo.py`, `docs/demo-report.md`); screenshots/video still to record
 - [ ] 8d Final README, honest-limits pass, release tag
 
 ## Open items

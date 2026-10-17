@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-17 - Phase 8c: demo script and report
+- `scripts/run_demo.py` drives the real API in process (offline): all seven scenarios, the Level 4 two-approver path, one role voting twice, replay, a customer turned away, and a check that the injection memo never appears in responses. 17 checks, writes `docs/demo-report.md`. A test runs it, so the report cannot silently rot.
+- `docs/demo.md`: six-minute walkthrough with fallbacks and limits to say aloud. Screenshots or video not recorded yet.
+- 654 tests pass. Next: 8d final README, honest-limits pass, release tag.
+
 ## 2026-10-17 - Phase 8b: dashboard
 - One static page (`api/static/index.html`) served at `/` by the API: open a case from a sample scenario, evidence, recommendation, approval votes, audit chain. Same origin, so no CORS and no build tooling (decided over a separate SPA to stay small before the deadline).
 - New `GET /scenarios` (employee only) returns the synthetic sample alerts. The page uses `textContent` only and keeps the token in `sessionStorage`.
