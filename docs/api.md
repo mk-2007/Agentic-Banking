@@ -61,4 +61,7 @@ never in the repository.
 - **Chat returns cited passages, not a written answer.** There is no model rewriting them; that keeps every word
   traceable to a document and version.
 - **Opening a case runs the whole investigation synchronously.** With the LLM provider that can take seconds.
-- No CORS settings yet; the frontend (8b) will need them.
+- **The dashboard is one static page at `/`** (`api/static/index.html`, no build step). It is served by the API itself, so
+  there is no cross-origin traffic and no CORS setup. You paste a token; it is kept in `sessionStorage` for the tab
+  only. All API text is inserted with `textContent`, never as HTML. `GET /scenarios` (employee) lists the synthetic
+  sample alerts so a demo can open a case with one click.

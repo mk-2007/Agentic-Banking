@@ -8,8 +8,8 @@ Starting a new AI chat? Give it this file, `AGENTS.md`, and the latest repo zip
 ## Where we are
 - Phases 0-5 done (domain, bank sim, tools, RAG, model gateway, specialist agents). **Phase 6a done**
   (LangGraph case graph, `docs/orchestration.md`). **6b done** (approval pause and resume via `decide=` and
-  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010) and **7d done** (live comparison, `docs/decision-comparison.md`). **Phase 7 is complete. 8a done** (HTTP API, `docs/api.md`, `scripts/run_api.py`). **Next: 8b** (frontend: case view, evidence, approval screen; needs CORS), 8c (demo script and report), 8d (final README, release). See `docs/TRACKER.md` for the split.
-- 652 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
+  `resume_case`). **6c done** (`RunLimits`, retries, audit per transition). **6d done** (approved actions execute through the guarded tool; scenario tests). **7a done** (rule-based provider) and **7b done** (LLM provider behind `DecisionProvider`; `docs/decision.md`). **7c done** (`scripts/run_decision_eval.py`; ADR 0010) and **7d done** (live comparison, `docs/decision-comparison.md`). **Phase 7 is complete. 8a done** (HTTP API, `docs/api.md`, `scripts/run_api.py`). **8b done** (dashboard page at `/`, served by the API, so no CORS). **Next: 8c** (demo script and report), 8d (final README, release). See `docs/TRACKER.md` for the split.
+- 653 tests pass; `ruff`, `mypy` clean. `python scripts/run_agent_eval.py` passes 7 of 7 scenarios and
   `python scripts/run_case.py --all` reaches `decision_ready` on all seven.
 
 ## What to read first

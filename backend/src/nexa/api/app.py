@@ -10,15 +10,19 @@ a voter is and which role they vote as come from their token, never from the req
     GET  /approvals/pending     cases waiting for votes                     (employee)
     POST /cases/{id}/votes      cast a verdict and continue the case        (employee)
     POST /chat                  answer from the knowledge base              (customer or employee)
+    GET  /scenarios             sample alerts to open cases from            (employee)
     GET  /health                liveness, no authentication
+    GET  /                      the dashboard page (static; every call it makes needs a token)
 """
 
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.responses import FileResponse
 
-from nexa.bank_sim import RecordNotFoundError
+from nexa.bank_sim import RecordNotFoundError, load_scenarios
 
 from .principals import Principal
 from .schemas import (
@@ -29,6 +33,7 @@ from .schemas import (
     ChatResponse,
     OpenCaseRequest,
     PassageView,
+    ScenarioView,
     VoteRequest,
     summary_of,
     view_of,
@@ -64,6 +69,26 @@ def create_app(service: CaseService, principals: Mapping[str, Principal]) -> Fas
         """Liveness check."""
         return {"status": "ok"}
 
+    @app.get("/", include_in_schema=False)
+    def dashboard() -> FileResponse:
+        """Serve the single-page dashboard; it holds no data and its API calls carry a token."""
+        return FileResponse(Path(__file__).parent / "static" / "index.html")
+
+    @app.get("/scenarios")
+    def scenarios(who: Employee) -> list[ScenarioView]:
+        """Sample alerts (synthetic) so a demo can open a case without typing ids."""
+        return [
+            ScenarioView(
+                id=s.id,
+                title=s.title,
+                description=s.description,
+                **s.alert.model_dump(
+                    include={"account_id", "customer_id", "transaction_id", "trigger"}
+                ),
+            )
+            for s in load_scenarios()
+        ]
+
     @app.post("/cases", status_code=status.HTTP_201_CREATED)
     def open_case(body: OpenCaseRequest, who: Employee) -> CaseView:
         """Open a case from an alert and run it through the graph."""
@@ -72,7 +97,7 @@ def create_app(service: CaseService, principals: Mapping[str, Principal]) -> Fas
         except RecordNotFoundError as error:
             raise HTTPException(status.HTTP_404_NOT_FOUND, str(error)) from None
         except InvalidAlertError as error:
-            raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(error)) from None
+            raise HTTPException(422, str(error)) from None
 
     @app.get("/cases")
     def list_cases(who: Employee) -> list[CaseSummary]:
