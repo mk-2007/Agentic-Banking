@@ -26,6 +26,7 @@ class Principal:
 
     user_id: str
     role: Role
+    customer_id: str | None = None  # the bank customer a customer sign-in belongs to
 
     @property
     def is_employee(self) -> bool:
@@ -46,37 +47,47 @@ class Principal:
 def parse_tokens(spec: str) -> dict[str, Principal]:
     """Parse ``token:user_id:role`` entries separated by commas.
 
-    Raises ``ValueError`` for a malformed entry, an unknown or non-human role, or a repeated token.
+    A customer entry may add the bank customer it belongs to: ``token:user_id:customer:cust_010``.
+    Raises ``ValueError`` for a malformed entry, an unknown or non-human role, a customer id on a
+    non-customer, or a repeated token.
     """
     found: dict[str, Principal] = {}
     for entry in filter(None, (part.strip() for part in spec.split(","))):
         pieces = entry.split(":")
-        if len(pieces) != 3 or not all(pieces):
-            raise ValueError("each token entry must look like token:user_id:role")
-        token, user_id, role_name = pieces
+        if len(pieces) not in (3, 4) or not all(pieces):
+            raise ValueError("each token entry must look like token:user_id:role[:customer_id]")
+        token, user_id, role_name, *linked = pieces
         try:
             role = Role(role_name)
         except ValueError:
             raise ValueError(f"unknown role {role_name!r}") from None
         if role not in ALLOWED_ROLES:
             raise ValueError(f"role {role_name!r} cannot sign in to the API")
+        if linked and role is not Role.CUSTOMER:
+            raise ValueError("only a customer sign-in can be linked to a bank customer")
         if token in found:
             raise ValueError("a token may be used only once")
-        found[token] = Principal(user_id, role)
+        found[token] = Principal(user_id, role, linked[0] if linked else None)
     return found
+
+
+DEMO_CUSTOMER_ID = "cust_010"  # an ordinary retail customer with a month of normal history
 
 
 def demo_tokens() -> dict[str, Principal]:
     """Create random tokens for a demo analyst, risk officer, auditor and customer."""
     people = (
-        ("demo_analyst", Role.FRAUD_ANALYST),
-        ("demo_risk_officer", Role.RISK_OFFICER),
-        ("demo_auditor", Role.AUDITOR),
-        ("demo_customer", Role.CUSTOMER),
+        Principal("demo_analyst", Role.FRAUD_ANALYST),
+        Principal("demo_risk_officer", Role.RISK_OFFICER),
+        Principal("demo_auditor", Role.AUDITOR),
+        Principal("demo_customer", Role.CUSTOMER, DEMO_CUSTOMER_ID),
     )
-    return {secrets.token_urlsafe(24): Principal(user, role) for user, role in people}
+    return {secrets.token_urlsafe(24): person for person in people}
 
 
 def describe(tokens: Mapping[str, Principal]) -> str:
     """List who can sign in (user and role, never the token) for logs."""
-    return ", ".join(f"{p.user_id} ({p.role.value})" for p in tokens.values())
+    return ", ".join(
+        f"{p.user_id} ({p.role.value}{', ' + p.customer_id if p.customer_id else ''})"
+        for p in tokens.values()
+    )

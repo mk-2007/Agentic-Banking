@@ -89,5 +89,25 @@ class AccountActionAPI(Protocol):
         ...
 
 
-class BankGateway(CustomerAPI, AccountAPI, TransactionAPI, KycAPI, AccountActionAPI, Protocol):
+class TransactionWriteAPI(Protocol):
+    """Posting a customer's transaction. Called by the customer-facing app, never by an agent."""
+
+    def add_transaction(self, transaction: TransactionRecord) -> TransactionRecord:
+        """Post ``transaction`` to its account and return it.
+
+        Raises `RecordNotFoundError` for an unknown account, `AccountFrozenError` for a frozen one
+        and `InsufficientFundsError` for a debit larger than the balance.
+        """
+        ...
+
+
+class BankGateway(
+    CustomerAPI,
+    AccountAPI,
+    TransactionAPI,
+    TransactionWriteAPI,
+    KycAPI,
+    AccountActionAPI,
+    Protocol,
+):
     """Everything the platform may ask of a bank."""

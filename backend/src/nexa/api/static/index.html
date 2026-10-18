@@ -138,6 +138,8 @@ td { padding:3px 6px; border-bottom:1px dashed #17120f66; vertical-align:top; }
 .tiles { display:flex; flex-wrap:wrap; gap:4px; }
 .tile { width:24px; height:24px; border:2px solid var(--ink); background:var(--paper); cursor:pointer; padding:0; transition:transform .1s; }
 .tile.pass { background:var(--t); } .tile.fail { background:var(--p); } .tile:hover { transform:translateY(-4px) rotate(-4deg); box-shadow:3px 3px 0 var(--ink); }
+.appform { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; margin:10px 0; } .fld { display:flex; flex-direction:column; gap:3px; font:700 12px var(--display); letter-spacing:.04em; text-transform:uppercase; }
+.fld input, .fld select { border:2px solid var(--ink); background:var(--paper); padding:6px; font:14px var(--mono); text-transform:none; }
 .labrow { display:flex; gap:8px; margin:8px 0; flex-wrap:wrap; } .labrow select, .labrow input { flex:1; min-width:120px; border:2px solid var(--ink); background:var(--paper); padding:6px; }
 .kv { display:grid; grid-template-columns:150px 1fr; gap:4px 12px; margin:6px 0 10px; } .kv dt { font:800 11px var(--display); letter-spacing:.1em; text-transform:uppercase; padding-top:2px; } .kv dd { margin:0; }
 .spark { display:flex; align-items:flex-end; gap:2px; height:90px; border-bottom:3px solid var(--ink); margin-top:6px; }
@@ -337,13 +339,59 @@ function drawChat() {
   $("rail").replaceChildren(); $("stage").replaceChildren(card("Ask the bank · cited answers only", "--t", h("div", "ask", input, go), h("p", "mono mute", `Filtered by channel before ranking. You are signed in as: ${S.mode}.`), out));
 }
 
-const TABS = { employee: [["cases", "Control room"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["capability", "Capability"], ["accounts", "Accounts"]] };
+/* ---------- the customer app: accounts and payments ----------
+   The page only sends what a customer would type. Whether the device is registered and whether a payee
+   is new are decided by the bank, so the two "simulate" controls stand in for the bank's own sensors. */
+const CATEGORIES = ["grocery", "dining", "fuel", "pharmacy", "retail", "electronics", "telecom", "utilities", "travel", "cash", "transfer"];
+const CHANNELS = ["pos", "atm", "card_online", "mobile_app", "web", "transfer"];
+const PRESETS = [
+  ["Everyday grocery", { amount: 2500, merchant_name: "Imtiaz Super Market", merchant_category: "grocery", channel: "pos", country: "PK", city: "Karachi", device: "registered", failed_logins: 0, payee_account: "" }],
+  ["Big transfer, new phone", { amount: 60000, merchant_name: "Quick Pay Services", merchant_category: "transfer", channel: "transfer", country: "PK", city: "Karachi", device: "new", failed_logins: 4, payee_account: "PK-NEW-" + Math.floor(Math.random() * 9000 + 1000) }],
+];
+async function drawApp() {
+  let me;
+  try { me = await api("/app/me"); }
+  catch (e) { if (e.status !== 403) throw e; S.tab = "chat"; drawTabs(); return drawChat(); }   // a sign-in with no bank customer behind it
+  const els = {}, field = (key, label, el) => { els[key] = el; return h("label", "fld", h("span", "", label), el); };
+  const sel = (opts, cur) => { const s = h("select"); opts.forEach(o => s.append(Object.assign(h("option", "", String(o)), { value: o }))); s.value = cur; return s; };
+  const num = (v, min, max) => Object.assign(h("input"), { type: "number", value: v, min, max });
+  const txt = (v, max) => Object.assign(h("input"), { value: v, maxLength: max });
+  const form = h("div", "appform",
+    field("account_id", "From account", sel(me.accounts.map(a => a.id), me.accounts[0]?.id)), field("amount", "Amount (PKR)", num(2500, 1, 5000000)),
+    field("merchant_name", "Pay to", txt("Imtiaz Super Market", 80)), field("merchant_category", "Category", sel(CATEGORIES, "grocery")),
+    field("channel", "Channel", sel(CHANNELS, "pos")), field("country", "Country", txt(me.home_country, 2)),
+    field("city", "City", txt("Karachi", 60)), field("payee_account", "Payee account (transfers)", txt("", 40)),
+    field("device", "Simulate: device", sel(["registered", "new"], "registered")), field("failed_logins", "Simulate: failed logins before this payment", num(0, 0, 10)));
+  const out = h("p", "mono mute", S.appNote || ""); S.appNote = "";   // a redraw follows every payment, so the note is carried over
+  const fill = v => Object.entries(v).forEach(([k, x]) => { els[k].value = x; });
+  const pay = h("button", "btn", "Pay");
+  pay.onclick = guard(async () => {
+    const body = {}; for (const [k, el] of Object.entries(els)) body[k] = el.value;
+    body.amount = Number(body.amount); body.failed_logins = Number(body.failed_logins); if (!body.payee_account) delete body.payee_account;
+    pay.disabled = true;
+    try { const r = await api("/app/payments", { method: "POST", body: JSON.stringify(body) }); S.appNote = `Paid. Balance now ${money(r.balance_after)}.`; await drawApp(); }
+    catch (e) { out.textContent = "✖ " + e.message; }
+    finally { pay.disabled = false; }
+  });
+  const quick = h("div", "labrow", ...PRESETS.map(([name, v]) => { const b = h("button", "btn alt", name); b.onclick = () => fill(v); return b; }));
+  const accounts = me.accounts.map(a => h("div", "row", stamp(a.status), h("span", "id", `${a.id} · ${a.product}`), h("b", "mono", money(a.balance)), h("span", "mute mono", "card " + a.card_status)));
+  const frozen = me.accounts.some(a => a.status === "frozen");
+  const recent = me.recent.map(t => h("div", "row", h("span", "mute mono", t.occurred_at.slice(0, 16).replace("T", " ")), h("span", "id", `${t.merchant_name} · ${t.merchant_category} · ${t.country}`), h("b", "mono", (t.direction === "debit" ? "−" : "+") + money(t.amount))));
+  $("rail").replaceChildren();
+  $("stage").replaceChildren(
+    card(`My accounts · ${me.display_name}`, "--t", ...accounts, frozen ? h("p", "mono", "The bank has frozen an account: payments from it are refused.") : null),
+    card("Make a payment", "--o", quick, form, h("p", "mono mute", "Whether the device is registered and whether the payee is new are decided by the bank, not by you. The two “simulate” fields stand in for the bank’s own sensors."), pay, out),
+    card("Recent activity", "--b", ...recent));
+}
+
+const TABS = { employee: [["cases", "Control room"], ["chat", "Ask the bank"]], customer: [["app", "Bank app"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["capability", "Capability"], ["accounts", "Accounts"]] };
 function drawTabs() {
   const tabs = $("tabs"); tabs.replaceChildren();
   (TABS[S.mode] || []).forEach(([k, label]) => { const b = h("button", S.tab === k ? "on" : "", label); b.onclick = guard(() => openTab(k)); tabs.append(b); });
 }
 async function openTab(k) {
   S.tab = k; drawTabs();
+  if (k === "app") return drawApp();
   if (k === "chat") return drawChat();
   if (k === "cases") { drawRail(); if (S.view) { build(); paint(); } else empty(); return; }
   if (k === "lab") { await loadLab(); labRail(); drawLab(); return; }
@@ -539,8 +587,8 @@ $("connect").onclick = guard(async () => {
     if (e.status !== 403) throw e;   // a valid token without case access is an auditor or a customer
     try { await api("/admin/lab/scorecard"); S.mode = "auditor"; } catch (e2) { if (e2.status !== 403) throw e2; S.mode = "customer"; }
   }
-  S.tab = { employee: "cases", auditor: "lab", customer: "chat" }[S.mode]; S.view = null; $("who").textContent = S.mode; drawTabs();
-  if (S.mode === "customer") return drawChat();
+  S.tab = { employee: "cases", auditor: "lab", customer: "app" }[S.mode]; S.view = null; $("who").textContent = S.mode; drawTabs();
+  if (S.mode === "customer") return drawApp();
   if (S.mode === "auditor") return openTab("lab");
   empty(); await refresh(); note("");
 });

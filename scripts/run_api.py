@@ -1,7 +1,7 @@
 """Start the HTTP API.
 
     python scripts/run_api.py --demo            # random demo tokens, printed once at start-up
-    NEXA_API_TOKENS="tok1:ana:fraud_analyst,tok2:rob:risk_officer,tok3:carl:customer" \
+    NEXA_API_TOKENS="tok1:ana:fraud_analyst,tok2:rob:risk_officer,tok3:ayesha:customer:cust_010" \
         python scripts/run_api.py                # your own tokens (never put them in the repo)
     python scripts/run_api.py --demo --llm      # decide with the LLM provider (rules as fallback)
 

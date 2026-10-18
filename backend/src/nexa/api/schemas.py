@@ -6,6 +6,7 @@ memos (third-party text) and customer details stay inside the platform.
 """
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -40,6 +41,84 @@ class ChatRequest(Request):
     """A question for the knowledge base."""
 
     question: str = Field(min_length=2, max_length=500)
+
+
+PaymentCategory = Literal[
+    "grocery",
+    "dining",
+    "fuel",
+    "pharmacy",
+    "retail",
+    "electronics",
+    "telecom",
+    "utilities",
+    "travel",
+    "cash",
+    "transfer",
+]
+PaymentChannel = Literal["pos", "atm", "card_online", "mobile_app", "web", "transfer"]
+
+
+class PaymentRequest(Request):
+    """A payment a customer makes in the app.
+
+    ``device`` and ``failed_logins`` stand in for what a bank's own systems observe; in this
+    prototype the page lets you set them to simulate a stolen phone or a password guesser. Whether
+    the payee is a new beneficiary is never asked: the bank works that out from the history.
+    """
+
+    account_id: str = Field(min_length=1, max_length=64)
+    amount: int = Field(gt=0, le=5_000_000, description="Whole PKR.")
+    merchant_name: str = Field(min_length=1, max_length=80, pattern=r"^[\w .&'\-]+$")
+    merchant_category: PaymentCategory
+    country: str = Field(pattern=r"^[A-Za-z]{2}$")
+    city: str = Field(min_length=1, max_length=60, pattern=r"^[\w .'\-]+$")
+    channel: PaymentChannel
+    payee_account: str | None = Field(default=None, max_length=40, pattern=r"^[\w\-]+$")
+    device: Literal["registered", "new"] = "registered"
+    failed_logins: int = Field(default=0, ge=0, le=10)
+
+
+class AppAccountView(BaseModel):
+    """One of the customer's accounts."""
+
+    id: str
+    product: str
+    status: str
+    card_status: str
+    balance: int
+
+
+class AppTransactionView(BaseModel):
+    """One of the customer's own transactions."""
+
+    id: str
+    account_id: str
+    occurred_at: datetime
+    direction: str
+    amount: int
+    merchant_name: str
+    merchant_category: str
+    country: str
+    channel: str
+
+
+class AppMeView(BaseModel):
+    """What the customer app shows: the customer's accounts and recent activity."""
+
+    customer_id: str
+    display_name: str
+    home_country: str
+    accounts: list[AppAccountView]
+    recent: list[AppTransactionView]
+
+
+class PaymentView(BaseModel):
+    """The bank's answer to a payment."""
+
+    transaction_id: str
+    balance_after: int
+    account_status: str
 
 
 class ScenarioView(BaseModel):

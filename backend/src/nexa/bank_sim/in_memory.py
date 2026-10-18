@@ -8,12 +8,18 @@ from collections.abc import Iterable
 from datetime import datetime
 from typing import TypeVar
 
-from .errors import DuplicateRecordError, RecordNotFoundError
+from .errors import (
+    AccountFrozenError,
+    DuplicateRecordError,
+    InsufficientFundsError,
+    RecordNotFoundError,
+)
 from .models import (
     AccountRecord,
     AccountStatus,
     CardStatus,
     CustomerRecord,
+    Direction,
     KycRecord,
     OutboxEntry,
     OutboxKind,
@@ -90,6 +96,25 @@ class InMemoryBank:
             and (until is None or t.occurred_at <= until)
         ]
         return tuple(sorted(selected, key=lambda t: (t.occurred_at, t.id)))
+
+    # --- TransactionWriteAPI -----------------------------------------
+    def add_transaction(self, transaction: TransactionRecord) -> TransactionRecord:
+        """Post the transaction and move the balance; refuse a frozen account or an overdraft."""
+        account = self.get_account(transaction.account_id)
+        if transaction.id in self._transactions:
+            raise DuplicateRecordError(f"duplicate transaction id: {transaction.id}")
+        if account.status is AccountStatus.FROZEN:
+            raise AccountFrozenError(f"account {account.id} is frozen")
+        signed = (
+            transaction.amount if transaction.direction is Direction.CREDIT else -transaction.amount
+        )
+        if account.balance + signed < 0:
+            raise InsufficientFundsError(f"account {account.id} has too little balance")
+        self._transactions[transaction.id] = transaction
+        self._accounts[account.id] = account.model_copy(
+            update={"balance": account.balance + signed}
+        )
+        return transaction
 
     # --- KycAPI ------------------------------------------------------
     def get_kyc(self, customer_id: str) -> KycRecord:

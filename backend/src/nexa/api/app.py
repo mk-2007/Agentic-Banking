@@ -11,6 +11,7 @@ a voter is and which role they vote as come from their token, never from the req
     POST /cases/{id}/votes      cast a verdict and continue the case        (employee)
     POST /chat                  answer from the knowledge base              (customer or employee)
     GET  /scenarios             sample alerts to open cases from            (employee)
+    GET  /app/me, POST /app/payments   the customer's accounts and payments         (customer)
     GET  /admin/...             lab cases, run, scorecard, reports, accounts (auditor only)
     GET  /health                liveness, no authentication
     GET  /                      the dashboard page (static; every call it makes needs a token)
@@ -23,7 +24,13 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.responses import FileResponse
 
-from nexa.bank_sim import RecordNotFoundError, load_scenarios
+from nexa.bank_sim import (
+    AccountFrozenError,
+    InsufficientFundsError,
+    RecordNotFoundError,
+    load_scenarios,
+)
+from nexa.domain.actors import Role
 
 from .lab import (
     AccountProfile,
@@ -39,8 +46,10 @@ from .lab import (
     ScorecardView,
     UnknownLabCaseError,
 )
+from .live import LiveService, NotYourAccountError
 from .principals import Principal
 from .schemas import (
+    AppMeView,
     AuditEventView,
     CaseSummary,
     CaseView,
@@ -48,6 +57,8 @@ from .schemas import (
     ChatResponse,
     OpenCaseRequest,
     PassageView,
+    PaymentRequest,
+    PaymentView,
     ScenarioView,
     VoteRequest,
     summary_of,
@@ -82,6 +93,15 @@ def create_app(
             raise HTTPException(status.HTTP_403_FORBIDDEN, "employees only")
         return who
 
+    def customer(who: Annotated[Principal, Depends(caller)]) -> Principal:
+        if who.role is not Role.CUSTOMER or who.customer_id is None:
+            raise HTTPException(
+                status.HTTP_403_FORBIDDEN, "customers linked to a bank customer only"
+            )
+        return who
+
+    live = LiveService(service.bank, service.now)
+
     def auditor(who: Annotated[Principal, Depends(caller)]) -> Principal:
         if not who.is_auditor:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "auditors only")
@@ -95,6 +115,7 @@ def create_app(
     Who = Annotated[Principal, Depends(caller)]
     Employee = Annotated[Principal, Depends(employee)]
     Auditor = Annotated[Principal, Depends(auditor)]
+    Customer = Annotated[Principal, Depends(customer)]
     Lab = Annotated[LabService, Depends(the_lab)]
 
     @app.get("/health")
@@ -186,6 +207,27 @@ def create_app(
         return ChatResponse(
             passages=[PassageView(**vars(p)) for p in service.chat(body.question, who)]
         )
+
+    # --- the customer app ----------------------------------------------------------------------
+    @app.get("/app/me")
+    def app_me(who: Customer) -> AppMeView:
+        """Return the signed-in customer's accounts and recent activity."""
+        assert who.customer_id is not None
+        return live.me(who.customer_id)
+
+    @app.post("/app/payments", status_code=status.HTTP_201_CREATED)
+    def app_pay(body: PaymentRequest, who: Customer) -> PaymentView:
+        """Make a payment from one of the customer's own accounts."""
+        assert who.customer_id is not None
+        try:
+            _, view = live.pay(who.customer_id, body)
+        except RecordNotFoundError as error:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, str(error)) from None
+        except NotYourAccountError:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "not your account") from None
+        except (AccountFrozenError, InsufficientFundsError) as error:
+            raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from None
+        return view
 
     # --- the auditor's lab -------------------------------------------------------------------
     @app.get("/admin/lab/cases")
