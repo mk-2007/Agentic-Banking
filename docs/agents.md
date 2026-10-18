@@ -27,6 +27,22 @@ alert -> Case -> DataAgent -> Dossier (typed facts + evidence)
 checks, case scoping and audit are the tool layer's, not the agent's. `AgentContext.channel` has **no
 default**: trusted code must say whether the session is for employees or customers.
 
+## The investigator (model-driven analysis, ADR 0014)
+
+With a model gateway and `AgentContext.investigate`, analysis becomes `AgenticAnalysis`: the baseline above always
+runs, and an **investigator** (role `investigator_agent`) also looks into the case. It asks for lookups one at a time
+through the tool layer (customer, account, history, KYC; at most six steps), reads the answers, and concludes with
+claims: a finding code and the observations it cites. It never sees merchant names (opaque refs `m1`, `m2` instead) or
+memos, and cannot claim `instruction_text`.
+
+Each claim is fact-checked against **what the model actually looked at**: a code the baseline covers is *confirmed* only
+if the baseline's logic, run on just the history the model fetched, also finds it; uncited claims, claims citing an
+observation that does not exist, and unsupported claims are dropped and counted. The model can **add** a finding the
+baseline never searches for (`possible_structuring`, NB-POL-AML-001 section 6) when the policy's criteria hold over the
+observed history; it cannot remove a finding or invent one. A missing, failing or endless model leaves exactly the
+baseline. The run leaves an `InquiryReport` (lookups, claimed, confirmed, added, dropped, missed) on the case and one
+audit line. Live runs on Groq and Gemini are in `docs/PROJECT_LOG.md`.
+
 ## Why most of it is plain code
 
 Thresholds are policy (NB-POL-FRAUD-001, NB-POL-AML-001), mirrored in `FraudThresholds`, and a test keeps
