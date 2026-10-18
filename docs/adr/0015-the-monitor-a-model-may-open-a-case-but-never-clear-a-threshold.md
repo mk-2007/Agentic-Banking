@@ -16,7 +16,7 @@ charge of dismissing alerts would let a model's mistake hide fraud.
    is asked. **Routine** (code): a payment that is ordinary in every respect is cleared, by a deliberately narrow rule.
    **Grey zone**: everything else goes to a model, which opens or clears it with a reason from a closed list.
 3. **A missing, failing or invalid model opens the case.** The monitor fails toward caution.
-4. A burst on one account does not open a case per payment: while a monitor case is recent (30 minutes), later payments
+4. A burst on one account does not open a case per payment: while a monitor case is recent (4 hours), later payments
    with the same reasons are linked to it, and a reason it did not have (the fifth payment in an hour) opens a new one.
 5. The review runs on one background worker. `CaseService` no longer holds one lock while a case runs: a lock guards the
    shared maps briefly and each case runs under its own, so a slow investigation does not stop anyone listing cases or

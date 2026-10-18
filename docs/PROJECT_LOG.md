@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - Randomised, labelled traffic: rules against a model (ADR 0016)
+- **Why:** hand-written cases only show the system follows its own thresholds, and some answers were right by accident.
+- **Done:** `evaluation/simulator.py` (seven personas, seeded, scaled to each account's habits, labels written first), `api/sim.py` (a fresh bank, case service and monitor per episode, posted through the customer-app path), `scripts/run_sim_eval.py` (rules always; `--llm` adds the model; saves `data/lab_results/sim.json`), `GET /admin/lab/sim` and a card in the auditor's Capability tab. Scoring separates caught, **recognised** (the right finding, not an accidental escalation) and safe.
+- **What the baseline showed straight away:** with no model, fraud is caught 12 of 12 over three seeds but only 9 of 12 are *recognised*: structuring is escalated by accident, as the docs always said, and nothing ever recognises it.
+- **Changes found by running it:** a case opened early on a growing cluster of deposits absorbed the later ones and could not see the pattern, so linking now applies only when the cluster has not grown; a credit has no "usual payment", so the monitor no longer compares deposits with debit habits; the investigator is handed a case brief (customer, account, KYC summary, no text) so it needs one lookup instead of four on a rate-limited free tier; the model entry points wait longer on rate limits.
+- Tests: `test_simulator.py` (13) and `test_sim.py` (9).
+
 ## 2026-10-18 - The monitor: the system notices payments and opens cases itself (ADR 0015)
 - **Why:** cases still came from a button. Live payments need something watching them.
 - **Done:** `MonitorAgent` plus `Monitor`: every customer payment is reviewed in the background from a typed digest. Floor (a policy threshold crossed: always opens a case), routine (ordinary: cleared) and a grey zone decided by a model with a closed list of reasons; a missing or failing model opens the case. Bursts link to the open case; a new reason opens another. `GET /monitor/log` and a Live feed tab. `CaseService` now locks per case, so a slow investigation no longer freezes listing or voting.
