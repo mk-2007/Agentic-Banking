@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - The demo video and a guide to presenting
+- **Video:** `scripts/make_demo_video.py` records the whole story through a real headless Chrome against the server with a model on, speaks the script with Windows' built-in voice, and renders a captioned `.webm` inside Chrome (no ffmpeg). The recorded run: a customer pays, the monitor clears the routine payment and opens cases on the takeover burst, a model investigates (Claude, 6,905 tokens in the freeze case), the analyst and risk officer approve a freeze, the customer's next payment is refused. About 2 minutes (124 s, 1600 by 1040). The file is not committed (about 30 MB); the script is.
+- **Found by recording:** `--llm` also let the model rank the actions, and it chose a more cautious action than the freeze (allowed: the model may be more cautious than the rules, never less), so the two-role freeze was not guaranteed on screen and did not match the saved evaluation. `--llm` now means the model monitors and investigates while the rules and gates decide; `--llm-decisions` lets it rank too. The server's log went to a pipe nobody read and could fill and block the run: the recorder now writes it to a file. The page redraws its form after each payment, which the script had to allow for.
+- **UI:** the case view now has an Investigation card (what the model looked at, what was confirmed, added, dropped, and what the baseline found that the model did not claim).
+- `docs/RUN_AND_PRESENT.md`: setup, the five-minute live demo, the talk track, likely questions and answers, and a troubleshooting table.
+
 ## 2026-10-18 - First randomised-traffic results with Claude
 - **Run:** `python scripts/run_sim_eval.py --seeds 2 --llm --providers anthropic` (`claude-haiku-5-5`, 14 episodes, 288 s, 153,198 tokens, decisions by the rules and gates). Saved in `data/lab_results/sim.json`.
 - **Result:** fraud caught 8 of 8 with and without the model; fraud *recognised* 6 of 8 without, 8 of 8 with; honest customers restricted 0 in both; cases opened on honest customers 4 of 6 without, 3 of 6 with. Investigator over 24 cases: all concluded; 51 claims, 43 confirmed, 4 added (all `possible_structuring`), 4 dropped by the fact-checker, 0 missed. Monitor paths: 16 floor, 8 routine, 22 model.

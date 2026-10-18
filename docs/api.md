@@ -4,7 +4,8 @@ A thin FastAPI layer over the platform. Code: `backend/src/nexa/api/`. Run it:
 
 ```
 python scripts/run_api.py --demo            # random demo tokens, printed once
-python scripts/run_api.py --demo --llm      # decide with the LLM provider (rules as fallback)
+python scripts/run_api.py --demo --llm      # a model monitors and investigates; rules and gates decide
+python scripts/run_api.py --demo --llm --llm-decisions   # the model also ranks the actions
 ```
 
 Interactive docs are served at `/docs`. Everything is held in memory: restarting forgets cases, approvals and the

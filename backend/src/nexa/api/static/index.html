@@ -302,6 +302,16 @@ function build(lead = []) {
   } else row.append(left);
   st.append(row);
 
+  if (v.inquiry) {
+    const q = v.inquiry, chip = (t, c) => h("span", "st " + (c || ""), pretty(t)), line = (label, items, cls) => items.length ? h("div", "", h("b", "", label + " "), ...items.map(x => chip(x, cls))) : null;
+    st.append(card("Investigation · a model looked, code checked", "--b",
+      h("div", "", chip(q.outcome, q.outcome === "concluded" ? "ok" : "bad"), " ", h("span", "mono mute", `${q.provider || "no model"} · ${q.tokens.toLocaleString("en-US")} tokens`)),
+      h("div", "", h("b", "", "Looked at "), ...(q.trace.length ? q.trace.map(t => chip(t.tool.replace("get_", "") + (t.ok ? "" : " (refused: " + t.error_code + ")"), t.ok ? "" : "bad")) : [h("span", "mute", "nothing: it had the case brief")])),
+      line("Confirmed", q.confirmed, "ok"), line("Added by the model, confirmed by code", q.added, "ok"),
+      line("Dropped by the fact-checker", q.dropped.map(d => d.code + " · " + d.reason), "bad"), line("Baseline found, model did not claim", q.missed, "wait"),
+      h("p", "mono mute", "The model never saw a merchant name or a memo. Each claim was checked against only what it actually looked at; it can add a finding, never remove or invent one.")));
+  }
+
   if (v.approval) st.append(approval(v));
 
   u.table = h("div", "scroll");

@@ -476,6 +476,13 @@
       "summary": "Study guide: glossary, flow, gates, token frontend, scenarios, tests, known gaps"
     },
     {
+      "id": "doc:run-and-present",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/RUN_AND_PRESENT.md",
+      "summary": "How to run the app and present it: setup, live demo, talk track, likely questions, video"
+    },
+    {
       "id": "adr:0012",
       "type": "adr",
       "status": "done",
@@ -1184,6 +1191,11 @@
     },
     {
       "from": "doc:project-guide",
+      "to": "module:api",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:run-and-present",
       "to": "module:api",
       "relation": "documents"
     },
