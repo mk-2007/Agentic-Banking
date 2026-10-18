@@ -30,6 +30,7 @@ class OpenAiCompatibleProvider:
         api_key: str,
         model: str,
         json_mode: JsonMode = JsonMode.JSON_OBJECT,
+        send_temperature: bool = True,
         timeout_seconds: float = 60.0,
         client: httpx.Client | None = None,
     ) -> None:
@@ -40,6 +41,7 @@ class OpenAiCompatibleProvider:
         self._api_key = api_key
         self._model = model
         self._json_mode = json_mode
+        self._send_temperature = send_temperature  # some newer models reject the parameter
         self._client = client or httpx.Client(timeout=timeout_seconds)
 
     @property
@@ -67,9 +69,10 @@ class OpenAiCompatibleProvider:
         body: dict[str, Any] = {
             "model": self._model,
             "messages": [{"role": m.role.value, "content": m.content} for m in request.messages],
-            "temperature": request.temperature,
             "max_tokens": request.max_tokens,
         }
+        if self._send_temperature:
+            body["temperature"] = request.temperature
         if request.json_output and use_json_mode:
             if self._json_mode is JsonMode.JSON_OBJECT:
                 body["response_format"] = {"type": "json_object"}

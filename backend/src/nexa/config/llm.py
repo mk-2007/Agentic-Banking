@@ -32,6 +32,7 @@ class ProviderPreset(Contract):
     model_env: str
     default_model: str
     json_mode: JsonMode = JsonMode.JSON_OBJECT
+    send_temperature: bool = True
 
 
 PRESETS: Final[Mapping[str, ProviderPreset]] = MappingProxyType(
@@ -53,6 +54,7 @@ PRESETS: Final[Mapping[str, ProviderPreset]] = MappingProxyType(
             model_env="NEXA_ANTHROPIC_MODEL",
             default_model="claude-haiku-5-5",
             json_mode=JsonMode.NONE,
+            send_temperature=False,  # the current Claude models reject it (HTTP 400)
         ),
         "gemini": ProviderPreset(
             name="gemini",
