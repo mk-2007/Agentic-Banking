@@ -62,6 +62,10 @@ def test_aml_policy_states_the_configured_thresholds() -> None:
     body = BY_ID["NB-POL-AML-001"]
     assert f"{DEFAULT_THRESHOLDS.kyc_review_max_age_days} days" in body
     assert f"PKR {DEFAULT_THRESHOLDS.high_value_amount_pkr:,}" in body
+    t = DEFAULT_THRESHOLDS
+    structuring = f"{t.structuring_min_payments} or more payments in the same direction"
+    assert f"{structuring} within {t.structuring_window_hours} hours" in body
+    assert f"{t.structuring_band_floor:.0%} and 100%" in body
 
 
 def test_authorization_policy_matches_the_approval_matrix() -> None:

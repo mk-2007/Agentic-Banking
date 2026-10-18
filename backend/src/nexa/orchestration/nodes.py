@@ -17,9 +17,11 @@ from langgraph.types import interrupt
 
 from nexa.agents import (
     AgentDataError,
+    AgenticAnalysis,
     AgentToolError,
     AnalysisAgent,
     DataAgent,
+    InquiryReport,
     Investigation,
     PolicyAgent,
     VerificationAgent,
@@ -61,6 +63,7 @@ class AgentSet:
     analysis: AnalysisAgent
     policy: PolicyAgent
     verification: VerificationAgent
+    agentic: AgenticAnalysis | None = None  # the model-driven analysis, when it is switched on
 
     @classmethod
     def from_context(cls, ctx: AgentContext) -> "AgentSet":
@@ -70,6 +73,7 @@ class AgentSet:
             analysis=AnalysisAgent(ctx),
             policy=PolicyAgent(ctx),
             verification=VerificationAgent(ctx.thresholds),
+            agentic=AgenticAnalysis(ctx) if ctx.investigate and ctx.gateway else None,
         )
 
 
@@ -202,10 +206,17 @@ class CaseNodes:
         """Run the analysis agent to compute the findings."""
 
         def step(s: CaseGraphState) -> Update:
+            if self._agents.agentic is not None:
+                outcome = self._agents.agentic.analyze(s["case"], s["dossier"])
+                return {"findings": list(outcome.findings), "inquiry": outcome.report}
             found = self._agents.analysis.analyze(s["case"], s["dossier"])
             return {"findings": list(found)}
 
-        return self._guarded(step)(state)
+        update = self._guarded(step)(state)
+        report = update.get("inquiry")
+        if isinstance(report, InquiryReport):
+            self._record(AuditEventType.EVIDENCE_RECORDED, state["case"], report.audit_line())
+        return update
 
     def research(self, state: CaseGraphState) -> Update:
         """Run the policy agent to find the clauses that apply."""

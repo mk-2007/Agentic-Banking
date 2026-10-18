@@ -106,6 +106,16 @@ def is_supported(evidence: Evidence, t: FraudThresholds) -> bool:
         case IndicatorCode.INSUFFICIENT_HISTORY:
             seen = _number(evidence, "transactions_in_lookback")
             return seen is not None and seen < t.min_history_transactions
+        case IndicatorCode.POSSIBLE_STRUCTURING:
+            count = _number(evidence, "qualifying_payments")
+            lowest = _number(evidence, "lowest_amount")
+            highest = _number(evidence, "highest_amount")
+            return (
+                count is not None and count >= t.structuring_min_payments
+                and lowest is not None and highest is not None
+                and lowest >= t.structuring_band_floor * t.high_value_amount_pkr
+                and highest < t.high_value_amount_pkr
+            )  # fmt: skip
         case _:
             return True
 

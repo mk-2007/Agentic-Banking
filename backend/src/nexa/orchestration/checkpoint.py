@@ -8,7 +8,7 @@ checkpointer under this list, so adding a field to the state without listing its
 
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 
-from nexa.agents import Dossier, PolicyResult, VerificationReport
+from nexa.agents import Dossier, InquiryOutcome, InquiryReport, PolicyResult, VerificationReport
 from nexa.agents.dossier import (
     AccountFact,
     CustomerFact,
@@ -16,6 +16,7 @@ from nexa.agents.dossier import (
     TransactionFact,
     TravelNoticeFact,
 )
+from nexa.agents.inquiry import DroppedClaim, TraceStep
 from nexa.agents.verification_agent import IssueCode, VerificationIssue
 from nexa.domain.actions import ActionType, RiskLevel
 from nexa.domain.actors import Role
@@ -29,6 +30,7 @@ _TYPES: tuple[type, ...] = (
     Evidence, EvidenceKind, SourceRef, PolicyRef,
     Dossier, TransactionFact, TravelNoticeFact, CustomerFact, AccountFact, KycFact,
     PolicyResult, VerificationReport, VerificationIssue, IssueCode, UncertaintyFlag,
+    InquiryReport, InquiryOutcome, TraceStep, DroppedClaim,
     Decision, CandidateScore, ActionType, RiskLevel,
     ApprovalRequest, ApprovalVote, ApprovalStatus, Verdict, Role,
 )  # fmt: skip

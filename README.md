@@ -491,6 +491,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | [0011](docs/adr/0011-an-auditor-role-and-a-private-evaluation-lab.md) | An auditor role and a private evaluation lab |
 | [0012](docs/adr/0012-capability-evidence-baselines-hostile-models-and-a-hard-tier.md) | Capability evidence: baselines, hostile models, a hard tier |
 | [0013](docs/adr/0013-every-action-is-carried-out-by-a-guarded-tool.md) | Every action in the closed set is carried out by a guarded tool |
+| [0014](docs/adr/0014-a-model-investigates-and-code-checks-what-it-claims.md) | A model investigates, and code checks what it claims |
 
 ## Documentation
 

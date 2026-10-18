@@ -110,6 +110,7 @@ class CaseService:
             clock=clock,
             channel=SessionChannel.EMPLOYEE,
             gateway=gateway,
+            investigate=gateway is not None,
         )
         decider = provider or RuleBasedDecisionProvider(clock)
         self._graph: CaseGraph = build_case_graph(

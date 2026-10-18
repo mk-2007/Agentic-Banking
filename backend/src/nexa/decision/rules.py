@@ -67,6 +67,12 @@ RULES: tuple[_Rule, ...] = (
         lambda f: f.of(C.KYC_ADDRESS_MISMATCH),
     ),
     _Rule(
+        "possible_structuring",
+        ActionType.ESCALATE_TO_ANALYST,
+        0.60,
+        lambda f: f.of(C.POSSIBLE_STRUCTURING),
+    ),
+    _Rule(
         "several_indicators",
         ActionType.ESCALATE_TO_ANALYST,
         0.50,

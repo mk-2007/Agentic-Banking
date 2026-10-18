@@ -15,15 +15,21 @@ _HUMAN_INVESTIGATORS = (Role.FRAUD_ANALYST, Role.RISK_OFFICER, Role.COMPLIANCE_O
 
 TOOL_ROLES: Final[Mapping[str, frozenset[Role]]] = MappingProxyType(
     {
-        "get_customer_profile": frozenset({Role.DATA_AGENT, *_HUMAN_INVESTIGATORS}),
-        "get_account_details": frozenset({Role.DATA_AGENT, *_HUMAN_INVESTIGATORS}),
+        "get_customer_profile": frozenset(
+            {Role.DATA_AGENT, Role.INVESTIGATOR_AGENT, *_HUMAN_INVESTIGATORS}
+        ),
+        "get_account_details": frozenset(
+            {Role.DATA_AGENT, Role.INVESTIGATOR_AGENT, *_HUMAN_INVESTIGATORS}
+        ),
         "get_transaction_details": frozenset(
-            {Role.DATA_AGENT, Role.ANALYSIS_AGENT, *_HUMAN_INVESTIGATORS}
+            {Role.DATA_AGENT, Role.ANALYSIS_AGENT, Role.INVESTIGATOR_AGENT, *_HUMAN_INVESTIGATORS}
         ),
         "get_transaction_history": frozenset(
-            {Role.DATA_AGENT, Role.ANALYSIS_AGENT, *_HUMAN_INVESTIGATORS}
+            {Role.DATA_AGENT, Role.ANALYSIS_AGENT, Role.INVESTIGATOR_AGENT, *_HUMAN_INVESTIGATORS}
         ),
-        "get_kyc_status": frozenset({Role.DATA_AGENT, *_HUMAN_INVESTIGATORS}),
+        "get_kyc_status": frozenset(
+            {Role.DATA_AGENT, Role.INVESTIGATOR_AGENT, *_HUMAN_INVESTIGATORS}
+        ),
         "search_knowledge_base": frozenset(
             {
                 Role.CUSTOMER_SERVICE_AGENT,

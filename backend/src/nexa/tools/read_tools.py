@@ -5,10 +5,10 @@ Phone numbers, e-mail addresses and street addresses never leave the bank layer,
 reduced to initials. Free-text fields supplied by third parties are labelled as untrusted.
 """
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import ClassVar
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from nexa.bank_sim.models import TransactionRecord
 from nexa.config import roles_for
@@ -56,6 +56,12 @@ class _HistoryArgs(Contract):
     since: datetime | None = None
     until: datetime | None = None
     limit: int = Field(default=200, ge=1, le=HISTORY_MAX_ROWS)
+
+    @field_validator("since", "until")
+    @classmethod
+    def assume_utc(cls, value: datetime | None) -> datetime | None:
+        """Read a time with no zone (a bare date, say) as UTC, as the stored times are."""
+        return value.replace(tzinfo=UTC) if value is not None and value.tzinfo is None else value
 
 
 class GetCustomerProfile(Tool):

@@ -33,7 +33,8 @@ class AgentContext:
 
     ``channel`` is required and has no default: it decides how much knowledge an agent may read,
     so trusted code must state it. ``gateway`` is optional; agents that use a model fall back to
-    deterministic behaviour without one.
+    deterministic behaviour without one. ``investigate`` is the opt-in that puts the model-driven
+    investigator into the analysis step; without it the analysis is the plain baseline.
     """
 
     registry: ToolRegistry
@@ -41,6 +42,7 @@ class AgentContext:
     channel: SessionChannel
     thresholds: FraudThresholds = DEFAULT_THRESHOLDS
     gateway: LlmGateway | None = None
+    investigate: bool = False  # let the model investigate (needs a gateway), under a fact-checker
 
 
 def agent_actor(role: Role) -> Actor:

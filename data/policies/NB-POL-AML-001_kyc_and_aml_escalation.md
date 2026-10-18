@@ -40,3 +40,9 @@ proof of fraud.
 ## 5. Escalation to compliance
 Escalate to a compliance officer when documents are refused, repeatedly not provided, or when
 the pattern of activity does not fit the declared source of funds.
+
+## 6. Possible structuring
+4 or more payments in the same direction within 24 hours, each between 60% and 100% of the
+high-value amount (PKR 300,000), may be an attempt to keep every payment below that line. Record
+it as a risk indicator (`possible_structuring`) and escalate to a compliance officer under section 5.
+The indicator alone never justifies restricting the account.

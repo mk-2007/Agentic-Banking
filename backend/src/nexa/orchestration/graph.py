@@ -22,7 +22,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command
 
-from nexa.agents import Investigation
+from nexa.agents import InquiryReport, Investigation
 from nexa.agents.base import AgentContext
 from nexa.approvals import InMemoryApprovalStore
 from nexa.audit import AuditRecorder
@@ -151,6 +151,7 @@ class CaseRun:
     approval_request: ApprovalRequest | None = None
     votes: tuple[ApprovalVote, ...] = ()
     approval: ApprovalStatus | None = None
+    inquiry: InquiryReport | None = None
 
     @property
     def ready_for_decision(self) -> bool:
@@ -183,6 +184,7 @@ def _to_run(final: dict[str, Any]) -> CaseRun:
         approval_request=final.get("approval_request"),
         votes=tuple(final.get("votes", ())),
         approval=final.get("approval"),
+        inquiry=final.get("inquiry"),
     )
 
 
