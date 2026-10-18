@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - First randomised-traffic results with Claude
+- **Run:** `python scripts/run_sim_eval.py --seeds 2 --llm --providers anthropic` (`claude-haiku-5-5`, 14 episodes, 288 s, 153,198 tokens, decisions by the rules and gates). Saved in `data/lab_results/sim.json`.
+- **Result:** fraud caught 8 of 8 with and without the model; fraud *recognised* 6 of 8 without, 8 of 8 with; honest customers restricted 0 in both; cases opened on honest customers 4 of 6 without, 3 of 6 with. Investigator over 24 cases: all concluded; 51 claims, 43 confirmed, 4 added (all `possible_structuring`), 4 dropped by the fact-checker, 0 missed. Monitor paths: 16 floor, 8 routine, 22 model.
+- **Found on the way:** the Claude models reject `temperature` (HTTP 400): a per-provider switch now omits it. An earlier Groq and Gemini run could not finish on free tiers (Gemini's quota ran out; Groq rate-limited investigations to `model_unavailable`), so it was stopped; the platform completed those cases on the baseline, as designed.
+- **Honest reading:** two seeds and a synthetic bank. It shows the model finds a pattern the arithmetic never searches for, and that nothing honest was restricted; it is not a claim of accuracy on real traffic.
+- The Claude key was pasted into `.env` without its name and printed once by a diagnostic: it should be rotated.
+
 ## 2026-10-18 - Randomised, labelled traffic: rules against a model (ADR 0016)
 - **Why:** hand-written cases only show the system follows its own thresholds, and some answers were right by accident.
 - **Done:** `evaluation/simulator.py` (seven personas, seeded, scaled to each account's habits, labels written first), `api/sim.py` (a fresh bank, case service and monitor per episode, posted through the customer-app path), `scripts/run_sim_eval.py` (rules always; `--llm` adds the model; saves `data/lab_results/sim.json`), `GET /admin/lab/sim` and a card in the auditor's Capability tab. Scoring separates caught, **recognised** (the right finding, not an accidental escalation) and safe.

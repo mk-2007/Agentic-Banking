@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/mk-2007/Agentic-Banking/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/mk-2007/Agentic-Banking/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge"></a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-728%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
+  <img alt="tests" src="https://img.shields.io/badge/tests-838%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
   <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
@@ -128,7 +128,7 @@ analysis stands alone.
 ## At a glance
 
 <p align="center">
-  <img src="docs/assets/stats.svg" alt="728 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 13 decision records" width="100%">
+  <img src="docs/assets/stats.svg" alt="838 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 13 decision records" width="100%">
 </p>
 
 | | |
@@ -139,7 +139,7 @@ analysis stands alone.
 | **Actions** | 7 in a closed set, risk-levelled 1 to 4; Level 4 (freeze account) needs fraud analyst **and** risk officer |
 | **Knowledge base** | 98 cited chunks, access decided *before* ranking; recall@3 = 92.5% on 40 labelled questions |
 | **Synthetic data** | 23 customers, 865 transactions, 3 policy documents, plus an 88-case labelled lab cohort (11 archetypes, 12 threshold-boundary cases and a 16-case hard tier, 88 more accounts) |
-| **Quality** | 728 tests, `ruff` and `mypy --strict` clean, 13 architecture decision records |
+| **Quality** | 838 tests, `ruff` and `mypy --strict` clean, 13 architecture decision records |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -354,6 +354,33 @@ recommended on an incomplete-KYC case; a "lazy" model downgraded an account take
 > Everything below is reproducible from this repository. Numbers come from the synthetic scenarios, so they show
 > that the rules do what the policy says, **not** that they would hold on real traffic.
 
+### Randomised traffic: rules against a model (2 seeds, 14 episodes)
+
+Seven personas (three honest, four fraudulent) post different payments every seed through the customer-app path; the monitor
+opens cases; the platform's recommendations are judged against labels written before the first run. The same seeds ran
+without a model and with Claude (`claude-haiku-5-5`) in the monitor and the investigator, decisions by the rules and gates
+([ADR 0016](docs/adr/0016-evaluate-on-randomised-labelled-traffic-with-and-without-a-model.md)).
+
+| | Rules, no model | With a model |
+|---|:---:|:---:|
+| Fraud caught (a case opened, handled acceptably) | 8 of 8 | 8 of 8 |
+| Fraud **recognised** (a case held the defining finding) | **6 of 8** | **8 of 8** |
+| Honest customers restricted or contacted | 0 | 0 |
+| Cases opened on honest customers (a cost) | 4 of 6 | 3 of 6 |
+
+What it shows: without a model, structuring is "caught" only because the rules escalate when they recognise nothing; with
+one, the investigator proposed `possible_structuring` four times and code confirmed each from the history it had looked at.
+Over 24 investigations (all concluded, none rate-limited) the model made 51 claims: 43 confirmed, 4 added (all structuring),
+4 dropped by the fact-checker (a `rapid_series` and an `unusual_geography` the data did not support, and one citing an
+observation that did not exist); it missed none of the baseline's risk findings. 153,198 tokens, 288 seconds. The monitor
+sent 22 payments to the model, 16 crossed the floor, 8 were cleared as routine.
+
+What it does **not** show: 14 episodes is small; the personas are our idea of fraud and the labels our reading of the policy;
+both runs are on the same synthetic bank. An earlier Groq and Gemini attempt on a free tier was too rate-limited to finish
+(investigations ended `model_unavailable` and the cases completed on the baseline), which is why this run used Claude.
+Reproduce: `python scripts/run_sim_eval.py --seeds 2 --llm --providers anthropic`; the saved result is
+`data/lab_results/sim.json`.
+
 ### Specialist agents: 11 of 11 scenarios
 
 ```text
@@ -419,7 +446,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 cd backend
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                             # 728 tests, incl. architecture rules
+pytest -q                                             # 838 tests, incl. architecture rules
 ruff check . && ruff format --check . && mypy
 ```
 

@@ -1,0 +1,3039 @@
+{
+  "saved_at": "2026-10-18T12:39:06+00:00",
+  "seeds": [
+    1,
+    2
+  ],
+  "personas": [
+    "honest_routine",
+    "honest_big_purchase",
+    "honest_new_payee",
+    "takeover",
+    "card_testing",
+    "structuring",
+    "new_phone"
+  ],
+  "complete": true,
+  "rules": {
+    "episodes": [
+      {
+        "persona": "honest_routine",
+        "seed": 1,
+        "account_id": "acc_008",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "honest_routine",
+          "seed": 1,
+          "kind": "honest",
+          "opened": false,
+          "actions": [],
+          "worst": null,
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 9450,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 3150,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 8050,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 11000,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 7200,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          }
+        ],
+        "cases": [],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_big_purchase",
+        "seed": 1,
+        "account_id": "acc_009",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_big_purchase",
+          "seed": 1,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "no_action"
+          ],
+          "worst": "no_action",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 23350,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_43cd3f86983e"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_43cd3f86983e",
+            "status": "completed",
+            "action": "no_action",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "trusted_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_new_payee",
+        "seed": 1,
+        "account_id": "acc_010",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_new_payee",
+          "seed": 1,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 12800,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_d80237dd16c0"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_d80237dd16c0",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "new_beneficiary",
+              "trusted_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "takeover",
+        "seed": 1,
+        "account_id": "acc_012",
+        "events": 6,
+        "refused": 0,
+        "score": {
+          "persona": "takeover",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "freeze_account"
+          ],
+          "worst": "freeze_account",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_0fdc82fa8e87"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_0fdc82fa8e87"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_0fdc82fa8e87"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_0fdc82fa8e87"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_6ba52280a7f2"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_6ba52280a7f2"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_0fdc82fa8e87",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_6ba52280a7f2",
+            "status": "waiting_for_approval",
+            "action": "freeze_account",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "rapid_series",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "card_testing",
+        "seed": 1,
+        "account_id": "acc_013",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "card_testing",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "block_card"
+          ],
+          "worst": "block_card",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 55,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_39a674c5b6ec"
+          },
+          {
+            "amount": 79,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_39a674c5b6ec"
+          },
+          {
+            "amount": 93,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_39a674c5b6ec"
+          },
+          {
+            "amount": 70,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_39a674c5b6ec"
+          },
+          {
+            "amount": 29837,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments"
+            ],
+            "case_id": "case_f825e08bb6bb"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_39a674c5b6ec",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_f825e08bb6bb",
+            "status": "waiting_for_approval",
+            "action": "block_card",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "card_testing",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "structuring",
+        "seed": 1,
+        "account_id": "acc_014",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "structuring",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 208000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_01a93d952171"
+          },
+          {
+            "amount": 199000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_4fce99181ad8"
+          },
+          {
+            "amount": 219000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_682ced7d7453"
+          },
+          {
+            "amount": 238000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_35ea2d092568"
+          },
+          {
+            "amount": 266000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_94effef623a2"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_01a93d952171",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_4fce99181ad8",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_682ced7d7453",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_35ea2d092568",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_94effef623a2",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "new_phone",
+        "seed": 1,
+        "account_id": "acc_015",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "new_phone",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 6300,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_ee6fbd33a682"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_ee6fbd33a682",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_routine",
+        "seed": 2,
+        "account_id": "acc_016",
+        "events": 3,
+        "refused": 0,
+        "score": {
+          "persona": "honest_routine",
+          "seed": 2,
+          "kind": "honest",
+          "opened": false,
+          "actions": [],
+          "worst": null,
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 8350,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 11800,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 6500,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          }
+        ],
+        "cases": [],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_big_purchase",
+        "seed": 2,
+        "account_id": "acc_008",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_big_purchase",
+          "seed": 2,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "no_action"
+          ],
+          "worst": "no_action",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 34900,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_2c841f34fee3"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_2c841f34fee3",
+            "status": "completed",
+            "action": "no_action",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "trusted_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_new_payee",
+        "seed": 2,
+        "account_id": "acc_009",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_new_payee",
+          "seed": 2,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 10250,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_6c5e7c18832d"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_6c5e7c18832d",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "new_beneficiary",
+              "trusted_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "takeover",
+        "seed": 2,
+        "account_id": "acc_010",
+        "events": 6,
+        "refused": 0,
+        "score": {
+          "persona": "takeover",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "freeze_account"
+          ],
+          "worst": "freeze_account",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_caa4dd3d6985"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_caa4dd3d6985"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_caa4dd3d6985"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_caa4dd3d6985"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_5f0c9ace0286"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_5f0c9ace0286"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_caa4dd3d6985",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_5f0c9ace0286",
+            "status": "waiting_for_approval",
+            "action": "freeze_account",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "rapid_series",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "card_testing",
+        "seed": 2,
+        "account_id": "acc_012",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "card_testing",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "block_card"
+          ],
+          "worst": "block_card",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 92,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_f4263345abaa"
+          },
+          {
+            "amount": 110,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_f4263345abaa"
+          },
+          {
+            "amount": 43,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_f4263345abaa"
+          },
+          {
+            "amount": 47,
+            "path": "model_unavailable",
+            "decision": "linked",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_f4263345abaa"
+          },
+          {
+            "amount": 26812,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments"
+            ],
+            "case_id": "case_4a0a4d7bc3ed"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_f4263345abaa",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_4a0a4d7bc3ed",
+            "status": "waiting_for_approval",
+            "action": "block_card",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "card_testing",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "structuring",
+        "seed": 2,
+        "account_id": "acc_013",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "structuring",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 207000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_46a8435cbf72"
+          },
+          {
+            "amount": 281000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_4ba61f6d2846"
+          },
+          {
+            "amount": 242000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_49bb6fa7d7ab"
+          },
+          {
+            "amount": 257000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_cf4cf960e033"
+          },
+          {
+            "amount": 265000,
+            "path": "model_unavailable",
+            "decision": "opened",
+            "reasons": [
+              "model_unavailable"
+            ],
+            "case_id": "case_db17e1fe374e"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_46a8435cbf72",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_4ba61f6d2846",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_49bb6fa7d7ab",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_cf4cf960e033",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          },
+          {
+            "case_id": "case_db17e1fe374e",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "new_phone",
+        "seed": 2,
+        "account_id": "acc_014",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "new_phone",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 18900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_83558d926dd6"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_83558d926dd6",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": null
+          }
+        ],
+        "seconds": 0.0,
+        "tokens": 0
+      }
+    ],
+    "summary": {
+      "episodes": 14,
+      "fraud_episodes": 8,
+      "fraud_caught": 8,
+      "fraud_recognised": 6,
+      "honest_episodes": 6,
+      "honest_opened": 4,
+      "honest_restricted": 0,
+      "over_restricted": 0,
+      "by_persona": [
+        {
+          "persona": "honest_routine",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 0,
+          "recognised": 0
+        },
+        {
+          "persona": "honest_big_purchase",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 0,
+          "opened": 2,
+          "recognised": 0
+        },
+        {
+          "persona": "honest_new_payee",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 0,
+          "opened": 2,
+          "recognised": 0
+        },
+        {
+          "persona": "takeover",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        },
+        {
+          "persona": "card_testing",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        },
+        {
+          "persona": "structuring",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 0
+        },
+        {
+          "persona": "new_phone",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        }
+      ]
+    },
+    "labels": {
+      "honest_routine": {
+        "kind": "honest",
+        "story": "Everyday spending within the customer's habits."
+      },
+      "honest_big_purchase": {
+        "kind": "honest",
+        "story": "One large but ordinary purchase (a phone, a trip), from their own device."
+      },
+      "honest_new_payee": {
+        "kind": "honest",
+        "story": "A normal transfer to someone they have not paid before, from their own device."
+      },
+      "takeover": {
+        "kind": "fraud",
+        "story": "A new device, repeated failed logins, then six quick transfers to new payees."
+      },
+      "card_testing": {
+        "kind": "fraud",
+        "story": "Four tiny online charges to one merchant from an unknown device, then a large one."
+      },
+      "structuring": {
+        "kind": "fraud",
+        "story": "Five cash deposits just under the PKR 300,000 line over a few hours."
+      },
+      "new_phone": {
+        "kind": "fraud",
+        "story": "A new phone, failed logins and a new payee on a modest payment: not a takeover."
+      }
+    }
+  },
+  "agentic": {
+    "episodes": [
+      {
+        "persona": "honest_routine",
+        "seed": 1,
+        "account_id": "acc_008",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "honest_routine",
+          "seed": 1,
+          "kind": "honest",
+          "opened": false,
+          "actions": [],
+          "worst": null,
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 9450,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 3150,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 8050,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 11000,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 7200,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          }
+        ],
+        "cases": [],
+        "seconds": 0.0,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_big_purchase",
+        "seed": 1,
+        "account_id": "acc_009",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_big_purchase",
+          "seed": 1,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "no_action"
+          ],
+          "worst": "no_action",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 23350,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "unusual_amount"
+            ],
+            "case_id": "case_e85a6dc56adb"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_e85a6dc56adb",
+            "status": "completed",
+            "action": "no_action",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "trusted_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "trusted_device"
+              ],
+              "confirmed": [
+                "trusted_device"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6803,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 10.6,
+        "tokens": 6803
+      },
+      {
+        "persona": "honest_new_payee",
+        "seed": 1,
+        "account_id": "acc_010",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_new_payee",
+          "seed": 1,
+          "kind": "honest",
+          "opened": false,
+          "actions": [],
+          "worst": null,
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 12800,
+            "path": "model",
+            "decision": "cleared",
+            "reasons": [
+              "nothing_unusual"
+            ],
+            "case_id": null
+          }
+        ],
+        "cases": [],
+        "seconds": 2.8,
+        "tokens": 0
+      },
+      {
+        "persona": "takeover",
+        "seed": 1,
+        "account_id": "acc_012",
+        "events": 6,
+        "refused": 0,
+        "score": {
+          "persona": "takeover",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "freeze_account"
+          ],
+          "worst": "freeze_account",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_8098a4a19a75"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_8098a4a19a75"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_8098a4a19a75"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_8098a4a19a75"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_3d411ec5e0a4"
+          },
+          {
+            "amount": 2900,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_3d411ec5e0a4"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_8098a4a19a75",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "confirmed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 5811,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_3d411ec5e0a4",
+            "status": "waiting_for_approval",
+            "action": "freeze_account",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "rapid_series",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "rapid_series",
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device"
+              ],
+              "confirmed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device"
+              ],
+              "added": [],
+              "dropped": [
+                {
+                  "code": "rapid_series",
+                  "reason": "unknown_observation"
+                }
+              ],
+              "missed": [],
+              "tokens": 6409,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 18.6,
+        "tokens": 12220
+      },
+      {
+        "persona": "card_testing",
+        "seed": 1,
+        "account_id": "acc_013",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "card_testing",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "block_card"
+          ],
+          "worst": "block_card",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 55,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_623b6b9a007a"
+          },
+          {
+            "amount": 79,
+            "path": "model",
+            "decision": "linked",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_623b6b9a007a"
+          },
+          {
+            "amount": 93,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "unusual_pattern"
+            ],
+            "case_id": "case_4cc9a591f2be"
+          },
+          {
+            "amount": 70,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_7f6d5006041c"
+          },
+          {
+            "amount": 29837,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments"
+            ],
+            "case_id": "case_f3284e576687"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_623b6b9a007a",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "confirmed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6276,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_4cc9a591f2be",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "confirmed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6234,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_7f6d5006041c",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "unusual_geography",
+                "unknown_device"
+              ],
+              "confirmed": [
+                "unusual_geography",
+                "unknown_device"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6295,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_f3284e576687",
+            "status": "waiting_for_approval",
+            "action": "block_card",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "card_testing",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "card_testing",
+                "rapid_series",
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "confirmed": [
+                "card_testing",
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "added": [],
+              "dropped": [
+                {
+                  "code": "rapid_series",
+                  "reason": "unsupported"
+                }
+              ],
+              "missed": [],
+              "tokens": 6822,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 41.9,
+        "tokens": 25627
+      },
+      {
+        "persona": "structuring",
+        "seed": 1,
+        "account_id": "acc_014",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "structuring",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 208000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "unusual_amount"
+            ],
+            "case_id": "case_6f71e3018d76"
+          },
+          {
+            "amount": 199000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_748214a15003"
+          },
+          {
+            "amount": 219000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_b6ec89d11f60"
+          },
+          {
+            "amount": 238000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_2189c3b363b3"
+          },
+          {
+            "amount": 266000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_f8939984bb2f"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_6f71e3018d76",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [],
+              "confirmed": [],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6008,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_748214a15003",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "unusual_geography"
+              ],
+              "confirmed": [],
+              "added": [],
+              "dropped": [
+                {
+                  "code": "unusual_geography",
+                  "reason": "unsupported"
+                }
+              ],
+              "missed": [],
+              "tokens": 6259,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_b6ec89d11f60",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [],
+              "confirmed": [],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6301,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_2189c3b363b3",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant",
+              "possible_structuring"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "possible_structuring"
+              ],
+              "confirmed": [],
+              "added": [
+                "possible_structuring"
+              ],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6269,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_f8939984bb2f",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant",
+              "possible_structuring"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "possible_structuring"
+              ],
+              "confirmed": [],
+              "added": [
+                "possible_structuring"
+              ],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6241,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 47.7,
+        "tokens": 31078
+      },
+      {
+        "persona": "new_phone",
+        "seed": 1,
+        "account_id": "acc_015",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "new_phone",
+          "seed": 1,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 6300,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_c0499aaf393c"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_c0499aaf393c",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "confirmed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6989,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 13.2,
+        "tokens": 6989
+      },
+      {
+        "persona": "honest_routine",
+        "seed": 2,
+        "account_id": "acc_016",
+        "events": 3,
+        "refused": 0,
+        "score": {
+          "persona": "honest_routine",
+          "seed": 2,
+          "kind": "honest",
+          "opened": false,
+          "actions": [],
+          "worst": null,
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 8350,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 11800,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 6500,
+            "path": "routine",
+            "decision": "cleared",
+            "reasons": [
+              "routine"
+            ],
+            "case_id": null
+          }
+        ],
+        "cases": [],
+        "seconds": 0.1,
+        "tokens": 0
+      },
+      {
+        "persona": "honest_big_purchase",
+        "seed": 2,
+        "account_id": "acc_008",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_big_purchase",
+          "seed": 2,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "no_action"
+          ],
+          "worst": "no_action",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 34900,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "unusual_amount"
+            ],
+            "case_id": "case_322538dce712"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_322538dce712",
+            "status": "completed",
+            "action": "no_action",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "trusted_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "trusted_device"
+              ],
+              "confirmed": [
+                "trusted_device"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6539,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 9.7,
+        "tokens": 6539
+      },
+      {
+        "persona": "honest_new_payee",
+        "seed": 2,
+        "account_id": "acc_009",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "honest_new_payee",
+          "seed": 2,
+          "kind": "honest",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": false,
+          "recognised": false
+        },
+        "monitor": [
+          {
+            "amount": 10250,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "new_payee_risk"
+            ],
+            "case_id": "case_f518dfdacb52"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_f518dfdacb52",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "new_beneficiary",
+              "trusted_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "within_normal_range",
+                "new_beneficiary",
+                "trusted_device"
+              ],
+              "confirmed": [
+                "within_normal_range",
+                "new_beneficiary",
+                "trusted_device"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6609,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 10.7,
+        "tokens": 6609
+      },
+      {
+        "persona": "takeover",
+        "seed": 2,
+        "account_id": "acc_010",
+        "events": 6,
+        "refused": 0,
+        "score": {
+          "persona": "takeover",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "freeze_account"
+          ],
+          "worst": "freeze_account",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_43c1ecae4b36"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_43c1ecae4b36"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_43c1ecae4b36"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_43c1ecae4b36"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_14b7ae3d6017"
+          },
+          {
+            "amount": 14750,
+            "path": "floor",
+            "decision": "linked",
+            "reasons": [
+              "rapid_payments",
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_14b7ae3d6017"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_43c1ecae4b36",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "confirmed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6496,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_14b7ae3d6017",
+            "status": "waiting_for_approval",
+            "action": "freeze_account",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "rapid_series",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "rapid_series",
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "confirmed": [
+                "rapid_series",
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 7157,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 20.4,
+        "tokens": 13653
+      },
+      {
+        "persona": "card_testing",
+        "seed": 2,
+        "account_id": "acc_012",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "card_testing",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "block_card"
+          ],
+          "worst": "block_card",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 92,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_1cc0c52a3303"
+          },
+          {
+            "amount": 110,
+            "path": "model",
+            "decision": "linked",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_1cc0c52a3303"
+          },
+          {
+            "amount": 43,
+            "path": "model",
+            "decision": "linked",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_1cc0c52a3303"
+          },
+          {
+            "amount": 47,
+            "path": "model",
+            "decision": "linked",
+            "reasons": [
+              "location_concern"
+            ],
+            "case_id": "case_1cc0c52a3303"
+          },
+          {
+            "amount": 26812,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "rapid_payments"
+            ],
+            "case_id": "case_10f9cd43f08b"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_1cc0c52a3303",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "confirmed": [
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6016,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_10f9cd43f08b",
+            "status": "waiting_for_approval",
+            "action": "block_card",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "card_testing",
+              "unknown_device",
+              "unusual_geography"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "card_testing",
+                "rapid_series",
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "confirmed": [
+                "card_testing",
+                "unknown_device",
+                "unusual_geography"
+              ],
+              "added": [],
+              "dropped": [
+                {
+                  "code": "rapid_series",
+                  "reason": "unsupported"
+                }
+              ],
+              "missed": [],
+              "tokens": 6593,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 27.4,
+        "tokens": 12609
+      },
+      {
+        "persona": "structuring",
+        "seed": 2,
+        "account_id": "acc_013",
+        "events": 5,
+        "refused": 0,
+        "score": {
+          "persona": "structuring",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst",
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 207000,
+            "path": "model",
+            "decision": "cleared",
+            "reasons": [
+              "nothing_unusual"
+            ],
+            "case_id": null
+          },
+          {
+            "amount": 281000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_c384e33f00fe"
+          },
+          {
+            "amount": 242000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_77033eff739f"
+          },
+          {
+            "amount": 257000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_6a9a6041bce1"
+          },
+          {
+            "amount": 265000,
+            "path": "model",
+            "decision": "opened",
+            "reasons": [
+              "near_threshold_cluster"
+            ],
+            "case_id": "case_51ec98e43d3e"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_c384e33f00fe",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [],
+              "confirmed": [],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 5939,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_77033eff739f",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [],
+              "confirmed": [],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6030,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_6a9a6041bce1",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant",
+              "possible_structuring"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "possible_structuring"
+              ],
+              "confirmed": [],
+              "added": [
+                "possible_structuring"
+              ],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6292,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          },
+          {
+            "case_id": "case_51ec98e43d3e",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "familiar_merchant",
+              "possible_structuring"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "possible_structuring"
+              ],
+              "confirmed": [],
+              "added": [
+                "possible_structuring"
+              ],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6102,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 67.2,
+        "tokens": 24363
+      },
+      {
+        "persona": "new_phone",
+        "seed": 2,
+        "account_id": "acc_014",
+        "events": 1,
+        "refused": 0,
+        "score": {
+          "persona": "new_phone",
+          "seed": 2,
+          "kind": "fraud",
+          "opened": true,
+          "actions": [
+            "escalate_to_analyst"
+          ],
+          "worst": "escalate_to_analyst",
+          "safe": true,
+          "useful": true,
+          "preferred": true,
+          "recognised": true
+        },
+        "monitor": [
+          {
+            "amount": 18900,
+            "path": "floor",
+            "decision": "opened",
+            "reasons": [
+              "failed_logins",
+              "new_payee_on_unknown_device"
+            ],
+            "case_id": "case_83f2828888b5"
+          }
+        ],
+        "cases": [
+          {
+            "case_id": "case_83f2828888b5",
+            "status": "completed",
+            "action": "escalate_to_analyst",
+            "overridden_by": null,
+            "findings": [
+              "within_normal_range",
+              "failed_auth",
+              "new_beneficiary",
+              "unknown_device"
+            ],
+            "inquiry": {
+              "outcome": "concluded",
+              "trace": [
+                {
+                  "step": 1,
+                  "tool": "get_transaction_history",
+                  "ok": true,
+                  "error_code": null,
+                  "observation": "obs_1"
+                }
+              ],
+              "claimed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "confirmed": [
+                "failed_auth",
+                "new_beneficiary",
+                "unknown_device",
+                "within_normal_range"
+              ],
+              "added": [],
+              "dropped": [],
+              "missed": [],
+              "tokens": 6708,
+              "repairs": 0,
+              "provider": "anthropic"
+            }
+          }
+        ],
+        "seconds": 16.3,
+        "tokens": 6708
+      }
+    ],
+    "summary": {
+      "episodes": 14,
+      "fraud_episodes": 8,
+      "fraud_caught": 8,
+      "fraud_recognised": 8,
+      "honest_episodes": 6,
+      "honest_opened": 3,
+      "honest_restricted": 0,
+      "over_restricted": 0,
+      "by_persona": [
+        {
+          "persona": "honest_routine",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 0,
+          "recognised": 0
+        },
+        {
+          "persona": "honest_big_purchase",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 0,
+          "opened": 2,
+          "recognised": 0
+        },
+        {
+          "persona": "honest_new_payee",
+          "kind": "honest",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 1,
+          "opened": 1,
+          "recognised": 0
+        },
+        {
+          "persona": "takeover",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        },
+        {
+          "persona": "card_testing",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        },
+        {
+          "persona": "structuring",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        },
+        {
+          "persona": "new_phone",
+          "kind": "fraud",
+          "episodes": 2,
+          "safe": 2,
+          "useful": 2,
+          "preferred": 2,
+          "opened": 2,
+          "recognised": 2
+        }
+      ]
+    },
+    "labels": {
+      "honest_routine": {
+        "kind": "honest",
+        "story": "Everyday spending within the customer's habits."
+      },
+      "honest_big_purchase": {
+        "kind": "honest",
+        "story": "One large but ordinary purchase (a phone, a trip), from their own device."
+      },
+      "honest_new_payee": {
+        "kind": "honest",
+        "story": "A normal transfer to someone they have not paid before, from their own device."
+      },
+      "takeover": {
+        "kind": "fraud",
+        "story": "A new device, repeated failed logins, then six quick transfers to new payees."
+      },
+      "card_testing": {
+        "kind": "fraud",
+        "story": "Four tiny online charges to one merchant from an unknown device, then a large one."
+      },
+      "structuring": {
+        "kind": "fraud",
+        "story": "Five cash deposits just under the PKR 300,000 line over a few hours."
+      },
+      "new_phone": {
+        "kind": "fraud",
+        "story": "A new phone, failed logins and a new payee on a modest payment: not a takeover."
+      }
+    }
+  },
+  "provider": "anthropic",
+  "llm_decisions": false,
+  "seconds": 288
+}
