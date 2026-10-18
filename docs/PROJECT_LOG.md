@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - Study guide and a gap found by running it
+- Added `docs/PROJECT_GUIDE.md`: glossary, end-to-end flow, gates, why the dashboard needs a token, every scenario with what it did when run, what the tests prove, and a table of known gaps.
+- **Found by running all scenarios through `CaseService`:** an approved `request_customer_verification` case (scenario D) ends `failed_tool` (`unsupported_action`), because the graph sends every approved case to `execute` and the tool supports only block-card and freeze-account. Not fixed yet; no test approves a Level 3 verification case end to end. Other gaps (modify verdict dead end, expiry only checked on a vote, verifier reuses the finding's own numbers) were read from the code, not run. All are listed in part 12 of the guide.
+- 713 tests pass; no code changed.
+
 ## 2026-10-17 - Capability evidence: baselines, hostile models, hard tier, live model
 - **Why:** 82 of 82 is the expected score on cases built around the thresholds; it shows consistency, not capability, and `escalate_to_analyst` is accepted almost everywhere so passing alone flatters an over-escalating system. Added two stricter measures: **preferred** (the label's first-listed action) and **over-escalated**.
 - **Hard tier:** 16 realistic stories (wedding jewellery, dormant account wake-up, mule cash-out, split transfers, family remittance, small-caps injection, salary cash-out, same payee round amounts...). Labels were written before the first run. First run: 16 of 16 accepted, **11 of 16 match the preferred action**; the 5 misses are the system escalating where watching would do (festival shopping, family remittance, ATM cash-out after salary, round-amount payee) plus a merchant-name injection answered with monitor.

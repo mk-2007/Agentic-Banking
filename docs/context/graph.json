@@ -469,6 +469,13 @@
       "summary": "File-by-file map of a case and where to change things"
     },
     {
+      "id": "doc:project-guide",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/PROJECT_GUIDE.md",
+      "summary": "Study guide: glossary, flow, gates, token frontend, scenarios, tests, known gaps"
+    },
+    {
       "id": "adr:0012",
       "type": "adr",
       "status": "done",
@@ -1144,6 +1151,11 @@
     },
     {
       "from": "doc:code-tour",
+      "to": "module:api",
+      "relation": "documents"
+    },
+    {
+      "from": "doc:project-guide",
       "to": "module:api",
       "relation": "documents"
     },

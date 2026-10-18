@@ -499,6 +499,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | Models | [LLM gateway](docs/llm-gateway.md) · [agents](docs/agents.md) |
 | Orchestration and decisions | [orchestration](docs/orchestration.md) · [decision layer](docs/decision.md) · [live comparison](docs/decision-comparison.md) |
 | Serving it | [HTTP API](docs/api.md) |
+| Start here | [study guide](docs/PROJECT_GUIDE.md): glossary, flow, scenarios, tests, known gaps |
 | Working on it | [AGENTS.md](AGENTS.md) · [workflow](docs/WORKFLOW.md) · [context graph](docs/context/graph.json) |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
