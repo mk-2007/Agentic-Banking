@@ -24,6 +24,7 @@ from nexa.agents.monitor_agent import MonitorAgent  # noqa: E402
 from nexa.api import CaseService, Monitor, create_app, demo_tokens, parse_tokens  # noqa: E402
 from nexa.api.principals import describe  # noqa: E402
 from nexa.config import DEFAULT_THRESHOLDS  # noqa: E402
+from nexa.config.llm import LlmLimits  # noqa: E402
 from nexa.decision import LlmDecisionProvider, RuleBasedDecisionProvider  # noqa: E402
 from nexa.domain.clock import utc_now  # noqa: E402
 from nexa.llm import LlmConfigError, build_gateway, load_dotenv_file  # noqa: E402
@@ -59,7 +60,9 @@ def main() -> int:
     gateway = None
     if args.llm:
         try:
-            gateway = build_gateway(load_dotenv_file(ROOT / ".env"))
+            # free tiers rate-limit by the minute: wait longer and try more before giving up
+            patient = LlmLimits(max_attempts_per_provider=5, max_backoff_seconds=70.0)
+            gateway = build_gateway(load_dotenv_file(ROOT / ".env"), limits=patient)
         except LlmConfigError as error:
             print(f"cannot use the LLM: {error}")
             return 2

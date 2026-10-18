@@ -560,7 +560,7 @@ function meter(n, total, ink, label) {
 async function drawCapability() {
   const st = $("stage"); st.replaceChildren(card("Capability", "--o", h("div", "mono mute", "running the agents, the simple rules and the hostile models on every lab case...")));
   const base = await api("/admin/lab/baselines");   // runs every case first, so load the rest afterwards
-  const [hostile, live] = await Promise.all([api("/admin/lab/hostile"), api("/admin/lab/live"), loadLab()]);
+  const [hostile, live, sim] = await Promise.all([api("/admin/lab/hostile"), api("/admin/lab/live"), api("/admin/lab/sim"), loadLab()]);
   st.replaceChildren();
 
   // 1. the agents against simple rules, on the same cases with the same checks
@@ -598,6 +598,30 @@ async function drawCapability() {
         stat("gates overruled it", String(lv.gate_interventions), "cases", "--p"), stat("rules took over", String(lv.fallbacks), "model down or invalid", "--o")),
       h("p", "mono mute", `${lv.provider} · ${lv.total} cases · ${lv.seconds} s · saved ${lv.saved_at}. A real model proposed; the same hard gates decided; the rules took over when it failed.`))
     : h("div", "", h("p", "", "No live run saved yet. In a terminal, from the project folder:"), h("p", "mono", "python -u scripts/run_lab_live.py"), h("p", "mono mute", "It needs a Groq or Gemini key in .env, takes a while on a free tier, and saves its result here."))));
+  st.append(simCard(sim));
+}
+
+/* ---------- 5 · randomised traffic: honest and fraudulent personas, with and without a model ---------- */
+function simCard(sim) {
+  const title = "5 · Randomised traffic: rules against a model";
+  if (!sim.available || !sim.rules) return card(title, "--p", h("p", "", "No run saved yet. In a terminal, from the project folder:"), h("p", "mono", "python -u scripts/run_sim_eval.py --seeds 2 --llm"), h("p", "mono mute", "Each seed runs seven personas (honest shoppers, an account takeover, card testing, structuring, a new phone) through the customer app path, the monitor and the case graph, and judges the result against a label written first."));
+  const modes = [["Rules, no model", sim.rules], ["With a model in the monitor and the investigator", sim.agentic?.summary ? sim.agentic : null]].filter(([, m]) => m);
+  const tiles = ([name, m]) => { const s = m.summary; return h("div", "", h("p", "mono", name), h("div", "stats",
+    stat("fraud caught", `${s.fraud_caught}/${s.fraud_episodes}`, "a case opened, handled acceptably", "--t"), stat("fraud recognised", `${s.fraud_recognised}/${s.fraud_episodes}`, "a case held the defining finding", "--y"),
+    stat("honest opened", `${s.honest_opened}/${s.honest_episodes}`, "cases opened on genuine customers", "--o"), stat("honest restricted", String(s.honest_restricted), "wrongly restricted or contacted", "--p"))); };
+  const by = (m, p) => m?.summary.by_persona.find(x => x.persona === p);
+  const cell = (m, p) => { const x = by(m, p); return x ? `${x.useful}/${x.episodes} ok · ${x.recognised}/${x.episodes} seen · ${x.opened}/${x.episodes} opened` : "–"; };
+  const personas = sim.rules.summary.by_persona.map(x => x.persona);
+  const t = h("table"); t.append(h("tr", "", ...["Persona", "Kind", "Rules, no model", "With a model"].map(x => h("th", "", x))),
+    ...personas.map(p => h("tr", "", h("td", "", h("b", "", pretty(p)), h("div", "mono mute", sim.rules.labels[p].story)), h("td", "", by(sim.rules, p).kind), h("td", "mono", cell(sim.rules, p)), h("td", "mono", cell(sim.agentic?.summary ? sim.agentic : null, p)))));
+  const cases = (sim.agentic?.episodes || []).flatMap(e => e.cases), inq = cases.map(c => c.inquiry).filter(Boolean), n = f => inq.reduce((a, i) => a + f(i), 0);
+  const ended = o => inq.filter(i => i.outcome === o).length;
+  const notes = sim.agentic?.summary
+    ? h("p", "mono mute", `Investigator over ${inq.length} cases: concluded ${ended("concluded")}, model unavailable ${ended("model_unavailable")}, out of steps ${ended("out_of_steps")} · claimed ${n(i => i.claimed.length)}, confirmed ${n(i => i.confirmed.length)}, added by the model ${n(i => i.added.length)}, dropped by the fact-checker ${n(i => i.dropped.length)}, missed ${n(i => i.missed.length)} · ${n(i => i.tokens).toLocaleString("en-US")} tokens. ${sim.provider} · ${sim.seconds} s · saved ${sim.saved_at}.`)
+    : h("p", "mono mute", sim.agentic?.partial ? `A model run is in progress (${sim.agentic.episodes_done} episodes done).` : "No model run saved yet (add --llm).");
+  return card(title, "--p", h("p", "", "The same random seeds, run twice. Each persona produces different payments every seed, scaled to the account's own habits. Caught = a case was opened and handled acceptably. Recognised = a case held the persona's defining finding: a case can escalate by accident, so this is where a model can beat the rules."),
+    ...modes.map(tiles), t, notes,
+    h("p", "mono mute", "Limits: the personas are our idea of fraud, the labels are our reading of the policy and were written before the first run, and a handful of episodes is a handful of episodes. This shows what the system does on traffic we did not hand-write, not how it performs on a bank's real traffic."));
 }
 
 function empty() { $("stage").replaceChildren(h("div", "card empty", "Load a ", h("span", "", "scenario"), h("br"), "watch the ", h("i", "", "agents"), " work")); }

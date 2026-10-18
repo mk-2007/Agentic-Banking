@@ -11,27 +11,48 @@ Modules:
     baselines  simple rules scored on the same cases, for a fair comparison
     hostile    deliberately misbehaving stand-in models behind the real gates
     live       a real model against the rules, behind the same gates
+    simulator  randomised, labelled personas (honest and fraudulent) and how to judge an episode
 """
 
 from .baselines import BASELINES, BaselineResult, run_baselines
 from .hostile import HostileResult, run_hostile
 from .live import LiveCase, LiveSummary, compare_live
 from .scoring import ArchetypeTally, CaseScore, Check, Scorecard, judge, score_case, scorecard
+from .simulator import (
+    LABELS,
+    PERSONAS,
+    EpisodeScore,
+    Profile,
+    SimEvent,
+    SimSummary,
+    generate,
+    judge_episode,
+    summarise,
+)
 
 __all__ = [
     "BASELINES",
+    "LABELS",
+    "PERSONAS",
     "ArchetypeTally",
     "BaselineResult",
     "CaseScore",
     "Check",
+    "EpisodeScore",
     "HostileResult",
     "LiveCase",
     "LiveSummary",
+    "Profile",
     "Scorecard",
+    "SimEvent",
+    "SimSummary",
     "compare_live",
+    "generate",
     "judge",
+    "judge_episode",
     "run_baselines",
     "run_hostile",
     "score_case",
     "scorecard",
+    "summarise",
 ]

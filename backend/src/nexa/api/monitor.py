@@ -35,7 +35,7 @@ from nexa.config import DEFAULT_THRESHOLDS, FraudThresholds
 
 from .service import CaseService
 
-LINK_WINDOW = timedelta(minutes=30)  # a recent monitor case on the same account absorbs a burst
+LINK_WINDOW = timedelta(hours=4)  # a recent monitor case on the same account absorbs a burst
 HOUR = timedelta(hours=1)
 DAY = timedelta(hours=24)
 
@@ -81,6 +81,7 @@ class MonitorEntry:
     case_id: str | None = None
     case_status: str | None = None
     opened_reasons: frozenset[str] = field(default_factory=frozenset, repr=False)
+    opened_near_line: int = field(default=0, repr=False)
 
 
 def build_digest(
@@ -116,7 +117,9 @@ def build_digest(
         channel=txn.channel.value,
         amount=txn.amount,
         prior_transactions=len(prior),
-        ratio_to_average=round(txn.amount / average, 1) if average and enough else None,
+        ratio_to_average=round(txn.amount / average, 1)
+        if average and enough and txn.direction.value == "debit"
+        else None,
         payments_last_hour=1 + sum(h.occurred_at >= txn.occurred_at - HOUR for h in same_way),
         payments_last_day=1 + len(same_way),
         total_last_day=spent,
@@ -199,13 +202,14 @@ class Monitor:
                 return
         entry.reasons = reasons
 
-        earlier = self._linked(txn, reasons)
+        earlier = self._linked(txn, reasons, digest.near_line_last_day)
         if earlier is not None:
             entry.decision, entry.phase = Decision.LINKED, Phase.DONE
             entry.case_id, entry.case_status = earlier.case_id, earlier.case_status
             return
         entry.phase = Phase.INVESTIGATING
         entry.opened_reasons = frozenset(reasons)
+        entry.opened_near_line = digest.near_line_last_day
         with self._lock:
             self._recent[txn.account_id] = entry
         run = self._service.open_case(
@@ -217,12 +221,20 @@ class Monitor:
         entry.case_id, entry.case_status = run.case.id, run.case.status.value
         entry.decision, entry.phase = Decision.OPENED, Phase.DONE
 
-    def _linked(self, txn: TransactionRecord, reasons: tuple[str, ...]) -> MonitorEntry | None:
-        """Return the recent case that already covers ``reasons`` on this account, if any."""
+    def _linked(
+        self, txn: TransactionRecord, reasons: tuple[str, ...], near_line: int
+    ) -> MonitorEntry | None:
+        """Return the recent case that already covers this payment, if there is one.
+
+        It covers it when it has every reason this payment has and the cluster just under the
+        high-value line has not grown since: a case opened on the second of five deposits could
+        not see the fifth, so a growing cluster gets a case of its own.
+        """
         with self._lock:
             recent = self._recent.get(txn.account_id)
         if recent is None or recent.case_id is None:
             return None
         if txn.occurred_at - recent.observed_at > LINK_WINDOW:
             return None
-        return recent if set(reasons) <= recent.opened_reasons else None
+        covers = set(reasons) <= recent.opened_reasons and near_line <= recent.opened_near_line
+        return recent if covers else None
