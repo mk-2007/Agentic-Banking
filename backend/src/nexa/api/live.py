@@ -102,7 +102,7 @@ class LiveService:
 
         counterparty: str | None = None
         new_payee = False
-        if request.channel == Channel.TRANSFER.value:
+        if request.merchant_category == "transfer":  # a payee exists whatever the channel
             counterparty = request.payee_account or f"name:{request.merchant_name.casefold()}"
             earlier = self._bank.list_transactions(account.id, until=now - NEW_PAYEE_WINDOW)
             new_payee = not any(t.counterparty_id == counterparty for t in earlier)

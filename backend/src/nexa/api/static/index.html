@@ -174,7 +174,7 @@ td { padding:3px 6px; border-bottom:1px dashed #17120f66; vertical-align:top; }
 const $ = id => document.getElementById(id);
 const h = (tag, cls, ...kids) => { const e = document.createElement(tag); if (cls) e.className = cls; e.append(...kids.filter(k => k != null)); return e; };
 const INKS = ["--t", "--b", "--y", "--o", "--p"];
-const S = { token: sessionStorage.getItem("nexa_token") || "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
+const S = { feedTimer: 0, token: sessionStorage.getItem("nexa_token") || "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
   view: null, audit: [], upto: 0, pick: null, timer: null, ui: {} };
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -346,7 +346,7 @@ const CATEGORIES = ["grocery", "dining", "fuel", "pharmacy", "retail", "electron
 const CHANNELS = ["pos", "atm", "card_online", "mobile_app", "web", "transfer"];
 const PRESETS = [
   ["Everyday grocery", { amount: 2500, merchant_name: "Imtiaz Super Market", merchant_category: "grocery", channel: "pos", country: "PK", city: "Karachi", device: "registered", failed_logins: 0, payee_account: "" }],
-  ["Big transfer, new phone", { amount: 60000, merchant_name: "Quick Pay Services", merchant_category: "transfer", channel: "transfer", country: "PK", city: "Karachi", device: "new", failed_logins: 4, payee_account: "PK-NEW-" + Math.floor(Math.random() * 9000 + 1000) }],
+  ["Big transfer, new phone", { amount: 60000, merchant_name: "Quick Pay Services", merchant_category: "transfer", channel: "mobile_app", country: "PK", city: "Karachi", device: "new", failed_logins: 4, payee_account: "PK-NEW-" + Math.floor(Math.random() * 9000 + 1000) }],
 ];
 async function drawApp() {
   let me;
@@ -384,13 +384,35 @@ async function drawApp() {
     card("Recent activity", "--b", ...recent));
 }
 
-const TABS = { employee: [["cases", "Control room"], ["chat", "Ask the bank"]], customer: [["app", "Bank app"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["capability", "Capability"], ["accounts", "Accounts"]] };
+/* ---------- the live feed: every customer payment the monitor reviewed, and what it did ---------- */
+const FEED_CLASS = { cleared: "ok", error: "bad", investigating: "wait", reviewing: "wait" };
+async function drawFeed() {
+  const rows = await api("/monitor/log"), n = k => rows.filter(r => r.decision === k).length;
+  const busy = rows.filter(r => r.phase !== "done").length, chip = (t, c) => h("span", "st " + (c || ""), pretty(t));
+  const body = rows.map(r => {
+    const row = h("div", "row", h("span", "mute mono", r.observed_at.slice(11, 19)), h("b", "mono", money(r.amount)),
+      r.phase === "done" ? chip(r.decision, FEED_CLASS[r.decision]) : chip(r.phase, "wait"),
+      chip(r.path || "…"), h("span", "mono mute", r.reasons.map(pretty).join(", ")),
+      r.case_id ? h("span", "id", r.case_id.replace("case_", "case ") + (r.case_status ? " · " + pretty(r.case_status) : "")) : null);
+    if (r.case_id) row.onclick = guard(async () => { await openTab("cases"); await show(r.case_id, 0); });
+    return row;
+  });
+  const stats = h("div", "stats", stat("reviewed", String(rows.length), "customer payments", "--t"), stat("cleared", String(n("cleared")), "no case", "--b"),
+    stat("opened", String(n("opened")), "new cases", "--o"), stat("linked", String(n("linked")), "to an open case", "--y"), stat("in progress", String(busy), "being investigated", "--p"));
+  $("rail").replaceChildren();
+  $("stage").replaceChildren(card("Live feed · what the monitor did with each payment", "--o", stats,
+    h("p", "mono mute", "Floor = a policy threshold was crossed (always opens a case). Routine = ordinary in every respect (cleared). Model = a model decided the grey zone; if it is down the case opens. Click a row to open its case."),
+    ...(body.length ? body : [h("p", "mute", "No payments yet. Sign in as the customer in another window and make one.")])));
+}
+
+const TABS = { employee: [["cases", "Control room"], ["feed", "Live feed"], ["chat", "Ask the bank"]], customer: [["app", "Bank app"], ["chat", "Ask the bank"]], auditor: [["lab", "Lab scorecard"], ["capability", "Capability"], ["accounts", "Accounts"]] };
 function drawTabs() {
   const tabs = $("tabs"); tabs.replaceChildren();
   (TABS[S.mode] || []).forEach(([k, label]) => { const b = h("button", S.tab === k ? "on" : "", label); b.onclick = guard(() => openTab(k)); tabs.append(b); });
 }
 async function openTab(k) {
-  S.tab = k; drawTabs();
+  clearInterval(S.feedTimer); S.tab = k; drawTabs();
+  if (k === "feed") { await drawFeed(); S.feedTimer = setInterval(() => drawFeed().catch(() => {}), 4000); return; }
   if (k === "app") return drawApp();
   if (k === "chat") return drawChat();
   if (k === "cases") { drawRail(); if (S.view) { build(); paint(); } else empty(); return; }

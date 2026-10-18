@@ -121,6 +121,21 @@ class PaymentView(BaseModel):
     account_status: str
 
 
+class MonitorEntryView(BaseModel):
+    """One payment the monitor reviewed: codes and ids only, never merchant text."""
+
+    transaction_id: str
+    account_id: str
+    amount: int
+    observed_at: datetime
+    phase: str
+    decision: str | None
+    path: str | None
+    reasons: list[str]
+    case_id: str | None
+    case_status: str | None
+
+
 class ScenarioView(BaseModel):
     """A sample alert from the synthetic scenarios, ready to open as a case."""
 

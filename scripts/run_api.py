@@ -20,8 +20,10 @@ import uvicorn
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend" / "src"))
 
-from nexa.api import CaseService, create_app, demo_tokens, parse_tokens  # noqa: E402
+from nexa.agents.monitor_agent import MonitorAgent  # noqa: E402
+from nexa.api import CaseService, Monitor, create_app, demo_tokens, parse_tokens  # noqa: E402
 from nexa.api.principals import describe  # noqa: E402
+from nexa.config import DEFAULT_THRESHOLDS  # noqa: E402
 from nexa.decision import LlmDecisionProvider, RuleBasedDecisionProvider  # noqa: E402
 from nexa.domain.clock import utc_now  # noqa: E402
 from nexa.llm import LlmConfigError, build_gateway, load_dotenv_file  # noqa: E402
@@ -32,6 +34,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--demo", action="store_true", help="create random demo tokens")
     parser.add_argument("--llm", action="store_true", help="use the LLM decision provider")
+    parser.add_argument("--no-monitor", action="store_true", help="do not review customer payments")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
@@ -66,7 +69,14 @@ def main() -> int:
         print("decision provider: rules")
 
     service = CaseService(provider=provider, gateway=gateway)
-    uvicorn.run(create_app(service, tokens), host=args.host, port=args.port, log_level="info")
+    monitor = None
+    if not args.no_monitor:
+        agent = MonitorAgent(gateway, DEFAULT_THRESHOLDS)
+        monitor = Monitor(service.bank, service, agent)
+        print("monitor: on (every customer payment is reviewed in the background)")
+    uvicorn.run(
+        create_app(service, tokens, monitor=monitor), host=args.host, port=args.port, log_level="info"
+    )
     return 0
 
 
