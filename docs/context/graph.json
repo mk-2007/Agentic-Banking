@@ -502,6 +502,13 @@
       "status": "done",
       "path": "docs/adr/0015-the-monitor-a-model-may-open-a-case-but-never-clear-a-threshold.md",
       "summary": "The monitor reviews every payment: a threshold crossing always opens a case, routine is cleared, a model decides the grey zone and a failed model opens the case"
+    },
+    {
+      "id": "adr:0016",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0016-evaluate-on-randomised-labelled-traffic-with-and-without-a-model.md",
+      "summary": "Randomised labelled personas run through the real path, with and without a model; caught versus recognised versus safe"
     }
   ],
   "edges": [
@@ -1223,6 +1230,11 @@
     {
       "from": "adr:0015",
       "to": "module:api",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0016",
+      "to": "module:evaluation",
       "relation": "decides"
     }
   ]

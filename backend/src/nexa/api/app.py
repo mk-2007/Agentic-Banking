@@ -14,6 +14,7 @@ a voter is and which role they vote as come from their token, never from the req
     GET  /app/me, POST /app/payments   the customer's accounts and payments         (customer)
     GET  /monitor/log           payments the monitor reviewed and what it did   (employee)
     GET  /admin/...             lab cases, run, scorecard, reports, accounts (auditor only)
+    GET  /admin/lab/sim         the saved randomised-traffic run: rules against a model (auditor)
     GET  /health                liveness, no authentication
     GET  /                      the dashboard page (static; every call it makes needs a token)
 """
@@ -45,6 +46,7 @@ from .lab import (
     LabService,
     LiveView,
     ScorecardView,
+    SimView,
     UnknownLabCaseError,
 )
 from .live import LiveService, NotYourAccountError
@@ -299,6 +301,11 @@ def create_app(
     def lab_live(who: Auditor, lab: Lab) -> LiveView:
         """Return the latest saved comparison of a real model against the rules, if one was run."""
         return lab.live()
+
+    @app.get("/admin/lab/sim")
+    def lab_sim(who: Auditor, lab: Lab) -> SimView:
+        """Return the latest saved randomised-traffic run (rules against a model)."""
+        return lab.sim()
 
     @app.get("/admin/accounts")
     def admin_accounts(who: Auditor, lab: Lab) -> list[AccountRow]:

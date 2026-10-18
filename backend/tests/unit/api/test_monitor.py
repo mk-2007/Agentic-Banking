@@ -312,3 +312,19 @@ def test_listing_and_voting_work_while_another_case_is_still_being_investigated(
         release.set()
         worker.join(timeout=30)
     assert len(service.all_runs()) == 1
+
+
+def test_a_growing_cluster_under_the_line_gets_a_case_each_time_it_grows() -> None:
+    s = Setup(None)  # no model: every grey-zone payment opens a case, so linking is what is tested
+    t0 = s.clock.now
+    outcomes = []
+    for i in range(4):
+        deposit = make(
+            s.service, 200 + i, 190_000, occurred_at=t0 + timedelta(minutes=10 * i),
+            direction=Direction.CREDIT, channel=Channel.ATM, device_trusted=False,
+        )  # fmt: skip
+        s.service.bank.add_transaction(deposit)
+        s.monitor.watch(deposit)
+        outcomes.append(s.last().decision.value)  # type: ignore[union-attr]
+    assert outcomes == ["opened", "opened", "opened", "opened"]  # each saw a bigger cluster
+    assert len(s.service.all_runs()) == 4

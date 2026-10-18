@@ -14,6 +14,7 @@ import threading
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -277,6 +278,25 @@ class LiveView(BaseModel):
     cases: list[LiveCaseView] = []
 
 
+class SimView(BaseModel):
+    """A saved randomised-traffic run: the same seeds without a model and with one."""
+
+    available: bool
+    saved_at: str = ""
+    complete: bool = False
+    provider: str | None = None
+    llm_decisions: bool = False
+    seconds: float = 0.0
+    seeds: list[int] = []
+    rules: dict[str, Any] | None = None
+    agentic: dict[str, Any] | None = None
+
+
+def sim_results_path() -> Path:
+    """Where the latest randomised-traffic run is saved: ``data/lab_results/sim.json``."""
+    return default_data_dir().parent / "lab_results" / "sim.json"
+
+
 def live_results_path() -> Path:
     """Where the latest live-model comparison is saved: ``data/lab_results/live.json``."""
     return default_data_dir().parent / "lab_results" / "live.json"
@@ -491,6 +511,15 @@ class LabService:
             )  # fmt: skip
             for r in run_hostile(self.finished_runs(), self._clock)
         ]
+
+    def sim(self) -> SimView:
+        """Return the latest saved randomised-traffic run, or ``available=False``."""
+        path = sim_results_path()
+        if not path.exists():
+            return SimView(available=False)
+        data = json.loads(path.read_text(encoding="utf-8"))
+        keep = {k: v for k, v in data.items() if k in SimView.model_fields}
+        return SimView(available=True, **keep)
 
     def live(self) -> LiveView:
         """Return the latest saved live-model comparison, or ``available=False`` if none was run."""

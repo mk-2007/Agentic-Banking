@@ -30,6 +30,7 @@ audit log, and demo tokens change on every start.
 | `GET /admin/lab/cases/{id}` | auditor | one case's report: label, run, audit chain and account profile |
 | `GET /admin/lab/baselines` | auditor | the agents and five simple rules scored on the same cases with the same checks |
 | `GET /admin/lab/hostile` | auditor | misbehaving stand-in models behind the real gates: unsafe if accepted versus unsafe after the gates |
+| `GET /admin/lab/sim` | auditor | the saved randomised-traffic run: the same seeds without a model and with one (`python scripts/run_sim_eval.py --llm`) |
 | `GET /admin/lab/live` | auditor | the latest saved run of a real model against the rules (`python scripts/run_lab_live.py`), or `available: false` |
 | `GET /admin/accounts`, `GET /admin/accounts/{id}` | auditor | every synthetic account; one profile (no merchant names or memos) |
 
