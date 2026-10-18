@@ -39,7 +39,7 @@
 ```bash
 pip install -e "backend[dev]"
 python scripts/run_api.py --demo      # prints sign-in tokens; open http://127.0.0.1:8000
-python scripts/run_api.py --demo --llm  # the same, with a model investigating (needs a key in .env)
+python scripts/run_api.py --demo --llm  # the same, with a model monitoring and investigating (needs a key in .env)
 ```
 
 Paste the analyst token, open a sample case (or paste the **auditor** token for the evaluation lab: run 98 labelled cases, compare the agents with simple rules and hostile models, and read a report per account), and watch it go from alert to evidence to a recommendation. For the
@@ -87,7 +87,7 @@ flowchart LR
 
 ## Agentic mode: live payments, a model that investigates, code that checks it
 
-Start the API with a model (`python scripts/run_api.py --demo --llm`) and the platform stops being a pipeline you push
+Start the API with a model (`python scripts/run_api.py --demo --llm`; the rules and gates still decide, add `--llm-decisions` to let the model rank too) and the platform stops being a pipeline you push
 a button on. A customer pays in the app; the system notices, investigates and acts; people sign only for what is serious.
 
 ```mermaid
@@ -574,6 +574,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | Orchestration and decisions | [orchestration](docs/orchestration.md) · [decision layer](docs/decision.md) · [live comparison](docs/decision-comparison.md) |
 | Serving it | [HTTP API](docs/api.md) |
 | Start here | [study guide](docs/PROJECT_GUIDE.md): glossary, flow, scenarios, tests, known gaps |
+| Presenting | [run it yourself and present it](docs/RUN_AND_PRESENT.md): setup, the live demo, the talk track, likely questions |
 | Working on it | [AGENTS.md](AGENTS.md) · [workflow](docs/WORKFLOW.md) · [context graph](docs/context/graph.json) |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>

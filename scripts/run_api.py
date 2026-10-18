@@ -3,7 +3,9 @@
     python scripts/run_api.py --demo            # random demo tokens, printed once at start-up
     NEXA_API_TOKENS="tok1:ana:fraud_analyst,tok2:rob:risk_officer,tok3:ayesha:customer:cust_010" \
         python scripts/run_api.py                # your own tokens (never put them in the repo)
-    python scripts/run_api.py --demo --llm      # model investigates and decides (rules as fallback)
+    python scripts/run_api.py --demo --llm      # a model monitors and investigates; rules and gates decide
+    python scripts/run_api.py --demo --llm --providers anthropic,gemini   # choose the model order
+    python scripts/run_api.py --demo --llm --llm-decisions   # the model also ranks the actions
 
 Everything is in memory: restarting forgets cases, approvals and the audit log, and the demo tokens
 change. Run it from the repository root with ``pip install -e backend`` done. Interactive docs are
@@ -34,7 +36,9 @@ def main() -> int:
     """Build the service and serve it. Returns a non-zero code when it cannot start."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--demo", action="store_true", help="create random demo tokens")
-    parser.add_argument("--llm", action="store_true", help="use the LLM decision provider")
+    parser.add_argument("--llm", action="store_true", help="a model monitors and investigates")
+    parser.add_argument("--llm-decisions", action="store_true", help="the model also ranks the actions")
+    parser.add_argument("--providers", default=None, help="model order, e.g. anthropic,gemini")
     parser.add_argument("--no-monitor", action="store_true", help="do not review customer payments")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
@@ -62,12 +66,17 @@ def main() -> int:
         try:
             # free tiers rate-limit by the minute: wait longer and try more before giving up
             patient = LlmLimits(max_attempts_per_provider=5, max_backoff_seconds=70.0)
-            gateway = build_gateway(load_dotenv_file(ROOT / ".env"), limits=patient)
+            env = load_dotenv_file(ROOT / ".env")
+            if args.providers:
+                env["NEXA_LLM_PROVIDERS"] = args.providers
+            gateway = build_gateway(env, limits=patient)
         except LlmConfigError as error:
             print(f"cannot use the LLM: {error}")
             return 2
-        provider = LlmDecisionProvider(gateway, utc_now, RuleBasedDecisionProvider(utc_now))
-        print(f"decision provider: llm ({', '.join(gateway.provider_names)}), rules as fallback")
+        if args.llm_decisions:
+            provider = LlmDecisionProvider(gateway, utc_now, RuleBasedDecisionProvider(utc_now))
+        print(f"model: {', '.join(gateway.provider_names)} (monitor and investigator)")
+        print("decision provider:", "llm, rules as fallback" if args.llm_decisions else "rules and gates")
     else:
         print("decision provider: rules")
 
