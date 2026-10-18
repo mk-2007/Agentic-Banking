@@ -185,7 +185,7 @@ def test_the_bank_not_the_customer_decides_whether_the_device_is_registered(
 def test_a_payee_is_new_until_it_has_been_paid_before_the_last_day(
     client: TestClient, service: CaseService, clock: Clock
 ) -> None:
-    transfer = {"channel": "transfer", "merchant_category": "transfer", "payee_account": "PK-77"}
+    transfer = {"channel": "mobile_app", "merchant_category": "transfer", "payee_account": "PK-77"}
     first = service.bank.get_transaction(pay(client, **transfer)["transaction_id"])
     clock.now += timedelta(hours=1)
     again = service.bank.get_transaction(pay(client, **transfer)["transaction_id"])
@@ -193,7 +193,7 @@ def test_a_payee_is_new_until_it_has_been_paid_before_the_last_day(
     later = service.bank.get_transaction(pay(client, **transfer)["transaction_id"])
     assert first.is_new_beneficiary and again.is_new_beneficiary and not later.is_new_beneficiary
     shop = service.bank.get_transaction(pay(client)["transaction_id"])
-    assert not shop.is_new_beneficiary  # only transfers have beneficiaries
+    assert not shop.is_new_beneficiary  # only transfers have payees
 
 
 def test_a_frozen_account_refuses_payments_and_an_overdraft_is_refused(

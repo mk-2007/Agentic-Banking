@@ -495,6 +495,13 @@
       "status": "done",
       "path": "docs/adr/0014-a-model-investigates-and-code-checks-what-it-claims.md",
       "summary": "A model investigator proposes findings; code fact-checks them against what it saw; it may add, never remove or invent"
+    },
+    {
+      "id": "adr:0015",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0015-the-monitor-a-model-may-open-a-case-but-never-clear-a-threshold.md",
+      "summary": "The monitor reviews every payment: a threshold crossing always opens a case, routine is cleared, a model decides the grey zone and a failed model opens the case"
     }
   ],
   "edges": [
@@ -1207,6 +1214,16 @@
       "from": "adr:0014",
       "to": "module:tools",
       "relation": "constrains"
+    },
+    {
+      "from": "adr:0015",
+      "to": "module:agents",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0015",
+      "to": "module:api",
+      "relation": "decides"
     }
   ]
 }

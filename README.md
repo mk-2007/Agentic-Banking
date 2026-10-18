@@ -492,6 +492,7 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | [0012](docs/adr/0012-capability-evidence-baselines-hostile-models-and-a-hard-tier.md) | Capability evidence: baselines, hostile models, a hard tier |
 | [0013](docs/adr/0013-every-action-is-carried-out-by-a-guarded-tool.md) | Every action in the closed set is carried out by a guarded tool |
 | [0014](docs/adr/0014-a-model-investigates-and-code-checks-what-it-claims.md) | A model investigates, and code checks what it claims |
+| [0015](docs/adr/0015-the-monitor-a-model-may-open-a-case-but-never-clear-a-threshold.md) | The monitor: a model may open a case, never clear a threshold crossing |
 
 ## Documentation
 

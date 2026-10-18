@@ -121,11 +121,19 @@ class CaseService:
             approvals=self.approvals,
         )
         self._runs: dict[str, CaseRun] = {}
+        # Guards _runs and _case_locks and is never held while a case runs, so a slow
+        # investigation does not stop anyone listing cases or voting on another one. Each case
+        # runs under its own lock.
         self._lock = threading.Lock()
+        self._case_locks: dict[str, threading.Lock] = {}
 
     def now(self) -> datetime:
         """Return the service's current time (the clock cases and approvals use)."""
         return self._clock()
+
+    def _case_lock(self, case_id: str) -> threading.Lock:
+        with self._lock:
+            return self._case_locks.setdefault(case_id, threading.Lock())
 
     # --- cases -----------------------------------------------------------------------------
     def open_case(
@@ -146,38 +154,57 @@ class CaseService:
             raised_at=now,
         )
         case = Case(id=new_id("case"), alert=alert, created_at=now, updated_at=now)
-        with self._lock:
-            self._scopes.scopes[case.id] = CaseScope(
-                case_id=case.id, customer_id=customer_id, account_ids=(account_id,)
-            )
+        self._scopes.scopes[case.id] = CaseScope(
+            case_id=case.id, customer_id=customer_id, account_ids=(account_id,)
+        )
+        with self._case_lock(case.id):
             run = run_case(case, self._ctx, graph=self._graph, thread_id=case.id)
+        with self._lock:
             self._runs[case.id] = run
         return run
 
     def _sweep(self) -> None:
-        """Time out cases whose approval ran out while nobody voted. Call with the lock held.
+        """Time out cases whose approval ran out while nobody voted.
 
         The approval rule only runs when votes arrive, so without this a case nobody votes on would
-        wait forever. Resuming with no votes lets the same rule see that the request has expired.
+        wait forever. Resuming with no votes lets the same rule see that the request has expired. A
+        case that is being voted on right now is left for the next sweep.
         """
         now = self._clock()
-        for case_id, run in list(self._runs.items()):
-            request = run.approval_request
-            if run.awaiting_approval and request is not None and now >= request.expires_at:
-                self._runs[case_id] = resume_case(self._graph, case_id, [])
+        with self._lock:
+            due = [
+                case_id
+                for case_id, run in self._runs.items()
+                if run.awaiting_approval
+                and run.approval_request is not None
+                and now >= run.approval_request.expires_at
+            ]
+        for case_id in due:
+            lock = self._case_lock(case_id)
+            if not lock.acquire(blocking=False):
+                continue
+            try:
+                with self._lock:
+                    current = self._runs[case_id]
+                if current.awaiting_approval:
+                    updated = resume_case(self._graph, case_id, [])
+                    with self._lock:
+                        self._runs[case_id] = updated
+            finally:
+                lock.release()
 
     def get(self, case_id: str) -> CaseRun:
         """Return the latest run of a case."""
+        self._sweep()
         with self._lock:
-            self._sweep()
             if case_id not in self._runs:
                 raise CaseNotFoundError(case_id)
             return self._runs[case_id]
 
     def all_runs(self) -> list[CaseRun]:
-        """Every case, oldest first."""
+        """Every finished or paused case, in the order each last settled."""
+        self._sweep()
         with self._lock:
-            self._sweep()
             return list(self._runs.values())
 
     def pending(self) -> list[CaseRun]:
@@ -186,8 +213,9 @@ class CaseService:
 
     def vote(self, case_id: str, who: Principal, verdict: Verdict, comment: str = "") -> CaseRun:
         """Record ``who``'s verdict and continue the case. Identity and role come from ``who``."""
-        with self._lock:
-            run = self._runs.get(case_id)
+        with self._case_lock(case_id):
+            with self._lock:
+                run = self._runs.get(case_id)
             if run is None:
                 raise CaseNotFoundError(case_id)
             if not run.awaiting_approval or run.approval_request is None:
@@ -201,7 +229,8 @@ class CaseService:
                 decided_at=self._clock(),
             )
             run = resume_case(self._graph, case_id, [ballot])
-            self._runs[case_id] = run
+            with self._lock:
+                self._runs[case_id] = run
             return run
 
     def audit(self, case_id: str) -> tuple[AuditEvent, ...]:

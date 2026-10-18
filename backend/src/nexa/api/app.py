@@ -12,6 +12,7 @@ a voter is and which role they vote as come from their token, never from the req
     POST /chat                  answer from the knowledge base              (customer or employee)
     GET  /scenarios             sample alerts to open cases from            (employee)
     GET  /app/me, POST /app/payments   the customer's accounts and payments         (customer)
+    GET  /monitor/log           payments the monitor reviewed and what it did   (employee)
     GET  /admin/...             lab cases, run, scorecard, reports, accounts (auditor only)
     GET  /health                liveness, no authentication
     GET  /                      the dashboard page (static; every call it makes needs a token)
@@ -47,6 +48,7 @@ from .lab import (
     UnknownLabCaseError,
 )
 from .live import LiveService, NotYourAccountError
+from .monitor import Monitor
 from .principals import Principal
 from .schemas import (
     AppMeView,
@@ -55,6 +57,7 @@ from .schemas import (
     CaseView,
     ChatRequest,
     ChatResponse,
+    MonitorEntryView,
     OpenCaseRequest,
     PassageView,
     PaymentRequest,
@@ -68,11 +71,15 @@ from .service import CaseNotFoundError, CaseService, InvalidAlertError, NotWaiti
 
 
 def create_app(
-    service: CaseService, principals: Mapping[str, Principal], lab: LabService | None = None
+    service: CaseService,
+    principals: Mapping[str, Principal],
+    lab: LabService | None = None,
+    monitor: Monitor | None = None,
 ) -> FastAPI:
     """Build the API around ``service``. ``principals`` maps bearer tokens to callers.
 
-    ``lab`` is the auditor's evaluation lab; it is built on first use if not given.
+    ``lab`` is the auditor's evaluation lab; it is built on first use if not given. With a
+    ``monitor`` every payment made in the customer app is reviewed in the background.
     """
     app = FastAPI(title="NexaBank Agentic Platform", version="0.1.0")
     lab_box: list[LabService] = [lab] if lab else []
@@ -220,14 +227,36 @@ def create_app(
         """Make a payment from one of the customer's own accounts."""
         assert who.customer_id is not None
         try:
-            _, view = live.pay(who.customer_id, body)
+            record, view = live.pay(who.customer_id, body)
         except RecordNotFoundError as error:
             raise HTTPException(status.HTTP_404_NOT_FOUND, str(error)) from None
         except NotYourAccountError:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "not your account") from None
         except (AccountFrozenError, InsufficientFundsError) as error:
             raise HTTPException(status.HTTP_409_CONFLICT, str(error)) from None
+        if monitor is not None:
+            monitor.watch(record)  # reviewed in the background; the payment is already posted
         return view
+
+    @app.get("/monitor/log")
+    def monitor_log(who: Employee) -> list[MonitorEntryView]:
+        """Return every payment the monitor reviewed, newest first (empty if it is off)."""
+        entries = monitor.entries() if monitor is not None else []
+        return [
+            MonitorEntryView(
+                transaction_id=e.transaction_id,
+                account_id=e.account_id,
+                amount=e.amount,
+                observed_at=e.observed_at,
+                phase=e.phase.value,
+                decision=e.decision.value if e.decision else None,
+                path=e.path.value if e.path else None,
+                reasons=list(e.reasons),
+                case_id=e.case_id,
+                case_status=e.case_status,
+            )
+            for e in entries
+        ]
 
     # --- the auditor's lab -------------------------------------------------------------------
     @app.get("/admin/lab/cases")
