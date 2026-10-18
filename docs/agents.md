@@ -43,6 +43,13 @@ observed history; it cannot remove a finding or invent one. A missing, failing o
 baseline. The run leaves an `InquiryReport` (lookups, claimed, confirmed, added, dropped, missed) on the case and one
 audit line. Live runs on Groq and Gemini are in `docs/PROJECT_LOG.md`.
 
+## The monitor agent (ADR 0015)
+
+`MonitorAgent` triages the payments that are neither clearly routine nor clearly alarming. It reads a typed
+`TransactionDigest` (counts, ratios and flags, never text), answers `{open_case, reason}` with a reason from a closed list,
+and a missing or invalid model means the case is opened. Thresholds crossed (the floor) always open a case and routine
+payments are cleared without it; both are plain code in `monitor_agent.py`, and the model cannot override either.
+
 ## Why most of it is plain code
 
 Thresholds are policy (NB-POL-FRAUD-001, NB-POL-AML-001), mirrored in `FraudThresholds`, and a test keeps

@@ -21,6 +21,7 @@ audit log, and demo tokens change on every start.
 | `GET /approvals/pending` | employee | cases waiting for votes |
 | `POST /cases/{id}/votes` | employee | cast `approve`, `reject`, `escalate` or `modify` and continue the case |
 | `POST /chat` | customer or employee | cited passages from the knowledge base |
+| `GET /monitor/log` | employee | every customer payment the monitor reviewed: path (floor, routine, model), reasons, decision, case |
 | `GET /app/me` | customer (linked to a bank customer) | the customer's own accounts and recent transactions |
 | `POST /app/payments` | customer (linked) | pay from one of the customer's own accounts; the bank posts it |
 | `GET /admin/lab/cases` | auditor | the 98 labelled lab cases with their latest score |
@@ -37,6 +38,13 @@ Employees are the fraud analyst, risk officer and compliance officer roles. A cu
 ## The customer app
 
 `POST /app/payments` is how live data enters the bank. The body is what a customer would type (amount, payee, category, channel, country, city, optional payee account) plus two controls that stand in for the bank's own sensors: `device` (registered or new) and `failed_logins`. Everything else is decided by the bank, never asked: whether the device is trusted (the customer's registered device list), whether the payee is a new beneficiary (not paid before the last 24 hours), the timestamp and the id. A customer can only pay from their own accounts (403 otherwise); a frozen account or an overdraft is refused (409); unknown fields such as a memo or `is_new_beneficiary` are rejected (422). A freeze decided by a case is therefore visible straight away: the same customer's next payment is refused.
+
+## The monitor
+
+Started by `scripts/run_api.py` (turn it off with `--no-monitor`), the `Monitor` reviews each payment made in the customer app
+after it is posted, on a background worker, so the customer is answered at once. See ADR 0015: a payment over a policy threshold
+always opens a case, an ordinary one is cleared, and a model decides the rest (and a failed model opens the case). The dashboard's
+Live feed tab shows each decision and links to the case.
 
 ## Rules this layer keeps
 

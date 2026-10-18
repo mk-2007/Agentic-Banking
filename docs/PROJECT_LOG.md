@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - The monitor: the system notices payments and opens cases itself (ADR 0015)
+- **Why:** cases still came from a button. Live payments need something watching them.
+- **Done:** `MonitorAgent` plus `Monitor`: every customer payment is reviewed in the background from a typed digest. Floor (a policy threshold crossed: always opens a case), routine (ordinary: cleared) and a grey zone decided by a model with a closed list of reasons; a missing or failing model opens the case. Bursts link to the open case; a new reason opens another. `GET /monitor/log` and a Live feed tab. `CaseService` now locks per case, so a slow investigation no longer freezes listing or voting.
+- **Fix:** a payee is now tracked by category (a transfer made in the app is a `mobile_app` payment), not by the `transfer` channel.
+- **Tests:** `test_monitor.py` (20): ordinary cleared with no model, a threshold always opens even against a model that would clear it, a model decides the grey zone and gives a reason, no or bad model opens, a burst is one case until a new reason, a failing review never fails the payment, the log is employee-only and text-free, the digest holds no text, the model prompt carries no merchant text, and listing cases while another is still being investigated.
+- **Browser (headless Chrome):** a customer paid PKR 2,500 (cleared as routine) and PKR 60,000 on a new phone with failed logins (floor: case opened and completed); the analyst's Live feed showed both and a click opened the case.
+
 ## 2026-10-18 - A model investigates; code checks what it claims (ADR 0014)
 - **Why:** analysis was fixed arithmetic, so nothing chose what to look at or found a pattern the rules lack.
 - **Done:** new role `investigator_agent`; `InvestigatorAgent` (a bounded lookup-and-conclude loop through the tool layer), `AgenticAnalysis` (baseline always runs; claims fact-checked against only what the model looked at; the model may add `possible_structuring`, never remove or invent), `InquiryReport` on the case, in the API (`inquiry`) and as one audit line. Merchant names become opaque refs; memos are dropped; a test proves no merchant text reaches a prompt. New indicator `possible_structuring` with thresholds and a policy section (NB-POL-AML-001 section 6) and an escalate rule. Also fixed: `get_transaction_history` read a bare date as naive and crashed (`internal_error`); it is now read as UTC.
