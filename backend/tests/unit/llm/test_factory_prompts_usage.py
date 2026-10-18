@@ -33,6 +33,15 @@ def test_providers_are_built_in_listed_order_when_keys_exist() -> None:
     assert names({**both, "NEXA_LLM_PROVIDERS": "gemini,groq"}) == ["gemini", "groq"]
 
 
+def test_claude_is_used_only_when_it_is_named_and_has_a_key() -> None:
+    keys = {"GROQ_API_KEY": "a", "ANTHROPIC_API_KEY": "c"}
+    assert names(keys) == ["groq"]  # not in the default order, so it can never spend by accident
+    assert names({**keys, "NEXA_LLM_PROVIDERS": "anthropic,groq"}) == ["anthropic", "groq"]
+    assert names({"NEXA_LLM_PROVIDERS": "anthropic"}) == []  # named but no key: skipped
+    claude = build_providers({"ANTHROPIC_API_KEY": "c", "NEXA_LLM_PROVIDERS": "anthropic"})[0]
+    assert claude.model == "claude-haiku-5-5"
+
+
 def test_a_single_key_is_enough() -> None:
     assert names({"GEMINI_API_KEY": "b"}) == ["gemini"]
 
