@@ -67,6 +67,7 @@ def build_providers(
                 api_key=key,
                 model=_model_id(env.get(preset.model_env, "").strip() or preset.default_model),
                 json_mode=preset.json_mode,
+                send_temperature=preset.send_temperature,
                 timeout_seconds=limits.request_timeout_seconds,
                 client=client_factory() if client_factory else None,
             )

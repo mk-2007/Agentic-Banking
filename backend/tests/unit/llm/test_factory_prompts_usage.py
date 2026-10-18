@@ -4,7 +4,7 @@ import pytest
 
 from nexa.llm import LlmConfigError, build_gateway, load_dotenv_file, wrap_untrusted
 from nexa.llm.factory import build_providers
-from nexa.llm.messages import LlmResponse, TokenUsage
+from nexa.llm.messages import ChatMessage, LlmRequest, LlmResponse, Role, TokenUsage
 from nexa.llm.usage import UsageLedger, cost_usd
 
 
@@ -40,6 +40,14 @@ def test_claude_is_used_only_when_it_is_named_and_has_a_key() -> None:
     assert names({"NEXA_LLM_PROVIDERS": "anthropic"}) == []  # named but no key: skipped
     claude = build_providers({"ANTHROPIC_API_KEY": "c", "NEXA_LLM_PROVIDERS": "anthropic"})[0]
     assert claude.model == "claude-haiku-5-5"
+    sent = claude._body(
+        LlmRequest(messages=(ChatMessage(role=Role.USER, content="hi"),)), use_json_mode=False
+    )  # type: ignore[attr-defined]
+    assert "temperature" not in sent  # the current Claude models reject it
+    other = build_providers({"GROQ_API_KEY": "a"})[0]
+    assert "temperature" in other._body(
+        LlmRequest(messages=(ChatMessage(role=Role.USER, content="hi"),)), use_json_mode=False
+    )  # type: ignore[attr-defined]
 
 
 def test_a_single_key_is_enough() -> None:
