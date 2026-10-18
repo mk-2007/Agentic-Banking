@@ -9,6 +9,23 @@ Read in order the first time. Part 12 is the list of gaps found while writing th
 
 ---
 
+## 0. What changed on 2026-10-18 (read this first)
+
+Part 3 below asked "is it really agentic?" and answered "partly". It is now more so. The rest of the guide still describes
+the case flow correctly; these are the additions (details in the ADRs):
+
+| New | What it does | ADR |
+|---|---|---|
+| Actions that run | Every action in the closed set is carried out by a guarded tool; Level 1-2 run by policy; the approved-verification bug is fixed | [0013](adr/0013-every-action-is-carried-out-by-a-guarded-tool.md) |
+| Customer app and live bank | A customer pays from their own account; the bank decides device trust and whether a payee is new | `docs/api.md` |
+| Investigator | A model asks for records and proposes findings; code checks each claim against what it saw; it may add `possible_structuring` | [0014](adr/0014-a-model-investigates-and-code-checks-what-it-claims.md) |
+| Monitor | Every payment is reviewed: a threshold always opens a case, ordinary is cleared, a model decides the grey zone | [0015](adr/0015-the-monitor-a-model-may-open-a-case-but-never-clear-a-threshold.md) |
+| Randomised traffic | Seven personas, with and without a model; "caught" versus "recognised" | [0016](adr/0016-evaluate-on-randomised-labelled-traffic-with-and-without-a-model.md) |
+| Claude as a provider | Opt-in through `NEXA_LLM_PROVIDERS`, for the final run | `docs/llm-gateway.md` |
+
+Authorization is still plain code, approvals are still single-use, and a model still only proposes. Nothing in section 7 was
+relaxed.
+
 ## 1. What problem this solves, in plain words
 
 A bank's fraud desk gets alerts: "this payment looks odd". Today, a human analyst opens six screens, looks
@@ -67,7 +84,9 @@ The honest answer is **partly, by design**. This is the most likely technical ch
 | Component | Uses an AI model? | What it is |
 |---|---|---|
 | Data agent | No | Calls read tools, builds a "dossier" of typed facts. |
-| Analysis agent | No | Arithmetic over the customer's history against policy thresholds (`analysis_agent.py`). |
+| Analysis agent | No | Arithmetic over the customer's history against policy thresholds (`analysis_agent.py`). With `--llm` it is joined by the investigator below, and the baseline always still runs. |
+| Investigator | **Yes**, with `--llm` | Asks for records one at a time through the tool layer and proposes findings; a fact-checker (code) confirms or drops each claim. Never sees merchant text. |
+| Monitor | **Optional** | Reviews each payment. Thresholds and the routine rule are code; a model decides only the grey zone, and a failed model opens the case. |
 | Policy agent | **Optional** | Searches policy passages by tool. A model may *narrow* the list, but can only pick refs the search returned. If the model fails, all retrieved clauses are kept. |
 | Verification agent | No | Recomputes each finding from its recorded numbers. |
 | Decision provider (rules) | No | Seven fixed rules. This is the default and the fallback. |

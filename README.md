@@ -39,6 +39,7 @@
 ```bash
 pip install -e "backend[dev]"
 python scripts/run_api.py --demo      # prints sign-in tokens; open http://127.0.0.1:8000
+python scripts/run_api.py --demo --llm  # the same, with a model investigating (needs a key in .env)
 ```
 
 Paste the analyst token, open a sample case (or paste the **auditor** token for the evaluation lab: run 98 labelled cases, compare the agents with simple rules and hostile models, and read a report per account), and watch it go from alert to evidence to a recommendation. For the
@@ -83,6 +84,44 @@ flowchart LR
 </p>
 
 **Priorities, in order:** security and privacy · precise decisions · auditability · cost.
+
+## Agentic mode: live payments, a model that investigates, code that checks it
+
+Start the API with a model (`python scripts/run_api.py --demo --llm`) and the platform stops being a pipeline you push
+a button on. A customer pays in the app; the system notices, investigates and acts; people sign only for what is serious.
+
+```mermaid
+flowchart LR
+    C([Customer pays<br/>in the app]) --> B[(Simulated bank<br/>posts it)]
+    B --> M{{Monitor<br/>floor · routine · model}}
+    M -->|ordinary| X([Cleared, no case])
+    M -->|threshold crossed,<br/>or the model is worried| I[Investigator<br/>asks for records,<br/>proposes findings]
+    I --> F{{Fact-checker<br/>code, against what<br/>it actually saw}}
+    F --> D[Decision<br/>+ hard gates]
+    D -->|Level 1-2| A([Acts by itself:<br/>watch, ask, escalate])
+    D -->|Level 3-4| H[/Named humans<br/>approve/]
+    H --> G([Guarded tool,<br/>single-use approval])
+
+    classDef ai fill:#e8f1ff,stroke:#3b73d4,color:#0b2a5b
+    classDef code fill:#e9f7ef,stroke:#2e8b57,color:#0b3d22
+    classDef human fill:#fff4e0,stroke:#e08a00,color:#5a3600
+    class I ai
+    class M,F,D,A,G code
+    class H human
+```
+
+| Step | Who does it | What stops it going wrong |
+|---|---|---|
+| Notice | **Monitor.** A payment over a policy threshold always opens a case (plain code); an ordinary one is cleared (plain code); a model decides the grey zone | A model can open a case, never clear a threshold crossing; a failed model opens the case ([ADR 0015](docs/adr/0015-the-monitor-a-model-may-open-a-case-but-never-clear-a-threshold.md)) |
+| Investigate | **Investigator** (a model). Asks for lookups one at a time through the tool layer, then claims findings and cites what it saw | It never sees merchant names or memos; a lookup outside the case is refused; it cannot act or read policy ([ADR 0014](docs/adr/0014-a-model-investigates-and-code-checks-what-it-claims.md)) |
+| Check | **Fact-checker** (code). Each claim must hold against *only what the model looked at* | The model can add a finding (it found structuring, which the arithmetic never looks for), never remove or invent one |
+| Act | Level 1-2 actions run on their own; Level 3-4 wait for named humans | Single-use approvals bound to one action, account and case ([ADR 0013](docs/adr/0013-every-action-is-carried-out-by-a-guarded-tool.md)) |
+| Prove | A simulator posts randomised honest and fraudulent traffic and scores the platform with and without a model | Labels written first; "caught" is separated from "right for the right reason" ([ADR 0016](docs/adr/0016-evaluate-on-randomised-labelled-traffic-with-and-without-a-model.md)) |
+
+Sign in as the **customer** token to make payments (a Bank app tab, with two presets and two clearly labelled "simulate the
+bank's sensors" controls), as the **analyst** to watch the **Live feed** and vote, and as the **auditor** for the **Capability**
+tab. Without `--llm` everything still runs deterministically: the monitor's grey zone then opens a case, and the baseline
+analysis stands alone.
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -392,6 +431,8 @@ python scripts/run_agent_eval.py             # agents on the eleven scenarios (o
 python scripts/run_decision_eval.py          # decision providers + misbehaving stand-in models (offline)
 python scripts/run_api.py --demo             # API + dashboard at http://127.0.0.1:8000 (docs at /docs)
 python scripts/run_demo.py                   # whole demo through the API, with pass/fail checks
+python scripts/run_sim_eval.py               # randomised honest and fraudulent traffic, no model (seconds)
+python scripts/run_sim_eval.py --seeds 2 --llm   # the same seeds with a model in the loop (slow)
 ```
 
 Live model runs need keys in `.env` (copy `.env.example`; it is git-ignored): `python scripts/llm_smoke_test.py`,
@@ -532,7 +573,16 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
   the API does not use it yet).
 - **Gemini's free tier ran out of quota during testing**, so failover to it is only partly proven. Groq carried the
   live runs.
-- **No structuring or smurfing detection** (scenario I escalates only by accident).
+- **Structuring is only found when a model is on.** The arithmetic never searches for it, so without `--llm` scenario I
+  and the structuring persona are escalated *by accident*, which the simulation's "recognised" measure shows.
+- **The investigator cannot be more right than the baseline on a baseline-covered code.** Its claims are confirmed by the
+  baseline's own logic over what it saw; what it adds is finding new patterns and a measurable second opinion.
+- **The monitor's floor and "routine" rule are our reading of the thresholds.** A dangerous payment that looks ordinary in
+  every digest field is cleared. One background worker means investigations queue; on a free tier a case takes minutes.
+- **The simulation's personas are our idea of fraud**, the labels our reading of the policy (written before the first run),
+  and an episode is a handful of payments. It shows behaviour on traffic we did not hand-write, not performance on a bank's.
+- **Free-tier models are slow and rate-limited.** A rate-limited investigator ends `model_unavailable` and the case completes
+  on the baseline; the report counts how often that happened.
 - A fixed graph sequence cannot adapt to a case that needs a different path, and it does not loop back to gather
   more records.
 

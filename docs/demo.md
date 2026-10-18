@@ -30,6 +30,23 @@ signed in at once: paste the **analyst** token in one and the **risk officer** t
 | 10 | Scroll the audit chain | "Every step is hash-chained; editing the log is detectable." | Event hashes |
 | 11 | Optional: `curl` the API with the customer token | "A customer can only ask the knowledge base." | 403 on `/cases` |
 
+## Live demo (agentic mode, about 5 minutes)
+
+Start `python scripts/run_api.py --demo --llm` (a key in `.env`; set `NEXA_LLM_PROVIDERS=anthropic` to use Claude
+for the final run). It prints four tokens. Use three windows: customer,
+analyst, risk officer.
+
+| # | Do | Say | Point at |
+|---|---|---|---|
+| 1 | Customer window, **Bank app**: click *Everyday grocery*, **Pay** | "An ordinary payment from the customer's own phone." | Balance drops; no case is opened |
+| 2 | Analyst window, **Live feed** | "The monitor reviewed it and cleared it: routine, no model, no case." | `cleared` / `routine` |
+| 3 | Customer: click *Big transfer, new phone*, **Pay** | "A new device, failed logins, a new payee. The bank works out the device and payee itself; the customer cannot set them." | The two *simulate* fields are labelled as the bank's sensors |
+| 4 | Analyst, Live feed | "A policy threshold was crossed, so a case opens whatever any model thinks. A model investigates it." | `opened` / `floor`; click the row |
+| 5 | In the case, show the **investigation** and findings | "The model chose which records to look at. It never saw a merchant name. Each claim was checked against what it actually looked at." | Lookups, claimed / confirmed / dropped |
+| 6 | Auditor window, **Capability**, card 5 | "The same random seeds, with and without a model. Structuring is escalated by accident without one and recognised with one." | caught vs **recognised**; honest restricted = 0 |
+| 7 | Takeover: the *Account takeover* scenario (control room) | "Level 4: two roles must approve; one is not enough." | Waiting for approval, two roles |
+| 8 | Customer window after approval | "The frozen account now refuses the customer's next payment." | 409 *account is frozen* |
+
 ## If something goes wrong
 
 - Page says *missing or unknown token*: demo tokens change every start; paste the new ones.
