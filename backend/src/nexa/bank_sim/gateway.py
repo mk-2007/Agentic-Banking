@@ -11,7 +11,14 @@ tool layer may call it, and only with an approved, unexpired approval.
 from datetime import datetime
 from typing import Protocol
 
-from .models import AccountRecord, CustomerRecord, KycRecord, TransactionRecord
+from .models import (
+    AccountRecord,
+    CustomerRecord,
+    KycRecord,
+    OutboxEntry,
+    OutboxKind,
+    TransactionRecord,
+)
 
 
 class CustomerAPI(Protocol):
@@ -69,6 +76,16 @@ class AccountActionAPI(Protocol):
 
     def block_card(self, account_id: str) -> AccountRecord:
         """Block the account's card (idempotent) and return the updated record."""
+        ...
+
+    def queue_followup(
+        self, account_id: str, kind: OutboxKind, case_id: str, at: datetime
+    ) -> OutboxEntry:
+        """Ask the bank's operations desk for a follow-up (watch, request, ticket) and return it."""
+        ...
+
+    def followups(self, account_id: str) -> tuple[OutboxEntry, ...]:
+        """Return the follow-ups queued for the account, oldest first."""
         ...
 
 

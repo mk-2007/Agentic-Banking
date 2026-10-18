@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - Actions that run: perform_case_action (ADR 0013)
+- **Why:** the study guide's gaps 1 to 4. An approved `request_customer_verification` case ended `failed_tool`; Levels 1-2 were only logged; `modify` was a dead end; an unvoted approval never timed out.
+- **Done:** new tool `perform_case_action` (execution service only) queues follow-ups on a simulated bank outbox. Level 1-2 run by policy through a new `act` node (`decision_ready -> approved -> executed -> verified -> completed`, with an audit note); Level 3 verification needs the same single-use approval as a freeze (shared `consume_approval`). `modify` now ends `escalated`. `CaseService` times out cases whose approval expired.
+- **Tests:** `tests/unit/orchestration/test_actions.py` approves every Level 3 and 4 path end to end, checks replay, a mismatched approval, a missing approval, non-executor roles and that the tool cannot restrict an account. Seven older tests were updated because low-risk cases now finish `completed` and `modify` now escalates. 728 tests, ruff and mypy clean.
+- Spike for the next stage: on Groq `gpt-oss-20b` a 5-step investigation loop concluded on 3 of 5 cases (13 of 13 steps valid JSON, 0 repairs). The two failures were an HTTP 400 when the prompt called the lookups "tools" (the model tried a native tool call) and a free-tier 429. On scenario J (PKR 18,000) the model claimed `high_value` and `amount_above_average`, which are false: this is what the fact-checker must catch.
+
 ## 2026-10-18 - Study guide and a gap found by running it
 - Added `docs/PROJECT_GUIDE.md`: glossary, end-to-end flow, gates, why the dashboard needs a token, every scenario with what it did when run, what the tests prove, and a table of known gaps.
 - **Found by running all scenarios through `CaseService`:** an approved `request_customer_verification` case (scenario D) ends `failed_tool` (`unsupported_action`), because the graph sends every approved case to `execute` and the tool supports only block-card and freeze-account. Not fixed yet; no test approves a Level 3 verification case end to end. Other gaps (modify verdict dead end, expiry only checked on a vote, verifier reuses the finding's own numbers) were read from the code, not run. All are listed in part 12 of the guide.

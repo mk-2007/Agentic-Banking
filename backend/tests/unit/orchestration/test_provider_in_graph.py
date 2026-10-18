@@ -74,6 +74,7 @@ def test_no_other_scenario_is_blocked_or_changes_the_bank_without_approval(
     ctx, graph = graph_for(world, InMemoryApprovalStore())
     case = world.case(scenario_id)
     run = run_case(case, ctx, graph=graph, thread_id="t")
-    assert run.failure is None and run.case.status in (S.DECISION_READY, S.WAITING_FOR_APPROVAL)
+    assert run.failure is None
+    assert run.case.status in (S.COMPLETED, S.WAITING_FOR_APPROVAL)
     assert run.decision is not None
     assert world.tools.bank.get_account(case.alert.account_id).status is AccountStatus.ACTIVE

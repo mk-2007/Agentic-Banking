@@ -34,6 +34,8 @@ TOOL_ROLES: Final[Mapping[str, frozenset[Role]]] = MappingProxyType(
         ),
         # Only the execution service may change bank state, and only with an approval.
         "execute_authorized_action": frozenset({Role.EXECUTION_SERVICE}),
+        # Follow-ups (watch, ask, escalate): same service; Level 3 ones still need an approval.
+        "perform_case_action": frozenset({Role.EXECUTION_SERVICE}),
     }
 )
 

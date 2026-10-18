@@ -135,7 +135,7 @@ def test_votes_for_another_request_are_ignored(freeze: Harness) -> None:
     [
         (Verdict.REJECT, S.REJECTED_BY_HUMAN, ApprovalStatus.REJECTED),
         (Verdict.ESCALATE, S.ESCALATED, ApprovalStatus.ESCALATED),
-        (Verdict.MODIFY, S.DECISION_READY, ApprovalStatus.MODIFICATION_REQUESTED),
+        (Verdict.MODIFY, S.ESCALATED, ApprovalStatus.MODIFICATION_REQUESTED),
     ],
 )
 def test_one_negative_vote_ends_the_approval(

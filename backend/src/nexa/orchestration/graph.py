@@ -5,7 +5,9 @@ r"""The case graph (Phase 6a): intake, four agents, then ready or failed.
                     \---------+----------+--> a tool problem ends the run     (FAILED_TOOL)
 
 With a decision source (6b) the graph goes on: propose -> request_approval -> await_votes (pauses)
--> settle, which ends in approved, rejected, escalated, timed out or back to decision-ready.
+-> settle, which ends in approved, rejected, escalated (also for "modify") or timed out. With an
+approval store, an approved action is carried out by a guarded tool, and a Level 1-2
+recommendation is carried out straight away (`act`) because policy needs no approval for it.
 
 Phase 6c bounds every loop (`RunLimits`: transient tool failures are retried, a case that keeps
 waiting on votes is escalated) and, given an audit recorder, writes an audit event for every
@@ -48,12 +50,6 @@ def _after_verify(state: CaseGraphState) -> Literal["mark_ready", "fail_validati
     return "mark_ready" if state["verification"].passed else "fail_validation"
 
 
-def _after_propose(state: CaseGraphState) -> str:
-    if state.get("failure") or not state["decision"].approval_required:
-        return END
-    return "request_approval"
-
-
 def _after_request(state: CaseGraphState) -> str:
     return END if state.get("failure") else "await_votes"
 
@@ -91,6 +87,13 @@ def build_case_graph(
         registry=ctx.registry,
     )
 
+    def after_propose(state: CaseGraphState) -> str:
+        if state.get("failure"):
+            return END
+        if state["decision"].approval_required:
+            return "request_approval"
+        return "act" if approvals is not None else END  # Level 1-2 need no approval
+
     def after_settle(state: CaseGraphState) -> str:
         if state["approval"] is ApprovalStatus.PENDING:
             return END if state.get("failure") else "await_votes"
@@ -122,14 +125,16 @@ def build_case_graph(
             ("request_approval", nodes.request_approval),
             ("await_votes", nodes.await_votes),
             ("settle", nodes.settle),
-            *((("execute", nodes.execute),) if approvals is not None else ()),
+            *((("execute", nodes.execute), ("act", nodes.act)) if approvals is not None else ()),
         ):
             graph.add_node(name, step)
         graph.add_edge("mark_ready", "propose")
-        graph.add_conditional_edges("propose", _after_propose)
+        graph.add_conditional_edges("propose", after_propose)
         graph.add_conditional_edges("request_approval", _after_request)
         graph.add_edge("await_votes", "settle")
         graph.add_conditional_edges("settle", after_settle)
+        if approvals is not None:
+            graph.add_edge("act", END)
     graph.add_edge("fail_validation", END)
     return graph.compile(checkpointer=checkpointer)
 

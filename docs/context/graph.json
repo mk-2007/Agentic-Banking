@@ -481,6 +481,13 @@
       "status": "done",
       "path": "docs/adr/0012-capability-evidence-baselines-hostile-models-and-a-hard-tier.md",
       "summary": "Baselines, hostile models, a hard tier and a live model as capability evidence; evaluation may import decision and llm"
+    },
+    {
+      "id": "adr:0013",
+      "type": "adr",
+      "status": "done",
+      "path": "docs/adr/0013-every-action-is-carried-out-by-a-guarded-tool.md",
+      "summary": "perform_case_action carries out Level 1-3 follow-ups; Level 1-2 run by policy, modify escalates, expired approvals time out"
     }
   ],
   "edges": [
@@ -1172,6 +1179,16 @@
     {
       "from": "adr:0012",
       "to": "module:evaluation",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0013",
+      "to": "module:tools",
+      "relation": "decides"
+    },
+    {
+      "from": "adr:0013",
+      "to": "module:orchestration",
       "relation": "decides"
     }
   ]

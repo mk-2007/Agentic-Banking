@@ -10,10 +10,12 @@ Modules:
     registry   `ToolRegistry.invoke`: authorization, audit and error handling for every call
     read_tools five read-only tools with data minimization
     knowledge  `search_knowledge_base`: cited passages, clearance from role and channel
-    execution  `execute_authorized_action`, the only state-changing tool
+    execution  `execute_authorized_action`, the only tool that restricts an account
+    case_actions `perform_case_action`, follow-ups such as watch, ask or escalate
 """
 
 from .base import Tool, ToolContext
+from .case_actions import PerformCaseAction
 from .execution import ExecuteAuthorizedAction
 from .knowledge import SearchKnowledgeBase
 from .read_tools import (
@@ -37,6 +39,7 @@ def build_default_registry(ctx: ToolContext) -> ToolRegistry:
         GetKycStatus(),
         SearchKnowledgeBase(),
         ExecuteAuthorizedAction(),
+        PerformCaseAction(),
     ):
         registry.register(tool)
     registry.assert_complete()
@@ -50,6 +53,7 @@ __all__ = [
     "GetKycStatus",
     "GetTransactionDetails",
     "GetTransactionHistory",
+    "PerformCaseAction",
     "SearchKnowledgeBase",
     "Tool",
     "ToolContext",

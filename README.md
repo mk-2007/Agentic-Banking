@@ -5,7 +5,7 @@
 <p align="center">
   <a href="https://github.com/mk-2007/Agentic-Banking/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/mk-2007/Agentic-Banking/ci.yml?branch=main&style=for-the-badge&label=CI"></a>
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge"></a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-713%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
+  <img alt="tests" src="https://img.shields.io/badge/tests-728%20passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white">
   <img alt="python" src="https://img.shields.io/badge/python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="mypy" src="https://img.shields.io/badge/mypy-strict-1f5082?style=for-the-badge">
   <img alt="data" src="https://img.shields.io/badge/data-synthetic%20only-f59e0b?style=for-the-badge">
@@ -89,7 +89,7 @@ flowchart LR
 ## At a glance
 
 <p align="center">
-  <img src="docs/assets/stats.svg" alt="713 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 10 decision records" width="100%">
+  <img src="docs/assets/stats.svg" alt="728 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 13 decision records" width="100%">
 </p>
 
 | | |
@@ -100,7 +100,7 @@ flowchart LR
 | **Actions** | 7 in a closed set, risk-levelled 1 to 4; Level 4 (freeze account) needs fraud analyst **and** risk officer |
 | **Knowledge base** | 98 cited chunks, access decided *before* ranking; recall@3 = 92.5% on 40 labelled questions |
 | **Synthetic data** | 23 customers, 865 transactions, 3 policy documents, plus an 88-case labelled lab cohort (11 archetypes, 12 threshold-boundary cases and a 16-case hard tier, 88 more accounts) |
-| **Quality** | 713 tests, `ruff` and `mypy --strict` clean, 10 architecture decision records |
+| **Quality** | 728 tests, `ruff` and `mypy --strict` clean, 13 architecture decision records |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -380,7 +380,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 cd backend
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                             # 713 tests, incl. architecture rules
+pytest -q                                             # 728 tests, incl. architecture rules
 ruff check . && ruff format --check . && mypy
 ```
 
@@ -488,6 +488,9 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
 | [0008](docs/adr/0008-typed-findings-deterministic-analysis-and-a-guarded-model-step.md) | Typed findings, deterministic analysis, one guarded model step |
 | [0009](docs/adr/0009-fixed-langgraph-sequence-status-only-in-nodes-allowlisted-checkpoints.md) | Fixed graph sequence; status only in nodes; allowlisted checkpoints |
 | [0010](docs/adr/0010-model-decisions-share-the-gates-and-keep-a-human-floor.md) | Model decisions share the gates and keep a human floor |
+| [0011](docs/adr/0011-an-auditor-role-and-a-private-evaluation-lab.md) | An auditor role and a private evaluation lab |
+| [0012](docs/adr/0012-capability-evidence-baselines-hostile-models-and-a-hard-tier.md) | Capability evidence: baselines, hostile models, a hard tier |
+| [0013](docs/adr/0013-every-action-is-carried-out-by-a-guarded-tool.md) | Every action in the closed set is carried out by a guarded tool |
 
 ## Documentation
 

@@ -148,9 +148,22 @@ class CaseService:
             self._runs[case.id] = run
         return run
 
+    def _sweep(self) -> None:
+        """Time out cases whose approval ran out while nobody voted. Call with the lock held.
+
+        The approval rule only runs when votes arrive, so without this a case nobody votes on would
+        wait forever. Resuming with no votes lets the same rule see that the request has expired.
+        """
+        now = self._clock()
+        for case_id, run in list(self._runs.items()):
+            request = run.approval_request
+            if run.awaiting_approval and request is not None and now >= request.expires_at:
+                self._runs[case_id] = resume_case(self._graph, case_id, [])
+
     def get(self, case_id: str) -> CaseRun:
         """Return the latest run of a case."""
         with self._lock:
+            self._sweep()
             if case_id not in self._runs:
                 raise CaseNotFoundError(case_id)
             return self._runs[case_id]
@@ -158,6 +171,7 @@ class CaseService:
     def all_runs(self) -> list[CaseRun]:
         """Every case, oldest first."""
         with self._lock:
+            self._sweep()
             return list(self._runs.values())
 
     def pending(self) -> list[CaseRun]:

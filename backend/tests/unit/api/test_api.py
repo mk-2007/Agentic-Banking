@@ -1,5 +1,7 @@
 """The HTTP API: who may call what, the whole Level 4 path over HTTP, and what must stay hidden."""
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -78,11 +80,12 @@ def test_a_customer_cannot_open_view_or_vote_on_cases(client: TestClient) -> Non
 
 
 # --- opening and viewing cases ---------------------------------------------------------------
-def test_a_low_risk_case_runs_to_decision_ready(client: TestClient) -> None:
+def test_a_low_risk_case_carries_itself_out_to_completion(client: TestClient) -> None:
     case = open_case(client, "scenario_a_normal")
-    assert case["status"] == "decision_ready" and case["failure"] is None
+    assert case["status"] == "completed" and case["failure"] is None
     assert case["decision"]["recommended_action"] == "no_action" and case["approval"] is None
-    assert case["trail"][0] == "created" and case["trail"][-1] == "decision_ready"
+    assert case["trail"][0] == "created"
+    assert case["trail"][-5:] == ["decision_ready", "approved", "executed", "verified", "completed"]
     assert case["findings"] and all(f["code"] for f in case["findings"])
 
 
@@ -176,7 +179,7 @@ def test_one_role_voting_twice_does_not_make_two_approvers(
             f"/cases/{case['id']}/votes", json={"verdict": "approve"}, headers=auth(token)
         )
     assert run.json()["status"] == "waiting_for_approval"
-    assert service.bank.get_account(case["account_id"]).status.value == "active"
+    assert service.bank.get_account("acc_106").status.value == "active"
 
 
 def test_a_rejection_ends_the_case_and_changes_nothing(
@@ -189,7 +192,7 @@ def test_a_rejection_ends_the_case_and_changes_nothing(
         headers=auth("t-analyst"),
     ).json()
     assert done["status"] == "rejected_by_human"
-    assert service.bank.get_account(case["account_id"]).status.value == "active"
+    assert service.bank.get_account("acc_106").status.value == "active"
 
 
 def test_voting_on_a_case_that_never_needed_approval_is_a_conflict(client: TestClient) -> None:
@@ -261,3 +264,22 @@ def test_dashboard_uses_the_real_waiting_status(client: TestClient) -> None:
     # The page shows vote buttons only for this exact status; a typo hid them (found in a browser run).
     page = client.get("/").text
     assert '"waiting_for_approval"' in page and "awaiting" not in page
+
+
+# --- approvals that nobody votes on ------------------------------------------------------------
+def test_a_case_nobody_votes_on_times_out_once_its_approval_expires() -> None:
+    now = [datetime.now(UTC)]
+    service = CaseService(clock=lambda: now[0])
+    client = TestClient(create_app(service, TOKENS))
+    case = open_case(client, "scenario_f_account_takeover")
+    assert case["status"] == "waiting_for_approval"
+    assert [c["id"] for c in client.get("/approvals/pending", headers=auth("t-analyst")).json()]
+    now[0] += timedelta(minutes=121)  # the freeze approval lasts 120 minutes
+    seen = client.get(f"/cases/{case['id']}", headers=auth("t-analyst")).json()
+    assert seen["status"] == "timed_out" and seen["approval"]["status"] == "expired"
+    assert client.get("/approvals/pending", headers=auth("t-analyst")).json() == []
+    late = client.post(
+        f"/cases/{case['id']}/votes", json={"verdict": "approve"}, headers=auth("t-analyst")
+    )
+    assert late.status_code == 409  # a timed-out case takes no votes
+    assert service.bank.get_account("acc_106").status.value == "active"
