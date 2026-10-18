@@ -21,6 +21,8 @@ audit log, and demo tokens change on every start.
 | `GET /approvals/pending` | employee | cases waiting for votes |
 | `POST /cases/{id}/votes` | employee | cast `approve`, `reject`, `escalate` or `modify` and continue the case |
 | `POST /chat` | customer or employee | cited passages from the knowledge base |
+| `GET /app/me` | customer (linked to a bank customer) | the customer's own accounts and recent transactions |
+| `POST /app/payments` | customer (linked) | pay from one of the customer's own accounts; the bank posts it |
 | `GET /admin/lab/cases` | auditor | the 98 labelled lab cases with their latest score |
 | `POST /admin/lab/run` | auditor | run all cases, some `ids`, or one `archetype` on a private platform copy and score them |
 | `GET /admin/lab/scorecard` | auditor | pass, safe, useful and human-routed rates over the cases run so far |
@@ -31,6 +33,10 @@ audit log, and demo tokens change on every start.
 | `GET /admin/accounts`, `GET /admin/accounts/{id}` | auditor | every synthetic account; one profile (no merchant names or memos) |
 
 Employees are the fraud analyst, risk officer and compliance officer roles. A customer can only chat. The auditor is not an employee: it cannot open live cases or vote, and it alone may use `/admin`. Lab runs use their own platform copy and never appear among live cases.
+
+## The customer app
+
+`POST /app/payments` is how live data enters the bank. The body is what a customer would type (amount, payee, category, channel, country, city, optional payee account) plus two controls that stand in for the bank's own sensors: `device` (registered or new) and `failed_logins`. Everything else is decided by the bank, never asked: whether the device is trusted (the customer's registered device list), whether the payee is a new beneficiary (not paid before the last 24 hours), the timestamp and the id. A customer can only pay from their own accounts (403 otherwise); a frozen account or an overdraft is refused (409); unknown fields such as a memo or `is_new_beneficiary` are rejected (422). A freeze decided by a case is therefore visible straight away: the same customer's next payment is refused.
 
 ## Rules this layer keeps
 
@@ -52,6 +58,8 @@ Employees are the fraud analyst, risk officer and compliance officer roles. A cu
   approvers, a rejection changes nothing, and a case that is no longer waiting answers 409.
 
 ## Sign-in
+
+Bearer tokens map to a user id and a role; a customer token may also name the bank customer it belongs to (`token:user_id:customer:cust_010`). Without that link the customer can chat but not use the app.
 
 Bearer tokens map to a user id and a role. Provide them as `NEXA_API_TOKENS="token:user_id:role,..."` (roles:
 `fraud_analyst`, `risk_officer`, `compliance_officer`, `auditor`, `customer`), or use `--demo` for random ones. Tokens are
