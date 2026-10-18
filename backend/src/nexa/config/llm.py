@@ -43,6 +43,17 @@ PRESETS: Final[Mapping[str, ProviderPreset]] = MappingProxyType(
             model_env="NEXA_GROQ_MODEL",
             default_model="openai/gpt-oss-20b",
         ),
+        # Claude through Anthropic's OpenAI-compatible endpoint. Not in the default order, so it is
+        # only used (and only costs anything) when named in NEXA_LLM_PROVIDERS. That endpoint does
+        # not honour JSON mode, so the gateway relies on its own validation, as it always does.
+        "anthropic": ProviderPreset(
+            name="anthropic",
+            base_url="https://api.anthropic.com/v1",
+            api_key_env="ANTHROPIC_API_KEY",
+            model_env="NEXA_ANTHROPIC_MODEL",
+            default_model="claude-haiku-5-5",
+            json_mode=JsonMode.NONE,
+        ),
         "gemini": ProviderPreset(
             name="gemini",
             base_url="https://generativelanguage.googleapis.com/v1beta/openai/",

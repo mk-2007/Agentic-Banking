@@ -11,6 +11,7 @@ Both expose an OpenAI-style `chat/completions` endpoint:
 | Provider | Base URL | Key variable | Model variable |
 |---|---|---|---|
 | Groq | `https://api.groq.com/openai/v1` | `GROQ_API_KEY` | `NEXA_GROQ_MODEL` |
+| Claude (Anthropic's compatible endpoint) | `https://api.anthropic.com/v1` | `ANTHROPIC_API_KEY` | `NEXA_ANTHROPIC_MODEL` |
 | Gemini | `https://generativelanguage.googleapis.com/v1beta/openai/` | `GEMINI_API_KEY` | `NEXA_GEMINI_MODEL` |
 
 `OpenAiCompatibleProvider` handles both. Adding another OpenAI-compatible provider is a few lines of
@@ -40,6 +41,8 @@ extra fields and wrong types are all handled.
 4. If the default model is unavailable, set `NEXA_GROQ_MODEL` / `NEXA_GEMINI_MODEL` in `.env`.
 5. Prove it works: `python scripts/llm_smoke_test.py`. Each configured provider makes one validated call
    and reports model, tokens, latency and repairs.
+
+**Claude** is not in the default order, so it is used (and costs anything) only when you name it, for example `NEXA_LLM_PROVIDERS=anthropic` in `.env`, or `--providers anthropic` on `scripts/run_sim_eval.py`. Its compatible endpoint ignores JSON mode, so the gateway relies on its own schema validation, as it always does.
 
 Provider order comes from `NEXA_LLM_PROVIDERS` (default `groq,gemini`, first is primary). A provider
 with no key is skipped, so one key is enough.

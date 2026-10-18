@@ -2,7 +2,7 @@ from nexa.config import DEFAULT_LIMITS, PRESETS, JsonMode
 
 
 def test_presets_are_complete_and_distinct() -> None:
-    assert set(PRESETS) == {"groq", "gemini"}
+    assert set(PRESETS) == {"groq", "gemini", "anthropic"}
     assert all(p.base_url.startswith("https://") for p in PRESETS.values())
     assert len({p.api_key_env for p in PRESETS.values()}) == len(PRESETS)
     assert len({p.model_env for p in PRESETS.values()}) == len(PRESETS)
