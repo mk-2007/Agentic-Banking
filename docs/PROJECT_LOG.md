@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-18 - Live transactions: the bank accepts payments and the customer has an app
+- **Why:** every case so far came from a hand-written scenario. Real payments need a way into the bank.
+- **Done:** `bank_sim` can post a transaction (`add_transaction`: moves the balance, refuses a frozen account or an overdraft). A customer sign-in can be linked to a bank customer (`token:user:customer:cust_010`; the demo customer is `cust_010`). New routes `GET /app/me` and `POST /app/payments`, customers only, own accounts only. The bank decides device trust and whether a payee is new; the customer cannot set them. Two simulate controls (device, failed logins) stand in for the bank's sensors and are labelled so. Dashboard: customers get a Bank app tab (accounts, payment form with two presets, activity).
+- **Checked in a real browser** (headless Chrome over the DevTools protocol): a 60,000 payment went through, the balance fell from 270,000 to 210,000 and the activity list showed it. The first run lost the success message to the redraw; fixed.
+- Nothing watches these payments yet: the monitor comes next, so an analyst can open a case on one by hand for now.
+
 ## 2026-10-18 - Actions that run: perform_case_action (ADR 0013)
 - **Why:** the study guide's gaps 1 to 4. An approved `request_customer_verification` case ended `failed_tool`; Levels 1-2 were only logged; `modify` was a dead end; an unvoted approval never timed out.
 - **Done:** new tool `perform_case_action` (execution service only) queues follow-ups on a simulated bank outbox. Level 1-2 run by policy through a new `act` node (`decision_ready -> approved -> executed -> verified -> completed`, with an audit note); Level 3 verification needs the same single-use approval as a freeze (shared `consume_approval`). `modify` now ends `escalated`. `CaseService` times out cases whose approval expired.

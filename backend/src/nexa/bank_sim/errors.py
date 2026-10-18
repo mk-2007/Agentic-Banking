@@ -9,3 +9,11 @@ class RecordNotFoundError(DomainError):
 
 class DuplicateRecordError(DomainError):
     """Raised when seed data contains the same id twice."""
+
+
+class AccountFrozenError(DomainError):
+    """Raised when a transaction is attempted on a frozen account."""
+
+
+class InsufficientFundsError(DomainError):
+    """Raised when a debit is larger than the account's balance."""

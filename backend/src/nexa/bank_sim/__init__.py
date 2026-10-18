@@ -13,16 +13,23 @@ Modules:
     seed       loads the committed synthetic dataset and the labelled lab cohort
 """
 
-from .errors import DuplicateRecordError, RecordNotFoundError
+from .errors import (
+    AccountFrozenError,
+    DuplicateRecordError,
+    InsufficientFundsError,
+    RecordNotFoundError,
+)
 from .gateway import BankGateway
 from .in_memory import InMemoryBank
 from .scenarios import LabCaseSpec
 from .seed import default_data_dir, load_bank, load_lab_bank, load_lab_cases, load_scenarios
 
 __all__ = [
+    "AccountFrozenError",
     "BankGateway",
     "DuplicateRecordError",
     "InMemoryBank",
+    "InsufficientFundsError",
     "LabCaseSpec",
     "RecordNotFoundError",
     "default_data_dir",

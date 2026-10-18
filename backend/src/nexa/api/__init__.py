@@ -7,6 +7,7 @@ Where it sits: Layer 5 (top). May import anything.
 
 Modules:
     lab         `LabService`: runs labelled cases and scores them (auditor only)
+    live        `LiveService`: the customer app's accounts and payments
     principals  bearer tokens to a user and role; the role decides the session channel
     service     `CaseService`: wires the platform and runs cases, votes and chat
     schemas     request and response shapes (no dossier, no third-party text)

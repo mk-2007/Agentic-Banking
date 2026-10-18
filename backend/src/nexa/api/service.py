@@ -8,6 +8,7 @@ graph, the approval store and the audit log are shared and the prototype keeps t
 
 import threading
 from dataclasses import dataclass
+from datetime import datetime
 
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -120,6 +121,10 @@ class CaseService:
         )
         self._runs: dict[str, CaseRun] = {}
         self._lock = threading.Lock()
+
+    def now(self) -> datetime:
+        """Return the service's current time (the clock cases and approvals use)."""
+        return self._clock()
 
     # --- cases -----------------------------------------------------------------------------
     def open_case(
