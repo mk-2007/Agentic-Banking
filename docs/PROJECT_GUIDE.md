@@ -320,6 +320,8 @@ model or holds a key for that screen.
 
 ## 12. Are the results real or faulty? Straight answer, plus the gaps found
 
+> **Update 2026-10-18:** gaps 1 to 4 below are fixed (ADR 0013, `docs/orchestration.md`). An approved Level 3 verification request now completes, Level 1-2 actions run by policy through `perform_case_action`, `modify` escalates, and an expired approval times out without a vote. The table is kept as found, with the original wording.
+
 **Real, in this sense:** the outputs are deterministic and reproducible, each finding carries the numbers it was
 computed from, the verifier recomputes them, and the safety properties are enforced by code that tests exercise.
 **Not proven:** performance on real data, and the limits below.

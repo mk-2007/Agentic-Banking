@@ -52,12 +52,11 @@ mark_ready -> propose -> request_approval -> await_votes (pauses) -> settle
 | Step | What happens |
 |---|---|
 | `propose` | The source returns a `Decision`. One for another case, or one that drops a blocking uncertainty flag verification found, ends in `blocked_by_policy` (`decision:wrong_case`, `decision:ignored_uncertainty`). |
-| `request_approval` | Level 3+ only. Orchestration code builds the `ApprovalRequest` from the approval matrix (roles, expiry) and the case's own account; the status becomes `waiting_for_approval`. Level 1-2 stops at `decision_ready`. |
+| `request_approval` | Level 3+ only. Orchestration code builds the `ApprovalRequest` from the approval matrix (roles, expiry) and the case's own account; the status becomes `waiting_for_approval`. Level 1-2 needs no approval and goes to `act` (below), or stops at `decision_ready` when no approval store is configured. |
 | `await_votes` | Saves the run and pauses (`interrupt`). `resume_case(graph, thread_id, votes)` continues it. |
-| `settle` | The pure `evaluate_approval` rule decides: approved, rejected (`rejected_by_human`), escalated, expired (`timed_out`), modify (back to `decision_ready`), or still pending (pause again). Votes accumulate across resumes. |
+| `settle` | The pure `evaluate_approval` rule decides: approved, rejected (`rejected_by_human`), escalated, expired (`timed_out`), modify (`escalated`: the reviewer wants it changed, so an analyst takes over and nothing runs), or still pending (pause again). Votes accumulate across resumes. |
 
-Execution of an approved action is not part of this graph yet; the run ends at `approved` and the request
-id is what the guarded execution tool needs.
+Without an approval store the run ends at `approved` and the request id is what the guarded tools need.
 
 ## Limits, retries and audit (6c)
 
@@ -83,12 +82,17 @@ approved case continues: `settle -> execute`.
 |---|---|
 | `request_approval` | also stores the request, so the execution tool can find it |
 | `settle` | mirrors every vote received so far into the store before judging them |
-| `execute` | calls `execute_authorized_action` as the execution service with the approval id as the only authority. Success: `approved -> executed -> verified -> completed`. A refusal (replay, expiry, wrong account) ends `failed_tool` with the tool's code. An action that did not take effect (the output does not show the account frozen or the card blocked) ends `failed_validation` (`execution:not_applied`). |
+| `act` | Level 1-2 only. Policy needs no approval, so the case goes `decision_ready -> approved` with an audit note (`policy:no_approval_needed_level_N`) and then through the same guarded tool, check and completion as below. |
+| `execute` | calls the tool that owns the action (`execute_authorized_action` for block card and freeze, `perform_case_action` for the rest) as the execution service with the approval id as the only authority. Success: `approved -> executed -> verified -> completed`. A refusal (replay, expiry, wrong account) ends `failed_tool` with the tool's code. An action that did not take effect (the output does not show the account frozen or the card blocked) ends `failed_validation` (`execution:not_applied`). |
+
+`perform_case_action` queues a follow-up on the bank's operations desk (watch, KYC request, customer verification request, analyst ticket). Level 1-2 actions need no approval; Level 3 `request_customer_verification` needs the same single-use approval as a freeze. It cannot block a card or freeze an account.
 
 The tool, not the graph, re-checks action, account, case, approvers, expiry and single use, so a graph bug
 cannot execute something a human did not approve. Tests cover the Level 4 two-approver path, Level 3 with one
 analyst, one approver only, rejection, expiry, replay and an approval consumed behind the graph's back, and run
-all scenarios end to end (nothing changes on the bank without an approval).
+all scenarios end to end (nothing is restricted on the bank without an approval).
+
+A case nobody votes on is timed out by `CaseService`, which resumes it with no votes once the approval's expiry has passed, so the pure rule can see that it ran out.
 
 ## Not built yet (by design, and on the tracker)
 
