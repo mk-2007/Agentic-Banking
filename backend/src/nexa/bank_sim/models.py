@@ -47,6 +47,26 @@ class CardStatus(StrEnum):
     NONE = "none"
 
 
+class OutboxKind(StrEnum):
+    """What the bank's operations desk is asked to do after a case recommends a response."""
+
+    WATCH = "watch"
+    KYC_REQUEST = "kyc_request"
+    VERIFICATION_REQUEST = "verification_request"
+    ANALYST_TICKET = "analyst_ticket"
+
+
+class OutboxEntry(Contract):
+    """One follow-up the platform asked the bank to perform (a notification, ticket or watch)."""
+
+    id: str = Field(min_length=1)
+    account_id: str = Field(min_length=1)
+    customer_id: str = Field(min_length=1)
+    kind: OutboxKind
+    case_id: str = Field(min_length=1)
+    created_at: AwareDatetime
+
+
 class Direction(StrEnum):
     """Money in or money out."""
 

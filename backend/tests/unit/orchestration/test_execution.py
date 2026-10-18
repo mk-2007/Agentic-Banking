@@ -251,8 +251,11 @@ def test_every_scenario_runs_end_to_end_without_unapproved_changes(
     if expected.must_involve_human and risk_level_for(action).requires_human_approval:
         assert run.awaiting_approval
     else:
-        assert run.case.status is S.DECISION_READY and not run.awaiting_approval
-    assert h.account().status is AccountStatus.ACTIVE  # nothing changed without an approval
-    assert not [
+        assert run.case.status is S.COMPLETED and not run.awaiting_approval
+    assert h.account().status is AccountStatus.ACTIVE  # nothing restricted without an approval
+    assert h.account().card_status is CardStatus.ACTIVE
+    executed = [
         e for e in world.log.for_case(h.case.id) if e.event_type is AuditEventType.ACTION_EXECUTED
     ]
+    assert len(executed) == (0 if run.awaiting_approval else 1)
+    assert all("no approval needed" in e.detail for e in executed)

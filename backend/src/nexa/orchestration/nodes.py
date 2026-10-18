@@ -40,6 +40,7 @@ from nexa.domain.evidence import Evidence
 from nexa.domain.ids import new_id
 from nexa.domain.tooling import ToolCall
 from nexa.tools import ToolRegistry
+from nexa.tools.execution import EXECUTABLE_ACTIONS
 
 from .limits import TRANSIENT_TOOL_CODES, RunLimits
 from .state import CaseGraphState
@@ -47,6 +48,7 @@ from .state import CaseGraphState
 ORCHESTRATOR = Actor(kind=ActorKind.SYSTEM, id="orchestrator")
 EXECUTOR = Actor(kind=ActorKind.SYSTEM, id="executor", role=Role.EXECUTION_SERVICE)
 EXECUTE_TOOL = "execute_authorized_action"
+PERFORM_TOOL = "perform_case_action"
 
 Update = dict[str, object]
 
@@ -332,7 +334,8 @@ class CaseNodes:
             ApprovalStatus.REJECTED: CaseStatus.REJECTED_BY_HUMAN,
             ApprovalStatus.ESCALATED: CaseStatus.ESCALATED,
             ApprovalStatus.EXPIRED: CaseStatus.TIMED_OUT,
-            ApprovalStatus.MODIFICATION_REQUESTED: CaseStatus.DECISION_READY,
+            # A reviewer who wants the action changed hands the case to an analyst: nothing runs.
+            ApprovalStatus.MODIFICATION_REQUESTED: CaseStatus.ESCALATED,
         }.get(status)
         if target is None:  # still pending, unless humans have already been asked too often
             if state.get("rounds", 0) >= self._limits.max_vote_rounds:
@@ -344,7 +347,22 @@ class CaseNodes:
         case, moved = self._move(state["case"], target)
         return {"case": case, "trail": moved, "approval": status}
 
-    # --- execution of an approved action (6d) ------------------------------------------------
+    # --- carrying out the action (6d) --------------------------------------------------------
+    def act(self, state: CaseGraphState) -> Update:
+        """Carry out a Level 1-2 recommendation. Policy needs no approval for these, so say so.
+
+        The case goes decision_ready -> approved by policy (no human is involved), then through the
+        same guarded tool, verification and completion as an approved action.
+        """
+        assert self._registry is not None  # the graph only has this step when execution is enabled
+        case, decision = state["case"], state["decision"]
+        case, moved = self._move(case, CaseStatus.APPROVED)
+        level = int(decision.risk_level)
+        self._record(AuditEventType.STATE_CHANGED, case, f"policy:no_approval_needed_level_{level}")
+        return self._carry_out(
+            case, moved, decision.recommended_action, case.alert.account_id, approval_id=None
+        )
+
     def execute(self, state: CaseGraphState) -> Update:
         """Apply the approved action through the guarded tool, check it took effect, and finish.
 
@@ -352,29 +370,46 @@ class CaseNodes:
         approvers, expiry and single use itself. A refusal ends the case ``FAILED_TOOL``; an action
         that did not take effect ends it ``FAILED_VALIDATION``.
         """
-        assert self._registry is not None  # the graph only has this step when execution is enabled
-        case, request = state["case"], state["approval_request"]
+        request = state["approval_request"]
+        return self._carry_out(
+            state["case"], [], request.action, request.target_account_id, approval_id=request.id
+        )
+
+    def _carry_out(
+        self,
+        case: Case,
+        prior: list[CaseStatus],
+        action: ActionType,
+        account_id: str,
+        *,
+        approval_id: str | None,
+    ) -> Update:
+        """Run ``action`` through the tool that owns it, confirm its effect, and close the case."""
+        assert self._registry is not None
+        tool = EXECUTE_TOOL if action in EXECUTABLE_ACTIONS else PERFORM_TOOL
         result = self._registry.invoke(
             ToolCall(
                 id=f"{case.id}:execute",
-                tool_name=EXECUTE_TOOL,
+                tool_name=tool,
                 actor=EXECUTOR,
                 case_id=case.id,
-                arguments={"account_id": request.target_account_id, "action": request.action.value},
-                approval_id=request.id,
+                arguments={"account_id": account_id, "action": action.value},
+                approval_id=approval_id,
                 requested_at=self._clock(),
             )
         )
         if not result.ok:
-            return self._stop(case, CaseStatus.FAILED_TOOL, f"{EXECUTE_TOOL}:{result.error_code}")
+            stopped = self._stop(case, CaseStatus.FAILED_TOOL, f"{tool}:{result.error_code}")
+            return {**stopped, "trail": [*prior, *stopped["trail"]]}  # type: ignore[misc]
         case, moved = self._move(case, CaseStatus.EXECUTED)
-        took_effect = (
-            result.output.get("account_status") == "frozen"
-            if request.action is ActionType.FREEZE_ACCOUNT
-            else result.output.get("card_status") == "blocked"
-        )
+        if action is ActionType.FREEZE_ACCOUNT:
+            took_effect = result.output.get("account_status") == "frozen"
+        elif action is ActionType.BLOCK_CARD:
+            took_effect = result.output.get("card_status") == "blocked"
+        else:
+            took_effect = result.output.get("recorded") == action.value
         if not took_effect:
             stopped = self._stop(case, CaseStatus.FAILED_VALIDATION, "execution:not_applied")
-            return {**stopped, "trail": [*moved, *stopped["trail"]]}  # type: ignore[misc]
+            return {**stopped, "trail": [*prior, *moved, *stopped["trail"]]}  # type: ignore[misc]
         case, done = self._move(case, CaseStatus.VERIFIED, CaseStatus.COMPLETED)
-        return {"case": case, "trail": [*moved, *done]}
+        return {"case": case, "trail": [*prior, *moved, *done]}

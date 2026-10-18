@@ -28,6 +28,34 @@ class _ExecuteArgs(Contract):
     action: ActionType
 
 
+def consume_approval(call: ToolCall, ctx: ToolContext, action: ActionType, account_id: str) -> str:
+    """Check the call's approval authorizes ``action`` on ``account_id``, spend it, return its id.
+
+    Raises `AuthorizationDenied` when there is no approval, it does not fit, or it was used before.
+    """
+    approval_id = call.approval_id
+    if approval_id is None:
+        AuthorizationDecision.deny(
+            DenialReason.APPROVAL_REQUIRED, "no approval id given"
+        ).raise_if_denied()
+        raise AssertionError("unreachable")  # raise_if_denied always raises for a denial
+
+    verify_execution_approval(
+        ctx.approvals,
+        approval_id=approval_id,
+        action=action,
+        case_id=call.case_id,
+        account_id=account_id,
+        now=ctx.clock(),
+    ).raise_if_denied()
+
+    if not ctx.approvals.try_consume(approval_id):
+        AuthorizationDecision.deny(
+            DenialReason.APPROVAL_ALREADY_USED, "an approval can be used only once"
+        ).raise_if_denied()
+    return approval_id
+
+
 class ExecuteAuthorizedAction(Tool):
     """Apply an approved block-card or freeze-account action."""
 
@@ -47,26 +75,7 @@ class ExecuteAuthorizedAction(Tool):
                 DenialReason.UNSUPPORTED_ACTION, f"{args.action.value} is not executable here"
             ).raise_if_denied()
 
-        approval_id = call.approval_id
-        if approval_id is None:
-            AuthorizationDecision.deny(
-                DenialReason.APPROVAL_REQUIRED, "no approval id given"
-            ).raise_if_denied()
-            raise AssertionError("unreachable")  # raise_if_denied always raises for a denial
-
-        verify_execution_approval(
-            ctx.approvals,
-            approval_id=approval_id,
-            action=args.action,
-            case_id=call.case_id,
-            account_id=args.account_id,
-            now=ctx.clock(),
-        ).raise_if_denied()
-
-        if not ctx.approvals.try_consume(approval_id):
-            AuthorizationDecision.deny(
-                DenialReason.APPROVAL_ALREADY_USED, "an approval can be used only once"
-            ).raise_if_denied()
+        approval_id = consume_approval(call, ctx, args.action, args.account_id)
 
         if args.action is ActionType.FREEZE_ACCOUNT:
             account = ctx.bank.freeze_account(args.account_id)

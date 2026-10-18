@@ -15,6 +15,8 @@ from .models import (
     CardStatus,
     CustomerRecord,
     KycRecord,
+    OutboxEntry,
+    OutboxKind,
     TransactionRecord,
 )
 
@@ -46,6 +48,7 @@ class InMemoryBank:
         self._accounts = _index(accounts, "id", "account")
         self._transactions = _index(transactions, "id", "transaction")
         self._kyc = _index(kyc, "customer_id", "kyc")
+        self._outbox: list[OutboxEntry] = []
 
     # --- CustomerAPI -------------------------------------------------
     def get_customer(self, customer_id: str) -> CustomerRecord:
@@ -107,6 +110,26 @@ class InMemoryBank:
         )
         self._accounts[account_id] = updated
         return updated
+
+    def queue_followup(
+        self, account_id: str, kind: OutboxKind, case_id: str, at: datetime
+    ) -> OutboxEntry:
+        """Queue a follow-up for the account's operations desk and return it."""
+        account = self.get_account(account_id)
+        entry = OutboxEntry(
+            id=f"out_{len(self._outbox) + 1:05d}",
+            account_id=account_id,
+            customer_id=account.customer_id,
+            kind=kind,
+            case_id=case_id,
+            created_at=at,
+        )
+        self._outbox.append(entry)
+        return entry
+
+    def followups(self, account_id: str) -> tuple[OutboxEntry, ...]:
+        """Return the follow-ups queued for the account, oldest first."""
+        return tuple(e for e in self._outbox if e.account_id == account_id)
 
     @staticmethod
     def _lookup(store: dict[str, _T], key: str, kind: str) -> _T:
