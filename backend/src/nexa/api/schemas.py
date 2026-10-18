@@ -192,6 +192,37 @@ class ApprovalView(BaseModel):
     votes: list[VoteView]
 
 
+class TraceStepView(BaseModel):
+    """One lookup the investigator asked for."""
+
+    step: int
+    tool: str
+    ok: bool
+    error_code: str | None
+    observation: str | None
+
+
+class DroppedClaimView(BaseModel):
+    """A claim the fact-checker refused."""
+
+    code: str
+    reason: str
+
+
+class InquiryView(BaseModel):
+    """How the model-driven investigation went: codes, counts and tool names only."""
+
+    outcome: str
+    trace: list[TraceStepView]
+    claimed: list[str]
+    confirmed: list[str]
+    added: list[str]
+    dropped: list[DroppedClaimView]
+    missed: list[str]
+    tokens: int
+    provider: str | None
+
+
 class CaseSummary(BaseModel):
     """One line per case, for lists."""
 
@@ -216,6 +247,7 @@ class CaseView(BaseModel):
     uncertainty_flags: list[str]
     decision: DecisionView | None
     approval: ApprovalView | None
+    inquiry: InquiryView | None = None
 
 
 class AuditEventView(BaseModel):
@@ -308,6 +340,29 @@ def view_of(run: CaseRun) -> CaseView:
                 for v in run.votes
             ],
         )
+    inquiry = None
+    if run.inquiry is not None:
+        i = run.inquiry
+        inquiry = InquiryView(
+            outcome=i.outcome.value,
+            trace=[
+                TraceStepView(
+                    step=s.step,
+                    tool=s.tool,
+                    ok=s.ok,
+                    error_code=s.error_code,
+                    observation=s.observation,
+                )
+                for s in i.trace
+            ],
+            claimed=list(i.claimed),
+            confirmed=list(i.confirmed),
+            added=list(i.added),
+            dropped=[DroppedClaimView(code=d.code, reason=d.reason) for d in i.dropped],
+            missed=list(i.missed),
+            tokens=i.tokens,
+            provider=i.provider,
+        )
     return CaseView(
         id=case.id,
         status=case.status.value,
@@ -321,4 +376,5 @@ def view_of(run: CaseRun) -> CaseView:
         uncertainty_flags=[f.value for f in inv.verification.uncertainty_flags] if inv else [],
         decision=decision,
         approval=approval,
+        inquiry=inquiry,
     )

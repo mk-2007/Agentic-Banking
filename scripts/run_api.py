@@ -3,7 +3,7 @@
     python scripts/run_api.py --demo            # random demo tokens, printed once at start-up
     NEXA_API_TOKENS="tok1:ana:fraud_analyst,tok2:rob:risk_officer,tok3:ayesha:customer:cust_010" \
         python scripts/run_api.py                # your own tokens (never put them in the repo)
-    python scripts/run_api.py --demo --llm      # decide with the LLM provider (rules as fallback)
+    python scripts/run_api.py --demo --llm      # model investigates and decides (rules as fallback)
 
 Everything is in memory: restarting forgets cases, approvals and the audit log, and the demo tokens
 change. Run it from the repository root with ``pip install -e backend`` done. Interactive docs are

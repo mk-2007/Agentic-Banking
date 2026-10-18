@@ -76,6 +76,11 @@ TOPICS: dict[str, tuple[frozenset[IndicatorCode], str, str]] = {
         "untrusted text merchant names memos instructions risk indicator",
         FRAUD,
     ),
+    "structuring": (
+        frozenset({C.POSSIBLE_STRUCTURING}),
+        "possible structuring payments just below the high-value amount escalate compliance",
+        AML,
+    ),
     "insufficient_history": (
         frozenset({C.INSUFFICIENT_HISTORY}),
         "insufficient history fewer than 10 transactions escalate analyst",

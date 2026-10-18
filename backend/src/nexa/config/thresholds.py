@@ -40,6 +40,16 @@ class FraudThresholds(Contract):
         lt=1.0,
         description="'Very small' means at most this share of the alert.",
     )
+    structuring_min_payments: int = Field(
+        default=4, gt=1, description="Payments in one window, just under the line, that look split."
+    )
+    structuring_window_hours: int = Field(default=24, gt=0)
+    structuring_band_floor: float = Field(
+        default=0.6,
+        gt=0.0,
+        lt=1.0,
+        description="'Just under the line' means between this share of it and the line itself.",
+    )
 
 
 DEFAULT_THRESHOLDS = FraudThresholds()

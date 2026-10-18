@@ -41,6 +41,7 @@ class IndicatorCode(StrEnum):
     FAMILIAR_MERCHANT = "familiar_merchant"
     WITHIN_NORMAL_RANGE = "within_normal_range"
     INSUFFICIENT_HISTORY = "insufficient_history"
+    POSSIBLE_STRUCTURING = "possible_structuring"
 
 
 C = IndicatorCode
@@ -64,5 +65,6 @@ SIGNAL_OF: Final[Mapping[IndicatorCode, Signal]] = MappingProxyType(
         C.FAMILIAR_MERCHANT: Signal.MITIGATING,
         C.WITHIN_NORMAL_RANGE: Signal.INFO,
         C.INSUFFICIENT_HISTORY: Signal.INFO,
+        C.POSSIBLE_STRUCTURING: Signal.RISK,  # NB-POL-AML-001 section 6
     }
 )

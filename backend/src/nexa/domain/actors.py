@@ -22,6 +22,7 @@ class Role(StrEnum):
     DATA_AGENT = "data_agent"
     POLICY_AGENT = "policy_agent"
     ANALYSIS_AGENT = "analysis_agent"
+    INVESTIGATOR_AGENT = "investigator_agent"
     VERIFICATION_AGENT = "verification_agent"
     DECISION_AGENT = "decision_agent"
     RISK_AGENT = "risk_agent"

@@ -10,7 +10,7 @@ same reason.
 import operator
 from typing import Annotated, TypedDict
 
-from nexa.agents import Dossier, PolicyResult, VerificationReport
+from nexa.agents import Dossier, InquiryReport, PolicyResult, VerificationReport
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
 from nexa.domain.decision import Decision
@@ -25,6 +25,8 @@ class CaseGraphState(TypedDict, total=False):
     trail: Annotated[list[CaseStatus], operator.add]
     dossier: Dossier
     findings: list[Evidence]
+    # How the model-driven investigation went; only set when it was switched on.
+    inquiry: InquiryReport
     policy: PolicyResult
     verification: VerificationReport
     # Set when the run stopped early. A short code such as "get_kyc_status:out_of_scope", never
