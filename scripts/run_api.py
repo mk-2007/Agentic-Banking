@@ -14,6 +14,7 @@ served at /docs.
 
 import argparse
 import os
+import secrets
 import sys
 from pathlib import Path
 
@@ -25,6 +26,7 @@ sys.path.insert(0, str(ROOT / "backend" / "src"))
 from nexa.agents.monitor_agent import MonitorAgent  # noqa: E402
 from nexa.api import CaseService, Monitor, create_app, demo_tokens, parse_tokens  # noqa: E402
 from nexa.api.principals import describe  # noqa: E402
+from nexa.api.sessions import Accounts, hash_password, parse_users  # noqa: E402
 from nexa.config import DEFAULT_THRESHOLDS  # noqa: E402
 from nexa.config.llm import LlmLimits  # noqa: E402
 from nexa.decision import LlmDecisionProvider, RuleBasedDecisionProvider  # noqa: E402
@@ -49,16 +51,27 @@ def main() -> int:
         print("demo sign-ins (shown once; send as 'Authorization: Bearer <token>'):")
         for token, who in tokens.items():
             print(f"  {who.user_id:18} {who.role.value:18} {token}")
+        users = {}
+        print("demo logins for the page (username / password):")
+        for who in tokens.values():
+            password = secrets.token_urlsafe(9)
+            users[who.user_id] = (hash_password(password), who)
+            print(f"  {who.user_id:18} {password}")
     else:
         try:
             tokens = parse_tokens(os.environ.get("NEXA_API_TOKENS", ""))
         except ValueError as error:
             print(f"NEXA_API_TOKENS is invalid: {error}")
             return 2
-        if not tokens:
-            print("no tokens: set NEXA_API_TOKENS or pass --demo")
+        try:
+            users = parse_users(os.environ.get("NEXA_API_USERS", ""))
+        except ValueError as error:
+            print(f"NEXA_API_USERS is invalid: {error}")
             return 2
-        print(f"sign-ins: {describe(tokens)}")
+        if not tokens and not users:
+            print("no sign-ins: set NEXA_API_USERS or NEXA_API_TOKENS, or pass --demo")
+            return 2
+        print(f"sign-ins: {describe(tokens)}; users: {', '.join(users) or 'none'}")
 
     provider = None
     gateway = None
@@ -87,7 +100,7 @@ def main() -> int:
         monitor = Monitor(service.bank, service, agent)
         print("monitor: on (every customer payment is reviewed in the background)")
     uvicorn.run(
-        create_app(service, tokens, monitor=monitor), host=args.host, port=args.port, log_level="info"
+        create_app(service, tokens, monitor=monitor, accounts=Accounts(users)), host=args.host, port=args.port, log_level="info"
     )
     return 0
 

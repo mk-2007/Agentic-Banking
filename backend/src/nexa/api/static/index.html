@@ -31,7 +31,7 @@ button,input,textarea { font:inherit; color:inherit; }
 .tag { flex:1; min-width:220px; font:700 15px/1.25 var(--display); text-transform:uppercase; letter-spacing:.04em; }
 .tag b { background:var(--ink); color:var(--paper); padding:0 6px; }
 .plug { display:flex; gap:8px; align-items:stretch; background:var(--card); border:2px solid var(--ink); box-shadow:5px 5px 0 var(--p); padding:6px; }
-.plug input { border:0; background:transparent; width:230px; outline:0; font-family:var(--mono); }
+.plug input { border:0; background:transparent; width:140px; outline:0; font-family:var(--mono); }
 .stamp { display:inline-block; font:800 12px var(--display); letter-spacing:.08em; text-transform:uppercase; padding:2px 8px; border:2px solid currentColor; }
 .btn { cursor:pointer; background:var(--ink); color:var(--paper); border:2px solid var(--ink); padding:7px 14px;
   font:800 13px var(--display); letter-spacing:.08em; text-transform:uppercase; box-shadow:3px 3px 0 var(--c,var(--o)); transition:transform .08s,box-shadow .08s; }
@@ -158,8 +158,9 @@ td { padding:3px 6px; border-bottom:1px dashed #17120f66; vertical-align:top; }
 <header class="mast">
   <div class="word" aria-label="NEXA"><span class="a">NE</span><span class="b">XA</span></div>
   <div class="tag">Agents <b>recommend</b><br>Code <b>enforces</b><br>Humans <b>authorize</b></div>
-  <div class="plug"><input id="token" type="password" placeholder="paste bearer token" autocomplete="off" aria-label="Bearer token">
-    <button class="btn" id="connect">Plug in</button></div>
+  <form class="plug" id="login"><input id="user" placeholder="username" autocomplete="username" aria-label="Username">
+    <input id="pass" type="password" placeholder="password" autocomplete="current-password" aria-label="Password">
+    <button class="btn" id="connect">Sign in</button> <button class="btn" type="button" id="logout">Sign out</button></form>
   <span id="who" class="stamp"></span>
 </header>
 <div class="ticker" aria-hidden="true"><div id="tick"></div></div>
@@ -174,7 +175,7 @@ td { padding:3px 6px; border-bottom:1px dashed #17120f66; vertical-align:top; }
 const $ = id => document.getElementById(id);
 const h = (tag, cls, ...kids) => { const e = document.createElement(tag); if (cls) e.className = cls; e.append(...kids.filter(k => k != null)); return e; };
 const INKS = ["--t", "--b", "--y", "--o", "--p"];
-const S = { feedTimer: 0, token: sessionStorage.getItem("nexa_token") || "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
+const S = { feedTimer: 0, token: "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
   view: null, audit: [], upto: 0, pick: null, timer: null, ui: {} };
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -636,8 +637,7 @@ function simCard(sim) {
 
 function empty() { $("stage").replaceChildren(h("div", "card empty", "Load a ", h("span", "", "scenario"), h("br"), "watch the ", h("i", "", "agents"), " work")); }
 
-$("connect").onclick = guard(async () => {
-  S.token = $("token").value.trim(); sessionStorage.setItem("nexa_token", S.token);
+const enter = guard(async () => {
   try { S.scenarios = await api("/scenarios"); S.mode = "employee"; }
   catch (e) {
     if (e.status !== 403) throw e;   // a valid token without case access is an auditor or a customer
@@ -648,7 +648,11 @@ $("connect").onclick = guard(async () => {
   if (S.mode === "auditor") return openTab("lab");
   empty(); await refresh(); note("");
 });
-$("token").value = S.token; if (S.token) $("connect").onclick();
+$("login").onsubmit = async e => { e.preventDefault(); note("");
+  try { await api("/auth/login", { method: "POST", body: JSON.stringify({ username: $("user").value, password: $("pass").value }) }); $("pass").value = ""; await enter(); }
+  catch (err) { note("✖ " + err.message); } };
+$("logout").onclick = async () => { await api("/auth/logout", { method: "POST" }).catch(() => {}); location.reload(); };
+enter().then(() => { if (!S.mode) note(""); });   // a live session cookie signs the page straight in
 $("tick").textContent = "AGENTS RECOMMEND  ✶  CODE ENFORCES  ✶  HUMANS AUTHORIZE  ✶  ";
 </script>
 </body>

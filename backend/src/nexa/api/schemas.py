@@ -37,6 +37,13 @@ class VoteRequest(Request):
     comment: str = Field(default="", max_length=500)
 
 
+class LoginRequest(Request):
+    """A username and password."""
+
+    username: str = Field(min_length=1, max_length=64)
+    password: str = Field(min_length=1, max_length=200)
+
+
 class ChatRequest(Request):
     """A question for the knowledge base."""
 

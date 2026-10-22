@@ -10,6 +10,8 @@ from pathlib import Path
 
 import pytest
 
+from nexa.api.sessions import hash_password
+
 sync_api = pytest.importorskip("playwright.sync_api")
 ROOT = Path(__file__).resolve().parents[3]
 PORT = "8766"
@@ -17,7 +19,10 @@ PORT = "8766"
 
 @pytest.fixture
 def server():
-    env = dict(os.environ, NEXA_API_TOKENS="tc:ayesha:customer:cust_010,te:ana:fraud_analyst")
+    users = (
+        f"ayesha:{hash_password('pw1')}:customer:cust_010,ana:{hash_password('pw2')}:fraud_analyst"
+    )
+    env = dict(os.environ, NEXA_API_USERS=users)
     cmd = [sys.executable, str(ROOT / "scripts" / "run_api.py"), "--port", PORT, "--no-monitor"]
     proc = subprocess.Popen(cmd, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     for _ in range(40):
@@ -30,8 +35,8 @@ def server():
     proc.kill()
 
 
-@pytest.mark.parametrize("token", ["tc", "te"])
-def test_user_can_type_and_ask(server: str, token: str) -> None:
+@pytest.mark.parametrize("login", [("ayesha", "pw1"), ("ana", "pw2")])
+def test_user_can_type_and_ask(server: str, login: tuple[str, str]) -> None:
     with sync_api.sync_playwright() as pw:
         try:
             browser = pw.chromium.launch(channel="chrome")
@@ -39,7 +44,8 @@ def test_user_can_type_and_ask(server: str, token: str) -> None:
             pytest.skip("Chrome is not available")
         page = browser.new_page()
         page.goto(server)
-        page.fill("#token", token)
+        page.fill("#user", login[0])
+        page.fill("#pass", login[1])
         page.click("#connect")
         page.get_by_role("button", name="Ask the bank").click()
         box = page.locator(".ask input")
