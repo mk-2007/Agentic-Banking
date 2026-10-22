@@ -4,7 +4,7 @@ Regenerate with `python scripts/gen_status.py`. Other documents link here for cu
 
 - **Tests:** 854 collected
 - **Architecture decision records:** 16
-- **Latest release tag:** v0.1.0; built from commit a4aa9bf
+- **Latest release tag:** v0.1.0; built from commit 75622cc
 - **Latest randomised-traffic run:** saved 2026-10-18T12:39:06+00:00, provider anthropic, [1, 2] seeds, 288 s
 
 | Phase | Status | Summary |

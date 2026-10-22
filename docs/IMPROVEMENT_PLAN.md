@@ -22,6 +22,21 @@ production platform. Where a production system would need more, the WP says so u
 | L9 | The investigator is a fixed pipeline, not an agent that chooses what to look at next | `agents/`, `orchestration/` |
 | L10 | Repo hygiene: AI-attribution trailers on some commits, AI notes in the repo root | see WP0 |
 
+## Final status (2026-10-22)
+
+| WP | Limitation | Result |
+|----|-----------|--------|
+| WP0 | L10 | Done: no trailers anywhere; CI rejects new ones |
+| WP1 | L1 | Done: generated `STATUS.md`, drift test, stale counts fixed |
+| WP2 | L8 | Done: Ask box typing fixed, browser test |
+| WP3 | L3 | Done (prototype depth): password login, sessions, lockout; no MFA or SSO yet |
+| WP4 | L2 | Partly: approvals and audit durable (`--data-dir`); checkpoints, case list, bank state, sessions, outbox open |
+| WP5 | L4 | Done (simulator only): retry, failure record, reconciliation |
+| WP6 | L9, L7 | Closed: investigator was already agentic; model stays optional |
+| WP7 | L5 | Done: holdout, cost, latency, drift (`docs/evaluation.md`); no expert labels |
+| WP8 | L6 | Partly: drafts and retired docs unreachable, access review; approver registry and per-run recall open |
+| WP9 | - | Open: tag v0.2.0 after merge, once WP4b and WP8b land |
+
 ## Work packages (in order)
 
 ### WP0. Repository hygiene (L10)
