@@ -5,9 +5,9 @@ Everything is synthetic data on one machine. No bank, no real keys needed for th
 ## 1. Install (once)
 ```powershell
 cd "E:\Allied Bank Hackathon"
-pip install -e "backend[dev]"
+python -m pip install -e "backend[dev]"
 ```
-Needs Python 3.11+. For the browser test only: `pip install playwright` and Chrome installed.
+Needs Python 3.11+. For the browser test only: `python -m pip install playwright` and Chrome installed.
 
 ## 2. Check the build (about 90 seconds)
 ```powershell
@@ -62,6 +62,7 @@ python scripts/gen_status.py            # regenerate docs/STATUS.md
 ## 6. If something is wrong
 | Symptom | Fix |
 |---------|-----|
+| `pip` crashes with `'NoneType' object has no attribute 'endswith'` | the `pip.exe` launcher is broken; always use `python -m pip ...` |
 | Port already in use | an earlier server is still running; stop it or use `--port 8001` |
 | Passwords not printed when output is redirected | run with `python -u` |
 | *wrong username or password* | demo passwords change on each start; use the new ones; 5 failures lock a user for 5 minutes |

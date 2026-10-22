@@ -8,8 +8,8 @@ and rehearse once.
 ```powershell
 cd "E:\Allied Bank Hackathon"
 python -m venv backend\.venv; backend\.venv\Scripts\activate     # optional
-pip install -e "backend[dev]"
-pip install websockets                                           # only needed to remake the video
+python -m pip install -e "backend[dev]"
+python -m pip install websockets                                           # only needed to remake the video
 copy .env.example .env                                           # then edit .env (below)
 ```
 
