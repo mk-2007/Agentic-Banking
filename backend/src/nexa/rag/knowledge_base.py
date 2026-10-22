@@ -69,12 +69,28 @@ class KnowledgeBase:
             visible = [c for c in chunks if c.meta.sensitivity <= level]
             current = [c for c in visible if c.meta.status is DocumentStatus.ACTIVE]
             self._indexes[(level, False)] = Bm25Index(current)
-            self._indexes[(level, True)] = Bm25Index(visible)
+            # history means superseded versions; drafts and retired documents are never served
+            kept = (DocumentStatus.ACTIVE, DocumentStatus.SUPERSEDED)
+            self._indexes[(level, True)] = Bm25Index([c for c in visible if c.meta.status in kept])
 
     @property
     def chunks(self) -> tuple[Chunk, ...]:
         """Every chunk, regardless of access. For ingestion tests, never for retrieval."""
         return self._chunks
+
+    def access_review(self) -> dict[Sensitivity, dict[str, tuple[str, str]]]:
+        """For each clearance, the servable documents it may see: id -> (version, status).
+
+        An access-review report: who can read what, from the same filter that serves searches.
+        """
+        review: dict[Sensitivity, dict[str, tuple[str, str]]] = {}
+        for level in Sensitivity:
+            docs = review.setdefault(level, {})
+            for chunk in self._chunks:
+                m = chunk.meta
+                if m.sensitivity <= level and m.status is DocumentStatus.ACTIVE:
+                    docs[m.document_id] = (m.version, m.status.value)
+        return review
 
     def search(
         self,

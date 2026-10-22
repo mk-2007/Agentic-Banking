@@ -23,7 +23,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Response, status
 from fastapi.responses import FileResponse
 
 from nexa.bank_sim import (
@@ -59,6 +59,7 @@ from .schemas import (
     CaseView,
     ChatRequest,
     ChatResponse,
+    LoginRequest,
     MonitorEntryView,
     OpenCaseRequest,
     PassageView,
@@ -70,6 +71,7 @@ from .schemas import (
     view_of,
 )
 from .service import CaseNotFoundError, CaseService, InvalidAlertError, NotWaitingError
+from .sessions import SESSION_SECONDS, Accounts
 
 
 def create_app(
@@ -77,6 +79,7 @@ def create_app(
     principals: Mapping[str, Principal],
     lab: LabService | None = None,
     monitor: Monitor | None = None,
+    accounts: Accounts | None = None,
 ) -> FastAPI:
     """Build the API around ``service``. ``principals`` maps bearer tokens to callers.
 
@@ -86,16 +89,42 @@ def create_app(
     app = FastAPI(title="NexaBank Agentic Platform", version="0.1.0")
     lab_box: list[LabService] = [lab] if lab else []
 
-    def caller(authorization: Annotated[str | None, Header()] = None) -> Principal:
+    def caller(
+        authorization: Annotated[str | None, Header()] = None,
+        nexa_session: Annotated[str | None, Cookie()] = None,
+    ) -> Principal:
         scheme, _, token = (authorization or "").partition(" ")
         principal = principals.get(token) if scheme.lower() == "bearer" else None
+        if principal is None and accounts is not None:
+            principal = accounts.principal(nexa_session)
         if principal is None:
             raise HTTPException(
                 status.HTTP_401_UNAUTHORIZED,
-                "missing or unknown token",
+                "not signed in",
                 {"WWW-Authenticate": "Bearer"},
             )
         return principal
+
+    @app.post("/auth/login")
+    def login(body: LoginRequest, response: Response) -> dict[str, str]:
+        """Sign in with a username and password; the session rides in an HttpOnly cookie."""
+        session = accounts.login(body.username, body.password) if accounts else None
+        if session is None:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, "wrong username or password")
+        response.set_cookie(
+            "nexa_session", session, max_age=SESSION_SECONDS, httponly=True, samesite="strict"
+        )
+        return {"user": body.username}
+
+    @app.post("/auth/logout")
+    def logout(
+        response: Response, nexa_session: Annotated[str | None, Cookie()] = None
+    ) -> dict[str, str]:
+        """End the session and clear the cookie."""
+        if accounts:
+            accounts.logout(nexa_session)
+        response.delete_cookie("nexa_session")
+        return {"status": "signed out"}
 
     def employee(who: Annotated[Principal, Depends(caller)]) -> Principal:
         if not who.is_employee:

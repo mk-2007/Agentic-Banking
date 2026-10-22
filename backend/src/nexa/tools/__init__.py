@@ -16,7 +16,7 @@ Modules:
 
 from .base import Tool, ToolContext
 from .case_actions import PerformCaseAction
-from .execution import ExecuteAuthorizedAction
+from .execution import ExecuteAuthorizedAction, TransientBankError
 from .knowledge import SearchKnowledgeBase
 from .read_tools import (
     GetAccountDetails,
@@ -25,6 +25,7 @@ from .read_tools import (
     GetTransactionDetails,
     GetTransactionHistory,
 )
+from .reconciliation import Mismatch, reconcile
 from .registry import ToolRegistry
 
 
@@ -47,6 +48,9 @@ def build_default_registry(ctx: ToolContext) -> ToolRegistry:
 
 
 __all__ = [
+    "Mismatch",
+    "TransientBankError",
+    "reconcile",
     "ExecuteAuthorizedAction",
     "GetAccountDetails",
     "GetCustomerProfile",

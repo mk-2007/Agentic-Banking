@@ -1,6 +1,7 @@
 """The HTTP API: who may call what, the whole Level 4 path over HTTP, and what must stay hidden."""
 
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -283,3 +284,16 @@ def test_a_case_nobody_votes_on_times_out_once_its_approval_expires() -> None:
     )
     assert late.status_code == 409  # a timed-out case takes no votes
     assert service.bank.get_account("acc_106").status.value == "active"
+
+
+def test_approvals_and_audit_chain_survive_a_restart(tmp_path: Path) -> None:
+    first = CaseService(data_dir=tmp_path)
+    app = create_app(first, parse_tokens("t-analyst:ana:fraud_analyst"))
+    case = open_case(TestClient(app), "scenario_f_account_takeover")
+    approval_id = case["approval"]["id"]
+    count = len(first.log.events())
+    assert count > 0
+
+    second = CaseService(data_dir=tmp_path)  # a new process would reopen the same files
+    assert len(second.log.events()) == count and second.log.verify() is None
+    assert second.approvals.get_request(approval_id) is not None

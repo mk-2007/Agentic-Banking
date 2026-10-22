@@ -9,12 +9,13 @@ graph, the approval store and the audit log are shared and the prototype keeps t
 import threading
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 
 from langgraph.checkpoint.memory import MemorySaver
 
 from nexa.agents.base import AgentContext
-from nexa.approvals import InMemoryApprovalStore
-from nexa.audit import AuditRecorder, InMemoryAuditLog
+from nexa.approvals import ApprovalStore, InMemoryApprovalStore, SqliteApprovalStore
+from nexa.audit import AuditRecorder, InMemoryAuditLog, JsonlAuditLog
 from nexa.bank_sim import load_bank
 from nexa.bank_sim.gateway import BankGateway
 from nexa.config import effective_clearance
@@ -89,11 +90,20 @@ class CaseService:
         provider: DecisionProvider | None = None,
         gateway: LlmGateway | None = None,
         clock: Clock = utc_now,
+        data_dir: Path | None = None,
     ) -> None:
         self._clock = clock
         self._scopes = _Scopes()
-        self.approvals = InMemoryApprovalStore()
-        self.log = InMemoryAuditLog()
+        # With a data directory, approvals and the audit chain survive a restart (the chain is
+        # re-verified on open); without one they are in memory, as in tests.
+        self.approvals: ApprovalStore
+        self.log: InMemoryAuditLog
+        if data_dir is None:
+            self.approvals, self.log = InMemoryApprovalStore(), InMemoryAuditLog()
+        else:
+            data_dir.mkdir(parents=True, exist_ok=True)
+            self.approvals = SqliteApprovalStore(data_dir / "approvals.db")
+            self.log = JsonlAuditLog(data_dir / "audit.jsonl")
         self.bank = bank or load_bank()
         tools = ToolContext(
             bank=self.bank,

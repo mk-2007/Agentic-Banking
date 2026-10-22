@@ -8,6 +8,7 @@ Modules:
     store  `InMemoryApprovalStore`: requests, votes and single-use consumption (Phase 6d)
 """
 
-from .store import InMemoryApprovalStore
+from .sqlite_store import SqliteApprovalStore
+from .store import ApprovalStore, InMemoryApprovalStore
 
-__all__ = ["InMemoryApprovalStore"]
+__all__ = ["ApprovalStore", "InMemoryApprovalStore", "SqliteApprovalStore"]

@@ -2,6 +2,26 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-22 - Improvement plan
+- `docs/IMPROVEMENT_PLAN.md`: ten limitations (L1-L10) mapped to work packages WP0-WP9, one PR each.
+- **Checked the co-author claim:** `main` and `origin/main` have no Claude trailer; the only GitHub contributor is the owner. Ten trailered commits exist only on the local `backup/feat/phase-6d-execution` branch and in `refs/original`. WP0 removes them locally.
+
+- **WP2 fixed (L8):** the Ask box ignored typing because its key handler `e => e.key === "Enter" && ask()` returned `false` for every other key, which cancels the keystroke. Now an `if`. Browser regression test `backend/tests/integration/test_ui_ask_box.py` (customer and employee).
+
+- **WP3 done (L3):** username and password sign-in (`api/sessions.py`): scrypt-hashed passwords, random session id in an HttpOnly SameSite=Strict cookie, 8 h expiry, lockout after 5 failures for 5 min, `/auth/login` and `/auth/logout`. Users come from `NEXA_API_USERS=user:hash:role[:customer]`; `--demo` prints random passwords. The page now has a login form; bearer tokens still work for scripts. Not done: second factor and OIDC (needs a provider), durable sessions (WP4).
+
+- **WP0 done (L10):** the local backup branch and `refs/original` were deleted and the reflog expired (`git log --all` now shows 0 trailers). `.github/workflows/no-trailers.yml` fails a PR whose commits carry `Co-Authored-By:`.
+
+- **WP4a (L2):** `SqliteApprovalStore` (atomic single-use via one conditional UPDATE) and `CaseService(data_dir=...)` / `run_api.py --data-dir`: approvals and the audit chain now survive a restart. An `ApprovalStore` protocol replaces the concrete in-memory type in orchestration. Not yet durable: checkpoints, case list, bank state, sessions, outbox (4b).
+
+- **WP1 done (L1):** `scripts/gen_status.py` writes `docs/STATUS.md` (test count, phases, ADR count, latest run, tag). Drift found and fixed: README said 838 tests and 13 ADRs (actual 848 and 16), `STATE.md` said 679, and the graph still had phases 6 and 8 open. `tests/architecture/test_status_page.py` fails if the README's test count disagrees. WP4 stops at 4a: restoring cases also needs the bank's state saved, which is a larger step.
+
+- **WP8a (L6):** fault found and fixed: the historical index (`include_historical=True`) held `draft` and `retired` chunks as well as superseded ones; it now holds only active and superseded. Added `KnowledgeBase.access_review()` (which clearance sees which active document and version). Not done: a document approver registry and retrieval-quality tracking per run (8b).
+
+- **WP5 (L4):** `apply_with_retry` (3 attempts, transient errors only) around the bank call in `execute_authorized_action`; a permanent failure writes an `exec_failed` audit record and leaves the approval spent for human follow-up; the executed event now carries a structured `output_ref`. New `tools/reconciliation.py` (`reconcile`) reports `not_applied` and `execution_failed` mismatches. Idempotency rests on the single-use approval id (replays are refused) and on freeze and block being idempotent at the bank. Not done: a real bank connection, scheduled reconciliation, a ticketing integration.
+
+- **WP6 / WP7 (L5, L7, L9):** the investigator was already a bounded tool-use agent, so WP6 became a review, not a rebuild. WP7: `scripts/run_holdout_eval.py` scores seeds 1001-1008 that were never used for tuning against seeds 1-3 (fraud caught 32/32 and 12/12, 0 honest restricted), prices mistakes with an assumed cost matrix, reports latency and a monitor-path drift check, and writes `docs/evaluation.md`. Finding: about two in three honest customers get a case opened (over-escalation).
+
 ## 2026-10-18 - The demo video and a guide to presenting
 - **Video:** `scripts/make_demo_video.py` records the whole story through a real headless Chrome against the server with a model on, speaks the script with Windows' built-in voice, and renders a captioned `.webm` inside Chrome (no ffmpeg). The recorded run: a customer pays, the monitor clears the routine payment and opens cases on the takeover burst, a model investigates (Claude, 6,905 tokens in the freeze case), the analyst and risk officer approve a freeze, the customer's next payment is refused. About 2 minutes (124 s, 1600 by 1040). The file is not committed (about 30 MB); the script is.
 - **Found by recording:** `--llm` also let the model rank the actions, and it chose a more cautious action than the freeze (allowed: the model may be more cautious than the rules, never less), so the two-role freeze was not guaranteed on screen and did not match the saved evaluation. `--llm` now means the model monitors and investigates while the rules and gates decide; `--llm-decisions` lets it rank too. The server's log went to a pipe nobody read and could fill and block the run: the recorder now writes it to a file. The page redraws its form after each payment, which the script had to allow for.

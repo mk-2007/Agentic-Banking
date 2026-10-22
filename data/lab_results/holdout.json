@@ -1,0 +1,210 @@
+{
+ "tuning": {
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "summary": {
+   "episodes": 21,
+   "fraud_episodes": 12,
+   "fraud_caught": 12,
+   "fraud_recognised": 9,
+   "honest_episodes": 9,
+   "honest_opened": 6,
+   "honest_restricted": 0,
+   "over_restricted": 0,
+   "by_persona": [
+    {
+     "persona": "honest_routine",
+     "kind": "honest",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 3,
+     "opened": 0,
+     "recognised": 0
+    },
+    {
+     "persona": "honest_big_purchase",
+     "kind": "honest",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 0,
+     "opened": 3,
+     "recognised": 0
+    },
+    {
+     "persona": "honest_new_payee",
+     "kind": "honest",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 0,
+     "opened": 3,
+     "recognised": 0
+    },
+    {
+     "persona": "takeover",
+     "kind": "fraud",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 3,
+     "opened": 3,
+     "recognised": 3
+    },
+    {
+     "persona": "card_testing",
+     "kind": "fraud",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 3,
+     "opened": 3,
+     "recognised": 3
+    },
+    {
+     "persona": "structuring",
+     "kind": "fraud",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 3,
+     "opened": 3,
+     "recognised": 0
+    },
+    {
+     "persona": "new_phone",
+     "kind": "fraud",
+     "episodes": 3,
+     "safe": 3,
+     "useful": 3,
+     "preferred": 3,
+     "opened": 3,
+     "recognised": 3
+    }
+   ]
+  },
+  "missed_fraud": 0,
+  "cost": 90,
+  "cost_per_episode": 4.3,
+  "latency_p50": 0.0,
+  "latency_max": 0.1,
+  "path_share": {
+   "floor": 0.348,
+   "model_unavailable": 0.478,
+   "routine": 0.174
+  }
+ },
+ "holdout": {
+  "seeds": [
+   1001,
+   1002,
+   1003,
+   1004,
+   1005,
+   1006,
+   1007,
+   1008
+  ],
+  "summary": {
+   "episodes": 56,
+   "fraud_episodes": 32,
+   "fraud_caught": 32,
+   "fraud_recognised": 24,
+   "honest_episodes": 24,
+   "honest_opened": 16,
+   "honest_restricted": 0,
+   "over_restricted": 0,
+   "by_persona": [
+    {
+     "persona": "honest_routine",
+     "kind": "honest",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 8,
+     "opened": 0,
+     "recognised": 0
+    },
+    {
+     "persona": "honest_big_purchase",
+     "kind": "honest",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 0,
+     "opened": 8,
+     "recognised": 0
+    },
+    {
+     "persona": "honest_new_payee",
+     "kind": "honest",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 0,
+     "opened": 8,
+     "recognised": 0
+    },
+    {
+     "persona": "takeover",
+     "kind": "fraud",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 8,
+     "opened": 8,
+     "recognised": 8
+    },
+    {
+     "persona": "card_testing",
+     "kind": "fraud",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 8,
+     "opened": 8,
+     "recognised": 8
+    },
+    {
+     "persona": "structuring",
+     "kind": "fraud",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 8,
+     "opened": 8,
+     "recognised": 0
+    },
+    {
+     "persona": "new_phone",
+     "kind": "fraud",
+     "episodes": 8,
+     "safe": 8,
+     "useful": 8,
+     "preferred": 8,
+     "opened": 8,
+     "recognised": 8
+    }
+   ]
+  },
+  "missed_fraud": 0,
+  "cost": 240,
+  "cost_per_episode": 4.3,
+  "latency_p50": 0.1,
+  "latency_max": 0.2,
+  "path_share": {
+   "floor": 0.342,
+   "model_unavailable": 0.471,
+   "routine": 0.187
+  }
+ },
+ "costs": {
+  "missed_fraud": 5000,
+  "honest_restricted": 200,
+  "honest_case_opened": 15
+ }
+}
