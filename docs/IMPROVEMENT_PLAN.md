@@ -75,6 +75,7 @@ production platform. Where a production system would need more, the WP says so u
 - **Done when:** tests for duplicate submit, timeout-then-retry, and a deliberately injected mismatch.
 
 ### WP6. Make the investigator genuinely agentic (L9, L7)
+- **Review result: premise was wrong.** `agents/investigator_agent.py` already is a bounded tool-use loop (the model picks lookups, 6-step limit, third-party text removed, claims fact-checked by `agentic_analysis`). No rebuild needed; L9 is closed as a mis-diagnosis. L7 (is the model worth it?) is answered by the measured comparison in `docs/demo-report.md`, and the model stays optional.
 - **Do:** replace the fixed order with a bounded tool-use loop: the model picks the next read-only tool call
   from the closed tool list, has a step and token budget, every observation is fenced with `wrap_untrusted`,
   the final output must still be typed findings that a deterministic fact-checker confirms. The model never
@@ -83,6 +84,7 @@ production platform. Where a production system would need more, the WP says so u
   confirmed/added/dropped counts against the baseline.
 
 ### WP7. Independent evaluation (L5, L7)
+- **Status: done** via `scripts/run_holdout_eval.py` and `docs/evaluation.md` (holdout seeds, assumed cost matrix, latency, drift, red-team pointers). Expert labels remain unavailable.
 - **Do:** a holdout scenario set generated from a different seed family and never used for tuning; cost
   matrix (false-positive restriction vs missed fraud, in assumed currency units, stated as assumptions);
   latency and token cost per case; a drift check comparing indicator frequencies across runs; a red-team
