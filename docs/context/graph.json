@@ -364,6 +364,13 @@
       "summary": "Findings are evidence with a closed code set; no free-text channel between agents"
     },
     {
+      "id": "doc:improvement-plan",
+      "type": "doc",
+      "status": "in_progress",
+      "path": "docs/IMPROVEMENT_PLAN.md",
+      "summary": "Limitations L1-L10 and the ordered work packages WP0-WP9 that solve them"
+    },
+    {
       "id": "doc:tracker",
       "type": "doc",
       "status": "in_progress",

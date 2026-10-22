@@ -2,6 +2,10 @@
 
 Newest first. Add an entry whenever a step is finished or a decision is made.
 
+## 2026-10-22 - Improvement plan
+- `docs/IMPROVEMENT_PLAN.md`: ten limitations (L1-L10) mapped to work packages WP0-WP9, one PR each.
+- **Checked the co-author claim:** `main` and `origin/main` have no Claude trailer; the only GitHub contributor is the owner. Ten trailered commits exist only on the local `backup/feat/phase-6d-execution` branch and in `refs/original`. WP0 removes them locally.
+
 ## 2026-10-18 - The demo video and a guide to presenting
 - **Video:** `scripts/make_demo_video.py` records the whole story through a real headless Chrome against the server with a model on, speaks the script with Windows' built-in voice, and renders a captioned `.webm` inside Chrome (no ffmpeg). The recorded run: a customer pays, the monitor clears the routine payment and opens cases on the takeover burst, a model investigates (Claude, 6,905 tokens in the freeze case), the analyst and risk officer approve a freeze, the customer's next payment is refused. About 2 minutes (124 s, 1600 by 1040). The file is not committed (about 30 MB); the script is.
 - **Found by recording:** `--llm` also let the model rank the actions, and it chose a more cautious action than the freeze (allowed: the model may be more cautious than the rules, never less), so the two-role freeze was not guaranteed on screen and did not match the saved evaluation. `--llm` now means the model monitors and investigates while the rules and gates decide; `--llm-decisions` lets it rank too. The server's log went to a pipe nobody read and could fill and block the run: the recorder now writes it to a file. The page redraws its form after each payment, which the script had to allow for.
