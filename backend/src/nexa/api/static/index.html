@@ -345,7 +345,7 @@ function drawChat() {
   const go = h("button", "btn", "Ask");
   const ask = guard(async () => { const r = await api("/chat", { method: "POST", body: JSON.stringify({ question: input.value }) });
     out.replaceChildren(...(r.passages.length ? r.passages.map(p => h("div", "passage", h("span", "chip", `${p.document_id} v${p.version} §${p.section}`), h("div", "", p.text))) : [h("p", "mute", "Nothing you are cleared to see matches that.")])); });
-  go.onclick = ask; input.onkeydown = e => e.key === "Enter" && ask();
+  go.onclick = ask; input.onkeydown = e => { if (e.key === "Enter") ask(); };   // never return false from a key handler: it cancels the keystroke
   $("rail").replaceChildren(); $("stage").replaceChildren(card("Ask the bank · cited answers only", "--t", h("div", "ask", input, go), h("p", "mono mute", `Filtered by channel before ranking. You are signed in as: ${S.mode}.`), out));
 }
 
