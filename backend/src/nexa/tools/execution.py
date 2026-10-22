@@ -5,7 +5,9 @@ account, right case, enough approvers, not expired, never used before. It is cal
 execution service. This is the code-level guarantee behind "agents recommend, humans authorize".
 """
 
-from typing import ClassVar
+import time
+from collections.abc import Callable
+from typing import ClassVar, TypeVar
 
 from pydantic import Field
 
@@ -14,12 +16,26 @@ from nexa.domain.actions import ActionType, RiskLevel
 from nexa.domain.approval import ApprovalStatus
 from nexa.domain.audit import AuditEventType
 from nexa.domain.base import Contract, JsonDict
+from nexa.domain.errors import DomainError
 from nexa.domain.tooling import ToolCall, ToolSpec
 from nexa.security import AuthorizationDecision, DenialReason, verify_execution_approval
 
 from .base import Tool, ToolContext
 
 NAME = "execute_authorized_action"
+FAILED_PREFIX = (
+    "exec_failed"  # output_ref of the audit event written when the bank never applied it
+)
+MAX_ATTEMPTS = 3
+BACKOFF_SECONDS = 0.05  # shortcut: fixed small delay; use exponential backoff against a real bank
+
+T = TypeVar("T")
+
+
+class TransientBankError(DomainError):
+    """The bank could not be reached or timed out; the same request may be tried again."""
+
+
 EXECUTABLE_ACTIONS = frozenset({ActionType.BLOCK_CARD, ActionType.FREEZE_ACCOUNT})
 
 
@@ -56,6 +72,22 @@ def consume_approval(call: ToolCall, ctx: ToolContext, action: ActionType, accou
     return approval_id
 
 
+def apply_with_retry(apply: Callable[[], T], *, sleep: Callable[[float], None] = time.sleep) -> T:
+    """Call the bank, retrying a transient failure a bounded number of times.
+
+    Freeze and block are idempotent on the bank, so repeating a request whose outcome is unknown is
+    safe. After ``MAX_ATTEMPTS`` the last error is raised.
+    """
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            return apply()
+        except TransientBankError:
+            if attempt == MAX_ATTEMPTS:
+                raise
+            sleep(BACKOFF_SECONDS * attempt)
+    raise AssertionError("unreachable")
+
+
 class ExecuteAuthorizedAction(Tool):
     """Apply an approved block-card or freeze-account action."""
 
@@ -77,16 +109,32 @@ class ExecuteAuthorizedAction(Tool):
 
         approval_id = consume_approval(call, ctx, args.action, args.account_id)
 
-        if args.action is ActionType.FREEZE_ACCOUNT:
-            account = ctx.bank.freeze_account(args.account_id)
-        else:
-            account = ctx.bank.block_card(args.account_id)
+        apply = (
+            ctx.bank.freeze_account
+            if args.action is ActionType.FREEZE_ACCOUNT
+            else ctx.bank.block_card
+        )
+        try:
+            account = apply_with_retry(lambda: apply(args.account_id))
+        except TransientBankError:
+            # The approval is already spent, so leave a record that reconciliation reports to
+            # operations: a human decides whether to ask for a fresh approval.
+            ctx.audit.record(
+                AuditEventType.ERROR,
+                call.actor,
+                case_id=call.case_id,
+                tool_name=NAME,
+                output_ref=f"{FAILED_PREFIX}:{args.action.value}:{args.account_id}:{approval_id}",
+                detail=f"bank unavailable after {MAX_ATTEMPTS} attempts; nothing applied",
+            )
+            raise
 
         ctx.audit.record(
             AuditEventType.ACTION_EXECUTED,
             call.actor,
             case_id=call.case_id,
             tool_name=NAME,
+            output_ref=f"{args.action.value}:{args.account_id}",
             approval_status=ApprovalStatus.APPROVED,
             detail=f"{args.action.value} applied to {args.account_id} under {approval_id}",
         )

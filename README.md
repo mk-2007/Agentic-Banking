@@ -128,7 +128,7 @@ analysis stands alone.
 ## At a glance
 
 <p align="center">
-  <img src="docs/assets/stats.svg" alt="851 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 16 decision records" width="100%">
+  <img src="docs/assets/stats.svg" alt="854 tests, 11 scenarios, 4 agents, 92.5 percent recall at 3, 16 decision records" width="100%">
 </p>
 
 | | |
@@ -139,7 +139,7 @@ analysis stands alone.
 | **Actions** | 7 in a closed set, risk-levelled 1 to 4; Level 4 (freeze account) needs fraud analyst **and** risk officer |
 | **Knowledge base** | 98 cited chunks, access decided *before* ranking; recall@3 = 92.5% on 40 labelled questions |
 | **Synthetic data** | 23 customers, 865 transactions, 3 policy documents, plus an 88-case labelled lab cohort (11 archetypes, 12 threshold-boundary cases and a 16-case hard tier, 88 more accounts) |
-| **Quality** | 851 tests, `ruff` and `mypy --strict` clean, 16 architecture decision records |
+| **Quality** | 854 tests, `ruff` and `mypy --strict` clean, 16 architecture decision records |
 
 <p align="center"><img src="docs/assets/divider.svg" alt="" width="100%"></p>
 
@@ -446,7 +446,7 @@ Full write-up, including what seven scenarios and three runs cannot show:
 cd backend
 python -m venv .venv && source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
-pytest -q                                             # 851 tests, incl. architecture rules
+pytest -q                                             # 854 tests, incl. architecture rules
 ruff check . && ruff format --check . && mypy
 ```
 
