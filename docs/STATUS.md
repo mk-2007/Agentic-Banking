@@ -2,9 +2,9 @@
 
 Regenerate with `python scripts/gen_status.py`. Other documents link here for current numbers.
 
-- **Tests:** 849 collected
+- **Tests:** 851 collected
 - **Architecture decision records:** 16
-- **Latest release tag:** v0.1.0; built from commit cd9dae2
+- **Latest release tag:** v0.1.0; built from commit 179fd0c
 - **Latest randomised-traffic run:** saved 2026-10-18T12:39:06+00:00, provider anthropic, [1, 2] seeds, 288 s
 
 | Phase | Status | Summary |

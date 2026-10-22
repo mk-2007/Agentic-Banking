@@ -95,6 +95,7 @@ production platform. Where a production system would need more, the WP says so u
   is retrievable; every answer records which versions were used; a retrieval test set with recall@k tracked
   per run; an access-review report of which role can see which section.
 - **Done when:** retrieving a `draft` or `retired` doc is impossible (test first), and the quality report runs.
+- **Status (8a):** drafts and retired documents are now unreachable even with history requested (this was a real gap), and `access_review()` reports visibility per clearance. **Open (8b):** approver and version registry, recall@k tracked per run.
 
 ### WP9. Final pass
 - Regenerate STATUS, re-run the full evaluation with Claude, update README, graph, log, tag `v0.2.0`.

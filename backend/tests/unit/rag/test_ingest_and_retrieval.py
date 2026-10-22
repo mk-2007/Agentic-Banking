@@ -125,3 +125,21 @@ def test_evaluation_labels_point_at_real_sections() -> None:
     for item in load_eval_items():
         for expected in item["expected"]:  # type: ignore[attr-defined]
             assert expected in existing, f"{item['id']}: no such section {expected}"
+
+
+def test_draft_and_retired_stay_hidden_even_when_history_is_requested() -> None:
+    for status in ("Draft", "Retired"):
+        kb = kb_from(doc(status=status, body=BODY_V1))
+        hits = kb.search(
+            "daily transfer limit", clearance=Sensitivity.RESTRICTED, include_historical=True
+        )
+        assert hits == [], status
+
+
+def test_access_review_lists_what_each_clearance_can_see() -> None:
+    kb = load_knowledge_base()
+    review = kb.access_review()
+    assert set(review) == set(Sensitivity)
+    counts = [len(review[level]) for level in sorted(Sensitivity)]
+    assert counts == sorted(counts) and counts[0] < counts[-1]  # more clearance, more documents
+    assert all(status == "active" for _, status in review[Sensitivity.PUBLIC].values())
