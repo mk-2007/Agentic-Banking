@@ -65,6 +65,7 @@ production platform. Where a production system would need more, the WP says so u
   kill the process, resume, approve, execute.
 - **Not done:** Postgres, a broker. The protocols make that a new adapter, and ADR 0011 records the choice.
 - **Done when:** restart/resume tests pass and tampering with a DB row is detected on verify.
+- **Status (4a):** approvals (with single-use consumption) are durable in SQLite and the audit chain is durable and re-verified on open, both switched on by `--data-dir`. **Still open (4b):** case checkpoints and the case list (needs `langgraph-checkpoint-sqlite`), the simulated bank's state, sessions, and the outbox.
 
 ### WP5. Bank adapter boundary (L4)
 - **Do:** an `execute(action, idempotency_key)` contract on the tool layer; replays return the first result;

@@ -28,7 +28,7 @@ from nexa.agents import (
 )
 from nexa.agents.base import AgentContext
 from nexa.agents.verification_agent import BLOCKING
-from nexa.approvals import InMemoryApprovalStore
+from nexa.approvals import ApprovalStore
 from nexa.audit import AuditRecorder
 from nexa.config.approval_matrix import approval_rule_for
 from nexa.domain.actions import ActionType
@@ -100,7 +100,7 @@ class CaseNodes:
         *,
         audit: AuditRecorder | None = None,
         limits: RunLimits | None = None,
-        approvals: InMemoryApprovalStore | None = None,
+        approvals: ApprovalStore | None = None,
         registry: ToolRegistry | None = None,
     ) -> None:
         self._agents = agents

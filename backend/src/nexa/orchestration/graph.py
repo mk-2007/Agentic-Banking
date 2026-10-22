@@ -24,7 +24,7 @@ from langgraph.types import Command
 
 from nexa.agents import InquiryReport, Investigation
 from nexa.agents.base import AgentContext
-from nexa.approvals import InMemoryApprovalStore
+from nexa.approvals import ApprovalStore
 from nexa.audit import AuditRecorder
 from nexa.domain.approval import ApprovalRequest, ApprovalStatus, ApprovalVote
 from nexa.domain.case import Case, CaseStatus
@@ -62,7 +62,7 @@ def build_case_graph(
     decide: DecisionSource | None = None,
     audit: AuditRecorder | None = None,
     limits: RunLimits | None = None,
-    approvals: InMemoryApprovalStore | None = None,
+    approvals: ApprovalStore | None = None,
 ) -> CaseGraph:
     """Compile the case graph for ``ctx``. Pass ``agents`` to swap a specialist (tests do).
 

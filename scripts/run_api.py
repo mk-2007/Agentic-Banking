@@ -42,6 +42,7 @@ def main() -> int:
     parser.add_argument("--llm-decisions", action="store_true", help="the model also ranks the actions")
     parser.add_argument("--providers", default=None, help="model order, e.g. anthropic,gemini")
     parser.add_argument("--no-monitor", action="store_true", help="do not review customer payments")
+    parser.add_argument("--data-dir", type=Path, default=None, help="keep approvals and the audit log here across restarts")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
@@ -93,7 +94,7 @@ def main() -> int:
     else:
         print("decision provider: rules")
 
-    service = CaseService(provider=provider, gateway=gateway)
+    service = CaseService(provider=provider, gateway=gateway, data_dir=args.data_dir)
     monitor = None
     if not args.no_monitor:
         agent = MonitorAgent(gateway, DEFAULT_THRESHOLDS)

@@ -7,8 +7,33 @@ Consumption is atomic and permanent: an approval id can be used once, ever.
 
 import threading
 from collections.abc import Sequence
+from typing import Protocol
 
 from nexa.domain.approval import ApprovalRequest, ApprovalVote
+
+
+class ApprovalStore(Protocol):
+    """What orchestration and the execution tool need from an approval store."""
+
+    def add_request(self, request: ApprovalRequest) -> None:
+        """Store a new request."""
+        ...
+
+    def set_votes(self, approval_id: str, votes: Sequence[ApprovalVote]) -> None:
+        """Replace the recorded votes."""
+        ...
+
+    def get_request(self, approval_id: str) -> ApprovalRequest | None:
+        """Return the request or None."""
+        ...
+
+    def get_votes(self, approval_id: str) -> Sequence[ApprovalVote]:
+        """Return the votes."""
+        ...
+
+    def try_consume(self, approval_id: str) -> bool:
+        """Mark used, once."""
+        ...
 
 
 class InMemoryApprovalStore:
