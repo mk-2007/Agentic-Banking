@@ -175,7 +175,7 @@ td { padding:3px 6px; border-bottom:1px dashed #17120f66; vertical-align:top; }
 const $ = id => document.getElementById(id);
 const h = (tag, cls, ...kids) => { const e = document.createElement(tag); if (cls) e.className = cls; e.append(...kids.filter(k => k != null)); return e; };
 const INKS = ["--t", "--b", "--y", "--o", "--p"];
-const S = { feedTimer: 0, token: "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
+const S = { feedTimer: 0, token: sessionStorage.getItem("nexa_token") || "", mode: "", tab: "cases", scenarios: [], sel: 0, cases: [], pending: [],
   view: null, audit: [], upto: 0, pick: null, timer: null, ui: {} };
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 

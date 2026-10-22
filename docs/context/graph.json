@@ -371,6 +371,13 @@
       "summary": "Limitations L1-L10 and the ordered work packages WP0-WP9 that solve them"
     },
     {
+      "id": "doc:how-to-run",
+      "type": "doc",
+      "status": "done",
+      "path": "docs/HOW_TO_RUN.md",
+      "summary": "Install, test, start, use and troubleshoot the app"
+    },
+    {
       "id": "doc:status",
       "type": "doc",
       "status": "done",
