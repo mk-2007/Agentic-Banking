@@ -8,8 +8,8 @@ and rehearse once.
 ```powershell
 cd "E:\Allied Bank Hackathon"
 python -m venv backend\.venv; backend\.venv\Scripts\activate     # optional
-pip install -e "backend[dev]"
-pip install websockets                                           # only needed to remake the video
+python -m pip install -e "backend[dev]"
+python -m pip install websockets                                           # only needed to remake the video
 copy .env.example .env                                           # then edit .env (below)
 ```
 
@@ -34,11 +34,11 @@ Check it before you present: `$env:NEXA_LLM_PROVIDERS="anthropic"; python script
 | **The agentic demo** (a model monitors and investigates; rules and gates decide) | `python scripts/run_api.py --demo --llm --providers anthropic,gemini` |
 | The model also ranks the actions | add `--llm-decisions` |
 
-It prints four sign-in tokens (analyst, risk officer, auditor, customer). They change every start. Open
+It prints a username and password for each of four users (analyst, risk officer, auditor, customer), plus bearer tokens for scripts. They change every start. Open
 <http://127.0.0.1:8000>. Use **three browser windows** (one normal, two private/incognito): customer, analyst,
-risk officer. In each: paste a token, press **Plug in**.
+risk officer. In each: type a username and password, press **Sign in**.
 
-The page asks for a token because the server, not the page, decides who you are and what you may do; the page cannot
+The page asks you to sign in because the server, not the page, decides who you are and what you may do; the page cannot
 set its own role. (See `docs/PROJECT_GUIDE.md`, part 8.)
 
 ## 3. The five-minute live demo
@@ -104,7 +104,7 @@ folder is git-ignored by default because the video is about 30 MB.
 
 | Symptom | Fix |
 |---|---|
-| *missing or unknown token* | Tokens change every start; paste the new ones. |
+| *wrong username or password* / *not signed in* | Demo passwords change every start; use the new ones. Five wrong tries lock a user for five minutes. |
 | Customer sees only "Ask the bank" | That token is not linked to a bank customer; use the printed customer token. |
 | Live feed shows *model unavailable* | The key is missing, wrong, or out of quota. The cases still complete on the baseline; run the smoke test above. |
 | Nothing waits for approval | Make sure the amount was 9000 and the preset was clicked before **each** of the six payments. |

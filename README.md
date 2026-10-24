@@ -42,7 +42,7 @@ python scripts/run_api.py --demo      # prints sign-in tokens; open http://127.0
 python scripts/run_api.py --demo --llm  # the same, with a model monitoring and investigating (needs a key in .env)
 ```
 
-Paste the analyst token, open a sample case (or paste the **auditor** token for the evaluation lab: run 98 labelled cases, compare the agents with simple rules and hostile models, and read a report per account), and watch it go from alert to evidence to a recommendation. For the
+Sign in as the analyst, open a sample case (or sign in as the **auditor** for the evaluation lab: run 98 labelled cases, compare the agents with simple rules and hostile models, and read a report per account), and watch it go from alert to evidence to a recommendation. For the
 Level 4 freeze, approve as the analyst and then as the risk officer (two windows). The full walkthrough is in
 [docs/demo.md](docs/demo.md); a recorded run of the same flow is [docs/demo-report.md](docs/demo-report.md).
 
@@ -592,11 +592,11 @@ scripts/            run_case · run_agent_eval · run_decision_eval · run_api �
   worse than the rules. It was as safe and slightly less consistent. Scores are never presented as probabilities.
 - **The indicator patterns for a freeze or card block are our reading of the fraud policy**, which names the
   indicators but not the condition. They live in one function.
-- **Authentication is a static in-memory bearer token.** No identity provider, expiry or rate limiting.
+- **Authentication is a username and password with in-memory sessions** (8 h expiry, lockout after 5 failures). No second factor, identity provider or durable sessions; see `docs/IMPROVEMENT_PLAN.md`.
 - **The lab scores variants of the scenario types the thresholds were designed around.** A 98 of 98 pass rate shows
   consistency inside those regimes, not accuracy on unseen traffic. Labels are our reading of the policy and one was
   widened after the first run (see `docs/PROJECT_LOG.md`). The 12 boundary cases (just below and just at each policy line) are the exception: they probe the thresholds themselves, and all passed.
-- **The dashboard is one static page** with a pasted token: no login screen, no live updates (the pipeline replays from the audit log, it is not streamed).
+- **The dashboard is one static page** with a simple login form and no live updates (the pipeline replays from the audit log, it is not streamed).
 - **State is in memory.** Restarting forgets cases, approvals and the audit log (the audit log can persist to JSONL;
   the API does not use it yet).
 - **Gemini's free tier ran out of quota during testing**, so failover to it is only partly proven. Groq carried the

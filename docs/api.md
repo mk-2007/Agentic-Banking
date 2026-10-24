@@ -69,7 +69,7 @@ Live feed tab shows each decision and links to the case.
 
 ## Sign-in
 
-Bearer tokens map to a user id and a role; a customer token may also name the bank customer it belongs to (`token:user_id:customer:cust_010`). Without that link the customer can chat but not use the app.
+Browsers sign in with `POST /auth/login` (username and password, HttpOnly session cookie); scripts use bearer tokens. A bearer token maps to a user id and a role; a customer token may also name the bank customer it belongs to (`token:user_id:customer:cust_010`). Without that link the customer can chat but not use the app.
 
 Bearer tokens map to a user id and a role. Provide them as `NEXA_API_TOKENS="token:user_id:role,..."` (roles:
 `fraud_analyst`, `risk_officer`, `compliance_officer`, `auditor`, `customer`), or use `--demo` for random ones. Tokens are
